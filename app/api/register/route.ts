@@ -88,6 +88,11 @@ export async function POST(request: Request) {
  * Los códigos de Prisma en https://www.prisma.io/docs/orm/reference/error-reference
  */
 function describeError(error: unknown): [Record<string, unknown>, { status: number }] {
+  // SIEMPRE se registra el error completo. La versión anterior solo lo hacía
+  // en la rama final, así que los casos que clasificaba mal desaparecían sin
+  // dejar rastro y no había forma de saber qué había pasado en realidad.
+  console.error('[register] fallo:', error)
+
   const code =
     typeof error === 'object' && error !== null && 'code' in error
       ? String((error as { code: unknown }).code)
@@ -98,24 +103,34 @@ function describeError(error: unknown): [Record<string, unknown>, { status: numb
     return [{ error: 'validation', fields: { email: 'emailTaken' } }, { status: 409 }]
   }
 
-  // La base no responde o no existe.
-  if (code === 'P1001' || code === 'P1002' || code === 'P1017') {
-    return [{ error: 'databaseUnreachable' }, { status: 503 }]
-  }
-
   // Falta la tabla: migraciones sin aplicar.
   if (code === 'P2021' || code === 'P2022') {
     return [{ error: 'databaseNotMigrated' }, { status: 503 }]
   }
 
-  // Sin DATABASE_URL, Prisma falla al inicializarse.
-  const message = error instanceof Error ? error.message : ''
-  if (/DATABASE_URL|datasource|Environment variable not found/i.test(message)) {
+  // La base no responde.
+  if (code === 'P1001' || code === 'P1002' || code === 'P1017') {
+    return [{ error: 'databaseUnreachable' }, { status: 503 }]
+  }
+
+  /*
+   * Falta de configuración: se decide por el ENTORNO, no por el texto del
+   * error. Antes esto era una expresión regular sobre el mensaje que
+   * capturaba «datasource» —una palabra que aparece en muchísimos errores
+   * de Prisma— y mandaba al usuario a ejecutar un comando que no arreglaba
+   * su problema real.
+   */
+  if (!process.env.DATABASE_URL) {
     return [{ error: 'databaseNotConfigured' }, { status: 503 }]
   }
 
-  // Cualquier otra cosa: se registra en el servidor con el detalle real,
-  // y al cliente solo va el código. El detalle no se filtra al navegador.
-  console.error('[register] error inesperado:', error)
+  // El cliente no está generado: `prisma generate` no llegó a ejecutarse.
+  const message = error instanceof Error ? error.message : ''
+  if (/did not initialize yet|@prisma\/client.*generate/i.test(message)) {
+    return [{ error: 'prismaClientMissing' }, { status: 503 }]
+  }
+
+  // Cualquier otra cosa. El detalle ya quedó en el log del servidor; al
+  // navegador solo va el código, nunca el mensaje interno.
   return [{ error: 'serverError' }, { status: 500 }]
 }
