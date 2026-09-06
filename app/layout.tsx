@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'raíces. | Descubre El Salvador a tu manera',
+  title: 'Experience El Salvador. | Descubre El Salvador a tu manera',
   description: 'Encuentra experiencias locales, tours y destinos inolvidables en El Salvador.',
   generator: 'v0.app',
 }
