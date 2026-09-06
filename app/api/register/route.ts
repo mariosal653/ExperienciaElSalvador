@@ -12,6 +12,14 @@ import { grantWelcomeBenefit } from '@/lib/benefits'
  *
  * El usuario y su beneficio de bienvenida se crean en la MISMA
  * transacción: no puede existir una cuenta sin beneficio ni al revés.
+ *
+ * RESPUESTAS
+ *   201 { ok: true, user }
+ *   400 { ok: false, code: 'validationError', fields }
+ *   409 { ok: false, code: 'emailTaken' }
+ *   503 { ok: false, code: 'databaseNotConfigured' | 'databaseNotMigrated'
+ *                        | 'databaseUnreachable' | 'prismaClientMissing' }
+ *   500 { ok: false, code: 'internalError' }
  */
 
 const schema = z.object({
@@ -25,41 +33,70 @@ const schema = z.object({
     .regex(/[0-9]/, 'passwordNeedsNumber'),
 })
 
+const DEV = process.env.NODE_ENV !== 'production'
+
+/**
+ * Traza paso a paso del registro.
+ *
+ * Nunca imprime contraseña, hash, tokens ni la URL de conexión completa:
+ * solo el motor (`file`, `postgresql`…), que es lo único que hace falta
+ * para diagnosticar.
+ */
+function trace(step: string, detail?: Record<string, unknown>) {
+  if (!DEV) return
+  const base = {
+    endpoint: 'POST /api/register',
+    databaseUrlDefinida: Boolean(process.env.DATABASE_URL),
+    motor: process.env.DATABASE_URL?.split(':')[0] ?? null,
+  }
+  console.log(`[register] ${step}`, { ...base, ...(detail ?? {}) })
+}
+
+function fail(code: string, status: number, extra?: Record<string, unknown>) {
+  return NextResponse.json({ ok: false, code, ...(extra ?? {}) }, { status })
+}
+
 export async function POST(request: Request) {
+  trace('inicio')
+
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: 'invalidBody' }, { status: 400 })
+    trace('cuerpo ilegible')
+    return fail('invalidBody', 400)
   }
 
   const parsed = schema.safeParse(body)
   if (!parsed.success) {
-    const fieldErrors: Record<string, string> = {}
+    const fields: Record<string, string> = {}
     for (const issue of parsed.error.issues) {
       const key = String(issue.path[0] ?? 'form')
-      if (!fieldErrors[key]) fieldErrors[key] = issue.message
+      if (!fields[key]) fields[key] = issue.message
     }
-    return NextResponse.json({ error: 'validation', fields: fieldErrors }, { status: 422 })
+    trace('validacion fallida', { campos: Object.keys(fields) })
+    return fail('validationError', 400, { fields })
   }
 
   const { name, email, password } = parsed.data
+  trace('datos validados', { email })
 
+  // El hash se calcula antes de tocar la base: es la operación más lenta
+  // y no tiene sentido mantener abierta una transacción mientras corre.
   const passwordHash = await bcrypt.hash(password, 12)
+  trace('contrasena cifrada')
 
   try {
-    // La comprobación de duplicado va DENTRO del try: si la base no está
-    // disponible o le faltan las tablas, esta consulta es la primera que
-    // falla, y antes quedaba fuera del manejo de errores. Ese era el
-    // origen del «Algo falló de nuestro lado».
+    // La comprobación de duplicado va DENTRO del try: si la base falla,
+    // esta es la primera consulta que revienta.
     const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } })
+    trace('busqueda de usuario existente', { encontrado: Boolean(existing) })
+
     if (existing) {
-      return NextResponse.json(
-        { error: 'validation', fields: { email: 'emailTaken' } },
-        { status: 409 },
-      )
+      return fail('emailTaken', 409, { fields: { email: 'emailTaken' } })
     }
 
+    trace('creando usuario y beneficio')
     const user = await prisma.$transaction(async (tx) => {
       const created = await tx.user.create({
         data: { name, email, passwordHash },
@@ -72,65 +109,64 @@ export async function POST(request: Request) {
       return created
     })
 
+    trace('usuario creado', { userId: user.id })
     return NextResponse.json({ ok: true, user }, { status: 201 })
   } catch (error) {
-    return NextResponse.json(...describeError(error))
+    return handleError(error)
   }
 }
 
 /**
- * Traduce el fallo a un código útil.
+ * Clasifica el fallo.
  *
- * Antes cualquier problema devolvía `serverError`, que en pantalla se
- * convertía siempre en «Algo falló de nuestro lado» — el mensaje que no
- * dice nada ni al usuario ni a quien tiene que arreglarlo.
- *
- * Los códigos de Prisma en https://www.prisma.io/docs/orm/reference/error-reference
+ * El error completo se registra SIEMPRE. Una versión anterior clasificaba
+ * por el texto del mensaje con una expresión regular que capturaba
+ * «datasource» —palabra presente en muchísimos errores de Prisma— y
+ * mandaba al usuario a ejecutar un comando que no arreglaba nada.
  */
-function describeError(error: unknown): [Record<string, unknown>, { status: number }] {
-  // SIEMPRE se registra el error completo. La versión anterior solo lo hacía
-  // en la rama final, así que los casos que clasificaba mal desaparecían sin
-  // dejar rastro y no había forma de saber qué había pasado en realidad.
-  console.error('[register] fallo:', error)
-
+function handleError(error: unknown): NextResponse {
+  const name = error instanceof Error ? error.constructor.name : typeof error
+  const message = error instanceof Error ? error.message : String(error)
   const code =
     typeof error === 'object' && error !== null && 'code' in error
       ? String((error as { code: unknown }).code)
       : ''
 
+  console.error('[register] fallo:', {
+    clase: name,
+    codigoPrisma: code || null,
+    mensaje: message.split('\n')[0],
+    databaseUrlDefinida: Boolean(process.env.DATABASE_URL),
+    motor: process.env.DATABASE_URL?.split(':')[0] ?? null,
+  })
+  if (DEV && error instanceof Error) console.error(error.stack)
+
   // Carrera entre dos altas con el mismo correo: el índice único gana.
   if (code === 'P2002') {
-    return [{ error: 'validation', fields: { email: 'emailTaken' } }, { status: 409 }]
+    return fail('emailTaken', 409, { fields: { email: 'emailTaken' } })
   }
 
-  // Falta la tabla: migraciones sin aplicar.
+  // Falta la tabla o la columna: migraciones sin aplicar.
   if (code === 'P2021' || code === 'P2022') {
-    return [{ error: 'databaseNotMigrated' }, { status: 503 }]
+    return fail('databaseNotMigrated', 503)
   }
 
   // La base no responde.
   if (code === 'P1001' || code === 'P1002' || code === 'P1017') {
-    return [{ error: 'databaseUnreachable' }, { status: 503 }]
+    return fail('databaseUnreachable', 503)
   }
 
-  /*
-   * Falta de configuración: se decide por el ENTORNO, no por el texto del
-   * error. Antes esto era una expresión regular sobre el mensaje que
-   * capturaba «datasource» —una palabra que aparece en muchísimos errores
-   * de Prisma— y mandaba al usuario a ejecutar un comando que no arreglaba
-   * su problema real.
-   */
+  // Configuración ausente: se decide por el ENTORNO, no por el texto.
   if (!process.env.DATABASE_URL) {
-    return [{ error: 'databaseNotConfigured' }, { status: 503 }]
+    return fail('databaseNotConfigured', 503)
   }
 
-  // El cliente no está generado: `prisma generate` no llegó a ejecutarse.
-  const message = error instanceof Error ? error.message : ''
+  // El cliente no está generado.
   if (/did not initialize yet|@prisma\/client.*generate/i.test(message)) {
-    return [{ error: 'prismaClientMissing' }, { status: 503 }]
+    return fail('prismaClientMissing', 503)
   }
 
   // Cualquier otra cosa. El detalle ya quedó en el log del servidor; al
   // navegador solo va el código, nunca el mensaje interno.
-  return [{ error: 'serverError' }, { status: 500 }]
+  return fail('internalError', 500)
 }

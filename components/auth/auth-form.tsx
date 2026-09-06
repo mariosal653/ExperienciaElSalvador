@@ -39,9 +39,9 @@ const COPY = {
       databaseNotMigrated: 'Faltan las tablas de la base de datos. Ejecuta: pnpm bootstrap',
       network: 'No hay conexión con el servidor. Revisa tu red e intenta de nuevo.',
       invalidBody: 'No pudimos leer los datos enviados. Recarga la página.',
-      validation: 'Revisa los campos marcados.',
+      validationError: 'Revisa los campos marcados.',
       createdButNotSignedIn: 'Tu cuenta se creó correctamente, pero no pudimos iniciar sesión automáticamente. Entra desde la pantalla de inicio de sesión.',
-      serverError: 'Error inesperado del servidor. Vuelve a intentarlo en un momento.',
+      internalError: 'Error inesperado del servidor. Vuelve a intentarlo en un momento.',
     } as Record<string, string>,
     hint: 'Mínimo 8 caracteres, con letras y números.',
   },
@@ -74,9 +74,9 @@ const COPY = {
       databaseNotMigrated: 'Database tables are missing. Run: pnpm bootstrap',
       network: 'No connection to the server. Check your network and try again.',
       invalidBody: 'We could not read the submitted data. Reload the page.',
-      validation: 'Check the highlighted fields.',
+      validationError: 'Check the highlighted fields.',
       createdButNotSignedIn: 'Your account was created, but we could not sign you in automatically. Please use the sign-in screen.',
-      serverError: 'Unexpected server error. Please try again shortly.',
+      internalError: 'Unexpected server error. Please try again shortly.',
     } as Record<string, string>,
     hint: 'At least 8 characters, with letters and numbers.',
   },
@@ -122,17 +122,12 @@ export function AuthForm({ mode, socialProviders }: { mode: Mode; socialProvider
         return
       }
 
-      const payload = await response.json().catch(() => ({ error: 'serverError' }))
+      const payload = await response.json().catch(() => ({ code: 'internalError' }))
 
       if (!response.ok) {
-        if (payload.fields) {
-          setFields(payload.fields)
-          // Los errores de campo se pintan bajo cada campo; el resumen
-          // ayuda a quien usa lector de pantalla.
-          setFormError(t.errors.validation)
-        } else {
-          setFormError(t.errors[payload.error] ?? t.errors.serverError)
-        }
+        // El endpoint devuelve { ok:false, code, fields? }.
+        if (payload.fields) setFields(payload.fields)
+        setFormError(t.errors[payload.code] ?? t.errors.internalError)
         setLoading(false)
         return
       }
