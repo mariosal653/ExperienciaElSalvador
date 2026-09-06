@@ -17,3 +17,11 @@ node_modules
 # TypeScript / build
 *.tsbuildinfo
 next-env.d.ts
+
+# Local env
+.env.local
+
+# Generados por Next 16 en cada build (agentRules).
+# Quitalos de aqui si prefieres versionarlos.
+AGENTS.md
+CLAUDE.md

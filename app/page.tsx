@@ -18,6 +18,8 @@ import {
 } from 'lucide-react'
 import { SearchPanel } from '@/components/search/search-panel'
 import { useWhatsAppLead } from '@/components/whatsapp/whatsapp-provider'
+import { useLanguage } from '@/components/i18n/language-provider'
+import { ReviewsSection } from '@/components/reviews/reviews-section'
 import {
   categories,
   emptyCriteria,
@@ -48,9 +50,38 @@ function formatDate(iso: string, lang: Locale): string {
   return `${date.getDate()} ${MONTHS_SHORT[lang][date.getMonth()]}`
 }
 
+/**
+ * Selector de idioma. Un conmutador con las dos opciones a la vista es más
+ * claro que un botón que solo muestra el idioma actual: se ve de un vistazo
+ * qué idiomas hay y cuál está activo.
+ */
+function LanguageSwitch({ lang, onChange }: { lang: Locale; onChange: (lang: Locale) => void }) {
+  return (
+    <div
+      role="group"
+      aria-label={lang === 'ES' ? 'Idioma' : 'Language'}
+      className="flex items-center rounded-full border border-white/40 bg-white/10 p-0.5 backdrop-blur-sm"
+    >
+      {(['EN', 'ES'] as const).map((option) => (
+        <button
+          key={option}
+          type="button"
+          onClick={() => onChange(option)}
+          aria-pressed={lang === option}
+          className={`rounded-full px-3 py-1 text-xs font-bold transition ${
+            lang === option ? 'bg-white text-[#173f45]' : 'text-white/80 hover:text-white'
+          }`}
+        >
+          {option}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 export default function Page() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [language, setLanguage] = useState<Locale>('ES')
+  const { lang: language, setLang } = useLanguage()
   const [activeCategory, setActiveCategory] = useState<CategoryId | null>(null)
   const [favorites, setFavorites] = useState<string[]>([])
 
@@ -101,18 +132,32 @@ export default function Page() {
             <span className="grid h-9 w-9 place-items-center rounded-full bg-[#f4b942] text-[#173f45]"><Compass size={21} strokeWidth={2.5} /></span>
             <span className="text-lg font-bold tracking-tight">Experience <span className="text-[#f4b942]">El Salvador</span></span>
           </a>
-          <nav className="hidden items-center gap-8 text-sm font-medium md:flex" aria-label="Navegación principal">
+          <nav className="hidden items-center gap-8 text-sm font-medium md:flex" aria-label={es ? 'Navegación principal' : 'Main navigation'}>
             <a href="#experiencias" className="transition hover:text-[#f4b942]">{es ? 'Explorar' : 'Explore'}</a>
             <a href="#destinos" className="transition hover:text-[#f4b942]">{es ? 'Destinos' : 'Destinations'}</a>
+            <a href="#opiniones" className="transition hover:text-[#f4b942]">{es ? 'Opiniones' : 'Reviews'}</a>
             <a href="#como-funciona" className="transition hover:text-[#f4b942]">{es ? 'Cómo funciona' : 'How it works'}</a>
           </nav>
           <div className="hidden items-center gap-4 md:flex">
-            <button onClick={() => setLanguage(es ? 'EN' : 'ES')} className="flex items-center gap-1 text-sm font-semibold" aria-label="Cambiar idioma">{language}<ChevronDown size={15} /></button>
+            <LanguageSwitch lang={language} onChange={setLang} />
             <button className="rounded-full border border-white/60 px-4 py-2 text-sm font-semibold transition hover:bg-white hover:text-[#173f45]">{es ? 'Iniciar sesión' : 'Sign in'}</button>
           </div>
-          <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}>{menuOpen ? <X /> : <Menu />}</button>
+          <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? (es ? 'Cerrar menú' : 'Close menu') : (es ? 'Abrir menú' : 'Open menu')}>{menuOpen ? <X /> : <Menu />}</button>
         </div>
-        {menuOpen && <div className="border-t border-white/20 bg-[#173f45] px-5 pb-5 pt-3 md:hidden"><nav className="flex flex-col gap-4 text-sm"><a href="#experiencias" onClick={() => setMenuOpen(false)}>{es ? 'Explorar' : 'Explore'}</a><a href="#destinos" onClick={() => setMenuOpen(false)}>{es ? 'Destinos' : 'Destinations'}</a><a href="#como-funciona" onClick={() => setMenuOpen(false)}>{es ? 'Cómo funciona' : 'How it works'}</a></nav></div>}
+        {menuOpen && (
+          <div className="border-t border-white/20 bg-[#173f45] px-5 pb-5 pt-3 md:hidden">
+            <nav className="flex flex-col gap-4 text-sm">
+              <a href="#experiencias" onClick={() => setMenuOpen(false)}>{es ? 'Explorar' : 'Explore'}</a>
+              <a href="#destinos" onClick={() => setMenuOpen(false)}>{es ? 'Destinos' : 'Destinations'}</a>
+              <a href="#opiniones" onClick={() => setMenuOpen(false)}>{es ? 'Opiniones' : 'Reviews'}</a>
+              <a href="#como-funciona" onClick={() => setMenuOpen(false)}>{es ? 'Cómo funciona' : 'How it works'}</a>
+            </nav>
+            {/* El selector de idioma también en móvil: antes solo existía en escritorio. */}
+            <div className="mt-4 border-t border-white/20 pt-4">
+              <LanguageSwitch lang={language} onChange={setLang} />
+            </div>
+          </div>
+        )}
       </header>
 
       {/*
@@ -122,7 +167,7 @@ export default function Page() {
       */}
       <section id="inicio" className="relative flex min-h-[620px] items-center bg-[#174b51] pt-24">
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,43,48,.86)_0%,rgba(10,43,48,.55)_45%,rgba(10,43,48,.15)_100%)]" />
-        <img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1800&q=90" alt="Playa tropical de El Salvador al atardecer" className="absolute inset-0 h-full w-full object-cover" />
+        <img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1800&q=90" alt={es ? 'Playa tropical de El Salvador al atardecer' : 'Tropical beach in El Salvador at sunset'} className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(12,55,61,.35),rgba(12,55,61,.1)_45%,rgba(251,250,247,.9)_100%)]" />
         {/*
           Capa 30. Este div crea el contexto de apilamiento donde viven los
@@ -267,9 +312,11 @@ export default function Page() {
         )}
       </section>
 
+      <ReviewsSection />
+
       <section id="como-funciona" className="bg-[#eaf1ed] py-20"><div className="mx-auto max-w-7xl px-5 lg:px-8"><div className="grid items-center gap-12 lg:grid-cols-[.9fr_1.1fr]"><div><p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-[#b8481c]">{es ? 'Viajar es fácil' : 'Travel made easy'}</p><h2 className="max-w-md text-3xl font-semibold tracking-tight md:text-4xl">{es ? <>Lo local se vive <em className="font-serif font-normal">mejor.</em></> : <>Local is simply <em className="font-serif font-normal">better.</em></>}</h2><p className="mt-5 max-w-md leading-relaxed text-[#547176]">{es ? 'Conectamos tus ganas de explorar con quienes conocen cada rincón de El Salvador. Tú eliges el plan, nosotros cuidamos los detalles.' : 'We connect your urge to explore with the people who know every corner of El Salvador. You pick the plan, we handle the details.'}</p><button className="mt-7 flex items-center gap-2 rounded-full bg-[#173f45] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#0e3035]">{es ? 'Conoce cómo funciona' : 'See how it works'} <ArrowRight size={17} /></button></div><div className="grid gap-4 sm:grid-cols-3">{(es ? [['01','Elige','Encuentra el destino o experiencia que te mueve.'],['02','Reserva','Confirma en pocos pasos y recibe todo al instante.'],['03','Disfruta','Vive el momento con anfitriones locales.']] : [['01','Choose','Find the destination or experience that moves you.'],['02','Book','Confirm in a few steps and get everything instantly.'],['03','Enjoy','Live the moment with local hosts.']]).map(([number, title, description]) => <div key={number} className="rounded-2xl bg-white p-5"><span className="text-4xl font-light text-[#f0b649]">{number}</span><h3 className="mt-8 font-semibold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-[#6a8588]">{description}</p><Check className="mt-5 text-[#b8481c]" size={19} /></div>)}</div></div></div></section>
 
-      <section id="destinos" className="mx-auto max-w-7xl px-5 py-20 lg:px-8"><div className="rounded-[2rem] bg-[#173f45] p-7 text-white md:p-12"><div className="flex flex-col justify-between gap-8 md:flex-row md:items-end"><div><p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-[#f4d27c]">{es ? 'Tu próxima historia' : 'Your next story'}</p><h2 className="max-w-xl text-3xl font-semibold tracking-tight md:text-5xl">{es ? <>Hay mucho más por <em className="font-serif font-normal text-[#f4c45e]">descubrir.</em></> : <>There is much more to <em className="font-serif font-normal text-[#f4c45e]">discover.</em></>}</h2></div><a href="#experiencias" className="flex shrink-0 items-center gap-2 rounded-full bg-[#b8481c] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#963b18]">{es ? 'Explorar destinos' : 'Explore destinations'} <ArrowRight size={17} /></a></div><div className="mt-10 grid gap-3 sm:grid-cols-3"><div className="relative h-48 overflow-hidden rounded-2xl sm:col-span-2"><img src="https://images.unsplash.com/photo-1530789253388-582c481c54b0?auto=format&fit=crop&w=1000&q=85" alt="Paisaje montañoso de El Salvador" className="h-full w-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" /><span className="absolute bottom-4 left-4 font-semibold">Ruta de las Flores</span></div><div className="relative h-48 overflow-hidden rounded-2xl"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=700&q=85" alt="Paisaje natural salvadoreño" className="h-full w-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" /><span className="absolute bottom-4 left-4 font-semibold">Suchitoto</span></div></div></div></section>
+      <section id="destinos" className="mx-auto max-w-7xl px-5 py-20 lg:px-8"><div className="rounded-[2rem] bg-[#173f45] p-7 text-white md:p-12"><div className="flex flex-col justify-between gap-8 md:flex-row md:items-end"><div><p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-[#f4d27c]">{es ? 'Tu próxima historia' : 'Your next story'}</p><h2 className="max-w-xl text-3xl font-semibold tracking-tight md:text-5xl">{es ? <>Hay mucho más por <em className="font-serif font-normal text-[#f4c45e]">descubrir.</em></> : <>There is much more to <em className="font-serif font-normal text-[#f4c45e]">discover.</em></>}</h2></div><a href="#experiencias" className="flex shrink-0 items-center gap-2 rounded-full bg-[#b8481c] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#963b18]">{es ? 'Explorar destinos' : 'Explore destinations'} <ArrowRight size={17} /></a></div><div className="mt-10 grid gap-3 sm:grid-cols-3"><div className="relative h-48 overflow-hidden rounded-2xl sm:col-span-2"><img src="https://images.unsplash.com/photo-1530789253388-582c481c54b0?auto=format&fit=crop&w=1000&q=85" alt={es ? 'Paisaje montañoso de El Salvador' : 'Mountain landscape in El Salvador'} className="h-full w-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" /><span className="absolute bottom-4 left-4 font-semibold">Ruta de las Flores</span></div><div className="relative h-48 overflow-hidden rounded-2xl"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=700&q=85" alt={es ? 'Paisaje natural salvadoreño' : 'Salvadoran natural landscape'} className="h-full w-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" /><span className="absolute bottom-4 left-4 font-semibold">Suchitoto</span></div></div></div></section>
 
       <footer className="border-t border-[#dce7e1] px-5 py-8 text-sm text-[#6a8588]"><div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 sm:flex-row"><span className="font-bold text-[#173f45]">Experience <span className="text-[#b8481c]">El Salvador</span></span><span>{es ? 'Hecho con cariño desde El Salvador · © 2026' : 'Made with care in El Salvador · © 2026'}</span><span>{es ? 'Español · Términos · Privacidad' : 'English · Terms · Privacy'}</span></div></footer>
     </main>
