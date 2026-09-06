@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img" aria-label="Cultura de El Salvador">
+  <defs>
+    <linearGradient id="c" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a5560"/>
+      <stop offset=".55" stop-color="#b8481c"/>
+      <stop offset="1" stop-color="#f0b649"/>
+    </linearGradient>
+    <radialGradient id="g" cx="72%" cy="24%" r="62%">
+      <stop offset="0" stop-color="#f4d27c" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#f4d27c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#c)"/>
+  <rect width="800" height="600" fill="url(#g)"/>
+  <g fill="none" stroke="#fbfaf7" stroke-opacity=".22" stroke-width="2">
+    <path d="M0 470 Q120 430 240 468 T480 466 T720 462 T800 470"/>
+    <path d="M0 508 Q140 470 280 506 T560 504 T800 508"/>
+    <path d="M0 546 Q160 512 320 544 T640 542 T800 546"/>
+  </g>
+  <g fill="#fbfaf7" fill-opacity=".16">
+    <circle cx="404" cy="196" r="52"/>
+    <rect x="396" y="248" width="16" height="150" rx="8"/>
+    <rect x="330" y="392" width="148" height="26" rx="10"/>
+  </g>
+</svg>
