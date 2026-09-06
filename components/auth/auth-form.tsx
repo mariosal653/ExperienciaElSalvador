@@ -31,9 +31,16 @@ const COPY = {
       passwordTooShort: 'Usa al menos 8 caracteres.',
       passwordNeedsLetter: 'Incluye al menos una letra.',
       passwordNeedsNumber: 'Incluye al menos un número.',
-      emailTaken: 'Ya existe una cuenta con ese correo.',
+      emailTaken: 'Ya existe una cuenta con ese correo. ¿Quieres iniciar sesión?',
       credentials: 'Correo o contraseña incorrectos.',
-      serverError: 'Algo falló de nuestro lado. Intenta de nuevo.',
+      databaseNotConfigured: 'La base de datos no está configurada. Falta DATABASE_URL en el archivo .env.local.',
+      databaseUnreachable: 'No se pudo conectar con la base de datos. Verifica que esté disponible.',
+      databaseNotMigrated: 'Faltan las tablas de la base de datos. Ejecuta: pnpm db:setup',
+      network: 'No hay conexión con el servidor. Revisa tu red e intenta de nuevo.',
+      invalidBody: 'No pudimos leer los datos enviados. Recarga la página.',
+      validation: 'Revisa los campos marcados.',
+      createdButNotSignedIn: 'Tu cuenta se creó correctamente, pero no pudimos iniciar sesión automáticamente. Entra desde la pantalla de inicio de sesión.',
+      serverError: 'Error inesperado del servidor. Vuelve a intentarlo en un momento.',
     } as Record<string, string>,
     hint: 'Mínimo 8 caracteres, con letras y números.',
   },
@@ -58,9 +65,16 @@ const COPY = {
       passwordTooShort: 'Use at least 8 characters.',
       passwordNeedsLetter: 'Include at least one letter.',
       passwordNeedsNumber: 'Include at least one number.',
-      emailTaken: 'An account with that email already exists.',
+      emailTaken: 'An account with that email already exists. Want to sign in?',
       credentials: 'Wrong email or password.',
-      serverError: 'Something failed on our side. Try again.',
+      databaseNotConfigured: 'The database is not configured. DATABASE_URL is missing from .env.local.',
+      databaseUnreachable: 'Could not reach the database. Check that it is running.',
+      databaseNotMigrated: 'Database tables are missing. Run: pnpm db:setup',
+      network: 'No connection to the server. Check your network and try again.',
+      invalidBody: 'We could not read the submitted data. Reload the page.',
+      validation: 'Check the highlighted fields.',
+      createdButNotSignedIn: 'Your account was created, but we could not sign you in automatically. Please use the sign-in screen.',
+      serverError: 'Unexpected server error. Please try again shortly.',
     } as Record<string, string>,
     hint: 'At least 8 characters, with letters and numbers.',
   },
@@ -89,38 +103,61 @@ export function AuthForm({ mode, socialProviders }: { mode: Mode; socialProvider
     const password = String(data.get('password') ?? '')
     const name = String(data.get('name') ?? '')
 
-    try {
-      if (mode === 'register') {
-        const response = await fetch('/api/register', {
+    // Distingue "no llegué al servidor" de "el servidor respondió mal".
+    let created = false
+
+    if (mode === 'register') {
+      let response: Response
+      try {
+        response = await fetch('/api/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, password }),
         })
-        const payload = await response.json()
-
-        if (!response.ok) {
-          if (payload.fields) setFields(payload.fields)
-          else setFormError(t.errors[payload.error] ?? t.errors.serverError)
-          setLoading(false)
-          return
-        }
-      }
-
-      // Tras registrarse se inicia sesion automaticamente.
-      const result = await signIn('credentials', { email, password, redirect: false })
-
-      if (result?.error) {
-        setFormError(t.errors.credentials)
+      } catch {
+        setFormError(t.errors.network)
         setLoading(false)
         return
       }
 
-      router.push(next)
-      router.refresh()
-    } catch {
-      setFormError(t.errors.serverError)
-      setLoading(false)
+      const payload = await response.json().catch(() => ({ error: 'serverError' }))
+
+      if (!response.ok) {
+        if (payload.fields) {
+          setFields(payload.fields)
+          // Los errores de campo se pintan bajo cada campo; el resumen
+          // ayuda a quien usa lector de pantalla.
+          setFormError(t.errors.validation)
+        } else {
+          setFormError(t.errors[payload.error] ?? t.errors.serverError)
+        }
+        setLoading(false)
+        return
+      }
+
+      created = true
     }
+
+    // Tras registrarse se inicia sesión automáticamente.
+    let result
+    try {
+      result = await signIn('credentials', { email, password, redirect: false })
+    } catch {
+      // La cuenta SÍ se creó: decirlo, en vez de dar un error que sugiere
+      // que hay que volver a registrarse.
+      setFormError(created ? t.errors.createdButNotSignedIn : t.errors.network)
+      setLoading(false)
+      return
+    }
+
+    if (result?.error) {
+      setFormError(created ? t.errors.createdButNotSignedIn : t.errors.credentials)
+      setLoading(false)
+      return
+    }
+
+    router.push(next)
+    router.refresh()
   }
 
   const title = mode === 'login' ? t.loginTitle : t.registerTitle

@@ -34,3 +34,6 @@ prisma/test.db*
 
 # Secretos locales — NUNCA al repositorio
 .env
+
+# Bases sueltas de pruebas
+no-existe-*.db

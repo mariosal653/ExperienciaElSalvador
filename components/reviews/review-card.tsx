@@ -1,9 +1,10 @@
 'use client'
 
-import { Star } from 'lucide-react'
+import { Star, MapPin, BadgeCheck } from 'lucide-react'
 import { SourceIcon, SOURCE_LABEL } from './platform-icons'
 import type { Review } from '@/lib/reviews/types'
 import type { Locale } from '@/lib/data'
+import { avatarColorFor } from '@/lib/reviews/seed-data'
 
 function initials(name: string): string {
   return name
@@ -38,9 +39,13 @@ export function ReviewCard({ review, lang }: { review: Review; lang: Locale }) {
             className="h-11 w-11 shrink-0 rounded-full object-cover"
           />
         ) : (
+          // Avatar generado localmente: iniciales sobre un color estable
+          // derivado del nombre. Sin red, sin servicios de terceros y sin
+          // fotos de personas que no dieron su consentimiento.
           <span
             aria-hidden="true"
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#eaf1ed] text-sm font-bold text-[#173f45]"
+            style={{ backgroundColor: avatarColorFor(review.authorName) }}
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-sm font-bold text-white"
           >
             {initials(review.authorName)}
           </span>
@@ -77,7 +82,21 @@ export function ReviewCard({ review, lang }: { review: Review; lang: Locale }) {
         </div>
       )}
 
-      <p className="mt-3 line-clamp-6 text-sm leading-relaxed text-[#547176]">{review.text}</p>
+      {review.experienceTitle && (
+        <p className="mt-3 flex items-start gap-1.5 text-xs font-semibold text-[#173f45]">
+          <MapPin size={13} className="mt-0.5 shrink-0 text-[#b8481c]" aria-hidden="true" />
+          <span>{review.experienceTitle}</span>
+        </p>
+      )}
+
+      <p className="mt-2.5 line-clamp-6 text-sm leading-relaxed text-[#547176]">{review.text}</p>
+
+      {review.verified && (
+        <p className="mt-3 flex items-center gap-1.5 text-[11px] font-bold text-[#2f7d63]">
+          <BadgeCheck size={13} aria-hidden="true" />
+          {lang === 'ES' ? 'Opinión verificada' : 'Verified review'}
+        </p>
+      )}
 
       {review.permalink && (
         <a
