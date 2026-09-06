@@ -4,74 +4,119 @@
  *
  * Existe porque .env y la base SQLite estan (correctamente) en .gitignore:
  * sin este paso, quien clone el repositorio se encuentra la aplicacion sin
- * base de datos, y tanto el registro como las opiniones fallan con un error
- * generico. Este script convierte eso en un solo comando.
+ * base de datos, y tanto el registro como las opiniones fallan.
  *
- *   1. Crea .env.local desde .env.example si no existe.
- *   2. Genera un AUTH_SECRET real si esta vacio.
- *   3. Aplica las migraciones.
- *   4. Carga las opiniones de arranque (idempotente).
+ * Se ejecuta solo en cada `pnpm dev` gracias al hook `predev`, asi que ese
+ * escenario ya no puede darse. Es IDEMPOTENTE y, con todo en su sitio,
+ * termina rapido sin imprimir nada (--quiet).
+ *
+ *   1. Crea .env desde .env.example si no existe.
+ *   2. Genera un AUTH_SECRET real si falta.
+ *   3. Asegura DATABASE_URL.
+ *   4. Aplica migraciones (migrate deploy no hace nada si ya estan).
+ *   5. Carga las opiniones de arranque.
  */
 import { existsSync, readFileSync, writeFileSync, copyFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
 
+const QUIET = process.argv.includes('--quiet')
 const ENV_FILE = '.env'
 const EXAMPLE = '.env.example'
 
-function log(step, message) {
-  console.log(`  ${step}  ${message}`)
+/** Solo en modo normal: detalle para quien ejecuta el script a mano. */
+const log = (message) => {
+  if (!QUIET) console.log(message)
 }
+/** Siempre: cambios reales que el desarrollador debe ver. */
+const always = (message) => console.log(message)
 
-console.log('\nPreparando Experience El Salvador\n')
+let didSomething = false
 
-// 1 y 2 — archivo de entorno
+log('\nPreparando Experience El Salvador\n')
+
+// --- 1. Archivo de entorno -------------------------------------------
 if (!existsSync(ENV_FILE)) {
   if (!existsSync(EXAMPLE)) {
-    console.error('  No existe .env.example. No se puede continuar.')
+    console.error(`\n  Falta ${EXAMPLE}. No se puede preparar el entorno.\n`)
     process.exit(1)
   }
   copyFileSync(EXAMPLE, ENV_FILE)
-  log('1.', `${ENV_FILE} creado desde ${EXAMPLE}`)
+  always(`  ${ENV_FILE} creado desde ${EXAMPLE}`)
+  didSomething = true
 } else {
-  log('1.', `${ENV_FILE} ya existe, se conserva`)
+  log(`  ${ENV_FILE} ya existe`)
 }
 
 let env = readFileSync(ENV_FILE, 'utf8')
-let changed = false
+let envChanged = false
 
-if (/^AUTH_SECRET=\s*$/m.test(env)) {
-  env = env.replace(/^AUTH_SECRET=\s*$/m, `AUTH_SECRET=${randomBytes(32).toString('base64')}`)
-  changed = true
-  log('2.', 'AUTH_SECRET generado')
-} else {
-  log('2.', 'AUTH_SECRET ya definido')
+// --- 2. AUTH_SECRET ---------------------------------------------------
+if (!/^AUTH_SECRET=.+/m.test(env)) {
+  const secret = randomBytes(32).toString('base64')
+  env = /^AUTH_SECRET=/m.test(env)
+    ? env.replace(/^AUTH_SECRET=.*$/m, `AUTH_SECRET=${secret}`)
+    : `${env}\nAUTH_SECRET=${secret}\n`
+  envChanged = true
+  always('  AUTH_SECRET generado')
 }
 
-if (!/^DATABASE_URL=/m.test(env)) {
+// --- 3. DATABASE_URL --------------------------------------------------
+// Cuenta solo una linea sin comentar y con valor.
+if (!/^DATABASE_URL=\s*\S+/m.test(env)) {
   env += '\nDATABASE_URL="file:./dev.db"\n'
-  changed = true
-  log('  ', 'DATABASE_URL anadido')
+  envChanged = true
+  always('  DATABASE_URL anadido (SQLite local)')
 }
 
-if (changed) writeFileSync(ENV_FILE, env)
+if (envChanged) {
+  writeFileSync(ENV_FILE, env)
+  didSomething = true
+}
 
-// 3 — migraciones
-log('3.', 'Aplicando migraciones...')
+// Los comandos de Prisma necesitan la variable en ESTE proceso: el .env
+// todavia no esta cargado aqui.
+const dbUrl = /^DATABASE_URL=\s*"?([^"\r\n]+)"?/m.exec(env)?.[1]
+const childEnv = { ...process.env, DATABASE_URL: dbUrl ?? process.env.DATABASE_URL }
+
+// --- 4. Migraciones ---------------------------------------------------
 try {
-  execSync('npx prisma migrate deploy', { stdio: 'inherit' })
-} catch {
-  console.error('\n  Fallaron las migraciones. Revisa DATABASE_URL en .env\n')
+  const output = execSync('npx prisma migrate deploy', {
+    env: childEnv,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  }).toString()
+
+  if (/Applying migration/.test(output)) {
+    always('  Migraciones aplicadas')
+    didSomething = true
+  } else {
+    log('  Migraciones ya al dia')
+  }
+} catch (error) {
+  console.error('\n  No se pudieron aplicar las migraciones.')
+  console.error('  Revisa DATABASE_URL en .env\n')
+  console.error(String(error.stdout ?? error.message).slice(0, 500))
   process.exit(1)
 }
 
-// 4 — opiniones de arranque
-log('4.', 'Cargando opiniones de arranque...')
+// --- 5. Opiniones de arranque ----------------------------------------
 try {
-  execSync('node --experimental-strip-types prisma/seed.ts', { stdio: 'inherit' })
-} catch {
-  console.error('\n  Fallo el seed.\n')
-  process.exit(1)
+  const output = execSync('node --experimental-strip-types prisma/seed.ts', {
+    env: childEnv,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  }).toString()
+
+  const real = /Opiniones reales: (\d+)/.exec(output)?.[1]
+  log(`  Opiniones de arranque listas${real ? ` (reales en base: ${real})` : ''}`)
+} catch (error) {
+  // Que falle el seed no impide arrancar: la seccion de opiniones tiene
+  // respaldo en memoria.
+  always('  Aviso: no se cargaron las opiniones de arranque.')
+  if (!QUIET) console.error(String(error.stdout ?? error.message).slice(0, 300))
 }
 
-console.log('\nListo. Arranca con:  pnpm dev\n')
+if (didSomething && QUIET) {
+  always('  Entorno preparado.\n')
+}
+
+log('\nListo. Arranca con:  pnpm dev\n')
