@@ -129,6 +129,9 @@ export function DestinationField({ value, onChange, lang }: Props) {
         )}
       </div>
 
+      {/* El z-30 de este panel es LOCAL: solo compite con sus hermanos.
+          Quien decide que tape a la tira de categorias es la capa 30 del
+          contenido del heroe. Escala completa en app/globals.css. */}
       {open && (
         <div className="absolute left-0 right-0 top-[calc(100%+.5rem)] z-30 max-h-72 overflow-y-auto rounded-2xl border border-[#e5ece9] bg-white p-2 shadow-2xl md:min-w-[19rem]">
           <p className="px-3 pb-1.5 pt-2 text-[11px] font-bold uppercase tracking-wider text-[#759096]">

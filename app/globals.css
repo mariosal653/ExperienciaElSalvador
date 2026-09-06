@@ -24,6 +24,36 @@
   --radius: 0.75rem;
 }
 
+/* ---------------------------------------------------------------------
+   ESCALA DE CAPAS
+   ---------------------------------------------------------------------
+   Un z-index alto no sirve de nada si el elemento vive dentro de un
+   contexto de apilamiento con un z bajo: el hijo nunca puede escapar de
+   su padre. Por eso lo que importa es el z de los CONTENEDORES de nivel
+   de página, no el de los desplegables.
+
+   Contenedores de nivel de página, de arriba abajo:
+
+     40  header                     (app/page.tsx)  fijo sobre el héroe
+     30  contenido del héroe        (app/page.tsx)  contiene el buscador
+     20  tira de categorías         (app/page.tsx)  solapa el héroe con -mt-3
+      –  resto de secciones                         flujo normal
+
+   Los desplegables del buscador (destino y calendario) usan z-30 LOCAL
+   dentro del contenido del héroe. Ese número solo compite con sus
+   hermanos; quien decide si tapan a las categorías es la capa 30 del
+   contenedor.
+
+   CUIDADO: <section id="inicio"> tiene `relative` pero NO lleva z-index, y
+   debe seguir así. Si se le pone uno, pasa a crear su propio contexto de
+   apilamiento y encierra al buscador dentro: la capa 30 dejaría de valer
+   frente a las categorías y los desplegables volverían a quedar detrás.
+
+   Antes de subir un z-index, comprobar si el problema es en realidad un
+   contexto de apilamiento creado por transform, filter, opacity < 1,
+   isolation o will-change en algún ancestro.
+   --------------------------------------------------------------------- */
+
 @layer base {
   * { @apply border-border outline-ring/50; }
   html { scroll-behavior: smooth; }

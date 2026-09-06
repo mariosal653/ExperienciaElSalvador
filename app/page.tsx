@@ -81,7 +81,8 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-[#fbfaf7] text-[#173f45]">
-      <header className="absolute inset-x-0 top-0 z-20 border-b border-white/20 text-white">
+      {/* Capa 40 — ver la escala documentada en app/globals.css */}
+      <header className="absolute inset-x-0 top-0 z-40 border-b border-white/20 text-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
           <a href="#inicio" className="flex items-center gap-2.5" aria-label="Experience El Salvador · Inicio">
             <span className="grid h-9 w-9 place-items-center rounded-full bg-[#f4b942] text-[#173f45]"><Compass size={21} strokeWidth={2.5} /></span>
@@ -110,7 +111,12 @@ export default function Page() {
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,43,48,.86)_0%,rgba(10,43,48,.55)_45%,rgba(10,43,48,.15)_100%)]" />
         <img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1800&q=90" alt="Playa tropical de El Salvador al atardecer" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(12,55,61,.35),rgba(12,55,61,.1)_45%,rgba(251,250,247,.9)_100%)]" />
-        <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pb-28 pt-16 lg:px-8">
+        {/*
+          Capa 30. Este div crea el contexto de apilamiento donde viven los
+          desplegables del buscador, así que su z decide si el buscador queda
+          por encima de la tira de categorías (capa 20) o por debajo.
+        */}
+        <div className="relative z-30 mx-auto w-full max-w-7xl px-5 pb-28 pt-16 lg:px-8">
           <div className="max-w-2xl text-white">
             <p className="mb-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-[.22em] text-[#f4d27c]"><span className="h-px w-8 bg-[#f4d27c]" />{es ? 'Viaja con propósito' : 'Travel with purpose'}</p>
             <h1 className="text-5xl font-semibold leading-[.98] tracking-[-.04em] md:text-7xl">El Salvador, <em className="font-serif font-normal text-[#f4c45e]">{es ? 'a tu manera.' : 'your way.'}</em></h1>
@@ -135,7 +141,11 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="relative z-10 mx-auto -mt-3 max-w-7xl px-5 lg:px-8"><div className="flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none]">
+      {/*
+        Capa 20: por encima del degradado del héroe, gracias al -mt-3 que la
+        solapa, pero por debajo del buscador (capa 30).
+      */}
+      <section className="relative z-20 mx-auto -mt-3 max-w-7xl px-5 lg:px-8"><div className="flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none]">
         {categories.map((category) => {
           const Icon = CATEGORY_ICONS[category.icon]
           const isActive = activeCategory === category.id

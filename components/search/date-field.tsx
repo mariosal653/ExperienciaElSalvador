@@ -96,6 +96,9 @@ export function DateField({ value, onChange, lang }: Props) {
         </span>
       </button>
 
+      {/* El z-30 de este panel es LOCAL: solo compite con sus hermanos.
+          Quien decide que tape a la tira de categorias es la capa 30 del
+          contenido del heroe. Escala completa en app/globals.css. */}
       {open && (
         <div className="absolute left-0 top-[calc(100%+.5rem)] z-30 w-[19.5rem] rounded-2xl border border-[#e5ece9] bg-white p-4 shadow-2xl">
           <div className="mb-3 flex items-center justify-between">
