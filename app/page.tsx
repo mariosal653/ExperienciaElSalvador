@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ArrowRight,
   Check,
@@ -17,6 +17,7 @@ import {
   X,
 } from 'lucide-react'
 import { SearchPanel } from '@/components/search/search-panel'
+import { useWhatsAppLead } from '@/components/whatsapp/whatsapp-provider'
 import {
   categories,
   emptyCriteria,
@@ -70,6 +71,18 @@ export default function Page() {
   )
 
   const isFiltered = (applied !== null && hasActiveCriteria(applied)) || activeCategory !== null
+
+  // Publica el contexto para el widget de WhatsApp: si el visitante ya
+  // busco, el mensaje llegara con destino, fecha y numero de viajeros.
+  const { setLead } = useWhatsAppLead()
+  useEffect(() => {
+    setLead({
+      lang: language,
+      destination: applied?.destination ?? null,
+      date: applied?.date ?? null,
+      people: applied ? applied.people : null,
+    })
+  }, [language, applied, setLead])
 
   function resetAll() {
     setApplied(null)

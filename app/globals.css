@@ -34,6 +34,7 @@
 
    Contenedores de nivel de página, de arriba abajo:
 
+     50  widget de WhatsApp         (components/whatsapp)  flotante, siempre visible
      40  header                     (app/page.tsx)  fijo sobre el héroe
      30  contenido del héroe        (app/page.tsx)  contiene el buscador
      20  tira de categorías         (app/page.tsx)  solapa el héroe con -mt-3

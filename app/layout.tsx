@@ -1,5 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
+import { WhatsAppProvider } from '@/components/whatsapp/whatsapp-provider'
+import { WhatsAppWidget } from '@/components/whatsapp/whatsapp-widget'
 import './globals.css'
 
 const SITE_NAME = 'Experience El Salvador'
@@ -37,7 +39,18 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es">
-      <body className="antialiased">{children}{process.env.NODE_ENV === 'production' && <Analytics />}</body>
+      <body className="antialiased">
+        {/*
+          El widget de WhatsApp se monta una sola vez aquí para que esté en
+          todas las páginas. El provider deja que cada página publique lo
+          que el visitante está mirando, y así el mensaje llega con contexto.
+        */}
+        <WhatsAppProvider>
+          {children}
+          <WhatsAppWidget />
+        </WhatsAppProvider>
+        {process.env.NODE_ENV === 'production' && <Analytics />}
+      </body>
     </html>
   )
 }
