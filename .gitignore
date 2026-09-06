@@ -25,3 +25,12 @@ next-env.d.ts
 # Quitalos de aqui si prefieres versionarlos.
 AGENTS.md
 CLAUDE.md
+
+# Base de datos local
+*.db
+*.db-journal
+prisma/dev.db*
+prisma/test.db*
+
+# Secretos locales — NUNCA al repositorio
+.env

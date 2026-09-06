@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { LanguageProvider } from '@/components/i18n/language-provider'
+import { SessionBoundary } from '@/components/auth/session-boundary'
 import { WhatsAppProvider } from '@/components/whatsapp/whatsapp-provider'
 import { WhatsAppWidget } from '@/components/whatsapp/whatsapp-widget'
 import './globals.css'
@@ -57,12 +58,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           todas las páginas. El provider deja que cada página publique lo
           que el visitante está mirando, y así el mensaje llega con contexto.
         */}
-        <LanguageProvider>
-          <WhatsAppProvider>
-            {children}
-            <WhatsAppWidget />
-          </WhatsAppProvider>
-        </LanguageProvider>
+        <SessionBoundary>
+          <LanguageProvider>
+            <WhatsAppProvider>
+              {children}
+              <WhatsAppWidget />
+            </WhatsAppProvider>
+          </LanguageProvider>
+        </SessionBoundary>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

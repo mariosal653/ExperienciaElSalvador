@@ -1,0 +1,222 @@
+// Experience El Salvador — esquema de datos
+//
+// PROVEEDOR: SQLite. El proyecto no tenía base de datos ni ORM, y no hay
+// un servidor PostgreSQL disponible en este entorno. SQLite permite tener
+// migraciones reales, transacciones y bloqueo de escritura sin
+// infraestructura externa.
+//
+// PARA PRODUCCIÓN hay que pasar a PostgreSQL: cambiar `provider` a
+// "postgresql", apuntar DATABASE_URL a la instancia y regenerar la
+// migración. SQLite NO sirve en Vercel: su sistema de archivos es de solo
+// lectura. Los tipos usados (String, Int, DateTime, Decimal evitado a
+// propósito) son compatibles con ambos motores.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------
+// Autenticación — esquema estándar de Auth.js más los campos propios
+// ---------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+
+  /// Null cuando la cuenta se creó con un proveedor externo (Google, etc.).
+  /// Nunca guarda la contraseña en claro: es un hash bcrypt.
+  passwordHash  String?
+
+  phone         String?
+  locale        String    @default("EN")
+
+  accounts      Account[]
+  sessions      Session[]
+  bookings      Booking[]
+  reviews       Review[]
+  benefits      UserBenefit[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ---------------------------------------------------------------------
+// Beneficios — el descuento de bienvenida
+// ---------------------------------------------------------------------
+
+enum BenefitStatus {
+  AVAILABLE
+  USED
+  EXPIRED
+}
+
+model UserBenefit {
+  id          String        @id @default(cuid())
+  userId      String
+
+  /// Identificador de la promoción. Único por usuario y tipo: es lo que
+  /// impide que alguien acumule dos descuentos de bienvenida.
+  code        String
+  percentage  Int
+  status      BenefitStatus @default(AVAILABLE)
+
+  /// Reserva donde se consumió. Sirve de rastro auditable.
+  usedOnBookingId String?
+
+  /// El popup de bienvenida se descarta en base de datos, no en el
+  /// navegador: así no reaparece al cambiar de dispositivo.
+  modalDismissed  Boolean  @default(false)
+
+  createdAt   DateTime      @default(now())
+  usedAt      DateTime?
+  expiresAt   DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, code])
+  @@index([userId, status])
+  @@map("user_benefits")
+}
+
+// ---------------------------------------------------------------------
+// Reservas
+// ---------------------------------------------------------------------
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+model Booking {
+  id           String        @id @default(cuid())
+  /// Número visible para el cliente: RCS-2026-0001
+  code         String        @unique
+  userId       String
+
+  /// Identificador de la experiencia en lib/data.ts. El catálogo sigue en
+  /// código; solo se guarda la referencia y una copia de los datos que el
+  /// cliente vio, para que la reserva no cambie si cambia el catálogo.
+  experienceId String
+  experienceTitle String
+  experienceImage String?
+  destination  String
+
+  date         String        // AAAA-MM-DD
+  people       Int
+
+  /// Importes en CENTAVOS enteros. Nunca coma flotante para dinero.
+  unitPriceCents Int
+  subtotalCents  Int
+  discountCents  Int         @default(0)
+  totalCents     Int
+  currency       String      @default("USD")
+
+  /// Beneficio aplicado, si lo hubo.
+  benefitCode  String?
+  discountPct  Int           @default(0)
+
+  status       BookingStatus @default(CONFIRMED)
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  completedAt  DateTime?
+  cancelledAt  DateTime?
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  review  Review?
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@map("bookings")
+}
+
+// ---------------------------------------------------------------------
+// Opiniones
+// ---------------------------------------------------------------------
+
+model Review {
+  id           String   @id @default(cuid())
+
+  /// Null en las opiniones de arranque (seed), que no pertenecen a ninguna
+  /// cuenta. Las opiniones reales siempre llevan usuario y reserva.
+  userId       String?
+  bookingId    String?  @unique
+
+  authorName   String
+  authorImage  String?
+
+  experienceId String
+  experienceTitle String
+
+  rating       Int
+  comment      String
+
+  /// true = opinión verificada, escrita por quien completó la reserva.
+  verified     Boolean  @default(false)
+  /// true = contenido de arranque para que la sección no se vea vacía.
+  /// Se muestra siempre etiquetado como tal.
+  isSeed       Boolean  @default(false)
+
+  published    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  user    User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  booking Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  @@index([experienceId, published])
+  @@index([published, createdAt])
+  @@map("reviews")
+}

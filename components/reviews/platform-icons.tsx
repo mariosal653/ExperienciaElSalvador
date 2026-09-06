@@ -32,13 +32,25 @@ export function TikTokIcon({ className }: { className?: string }) {
   )
 }
 
+/** Icono de las opiniones propias: la brujula de la marca. */
+export function LocalIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="#173f45" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+    </svg>
+  )
+}
+
 export function SourceIcon({ source, className }: { source: ReviewSource; className?: string }) {
+  if (source === 'local') return <LocalIcon className={className} />
   if (source === 'google') return <GoogleIcon className={className} />
   if (source === 'facebook') return <FacebookIcon className={className} />
   return <TikTokIcon className={className} />
 }
 
 export const SOURCE_LABEL: Record<ReviewSource, string> = {
+  local: 'Experience El Salvador',
   google: 'Google',
   facebook: 'Facebook',
   tiktok: 'TikTok',

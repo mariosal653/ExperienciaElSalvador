@@ -6,7 +6,7 @@
  * que devuelva `Review[]`, sin tocar ni un componente.
  */
 
-export type ReviewSource = 'google' | 'facebook' | 'tiktok'
+export type ReviewSource = 'local' | 'google' | 'facebook' | 'tiktok'
 
 export type Review = {
   /** Único dentro de su plataforma. */
@@ -26,6 +26,12 @@ export type Review = {
   relativeTime: string | null
   /** Enlace a la reseña o publicación original. */
   permalink: string | null
+  /** Experiencia sobre la que opina, cuando se conoce. */
+  experienceTitle?: string | null
+  /** Escrita por quien completó la reserva. */
+  verified?: boolean
+  /** Contenido de arranque, etiquetado como tal en la interfaz. */
+  isSeed?: boolean
 }
 
 export type ReviewSummary = {

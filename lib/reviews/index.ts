@@ -1,4 +1,5 @@
 import { googleProvider } from './google'
+import { fetchLocalReviews } from './local'
 import { emptyResult, type ReviewProvider, type ReviewsPayload } from './types'
 
 /**
@@ -30,8 +31,12 @@ const planned = [
 ]
 
 export async function getReviews(locale: string): Promise<ReviewsPayload> {
-  const results = await Promise.all(providers.map((provider) => provider.fetchReviews(locale)))
+  const [local, ...external] = await Promise.all([
+    fetchLocalReviews(),
+    ...providers.map((provider) => provider.fetchReviews(locale)),
+  ])
 
+  const results = [local, ...external]
   const all = results.flatMap((result) => result.reviews)
 
   // Más recientes primero; las que no traen fecha van al final.
@@ -41,7 +46,12 @@ export async function getReviews(locale: string): Promise<ReviewsPayload> {
     return b.publishedAt.localeCompare(a.publishedAt)
   })
 
-  const summary = results.find((result) => result.summary !== null)?.summary ?? null
+  // Se prefiere el resumen de Google (promedio del negocio en la
+  // plataforma); si no esta configurado, se usa el de las opiniones propias.
+  const summary =
+    results.find((r) => r.source === 'google' && r.summary !== null)?.summary ??
+    results.find((r) => r.summary !== null)?.summary ??
+    null
 
   return {
     providers: [...results, ...planned.map((p) => emptyResult(p.source, p.notice))],

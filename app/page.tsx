@@ -20,6 +20,8 @@ import { SearchPanel } from '@/components/search/search-panel'
 import { useWhatsAppLead } from '@/components/whatsapp/whatsapp-provider'
 import { useLanguage } from '@/components/i18n/language-provider'
 import { ReviewsSection } from '@/components/reviews/reviews-section'
+import { SessionNav } from '@/components/auth/session-nav'
+import { WelcomeModal } from '@/components/benefits/welcome-modal'
 import {
   categories,
   emptyCriteria,
@@ -125,6 +127,7 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-[#fbfaf7] text-[#173f45]">
+      <WelcomeModal />
       {/* Capa 40 — ver la escala documentada en app/globals.css */}
       <header className="absolute inset-x-0 top-0 z-40 border-b border-white/20 text-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
@@ -140,7 +143,7 @@ export default function Page() {
           </nav>
           <div className="hidden items-center gap-4 md:flex">
             <LanguageSwitch lang={language} onChange={setLang} />
-            <button className="rounded-full border border-white/60 px-4 py-2 text-sm font-semibold transition hover:bg-white hover:text-[#173f45]">{es ? 'Iniciar sesión' : 'Sign in'}</button>
+            <SessionNav />
           </div>
           <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? (es ? 'Cerrar menú' : 'Close menu') : (es ? 'Abrir menú' : 'Open menu')}>{menuOpen ? <X /> : <Menu />}</button>
         </div>
@@ -286,7 +289,7 @@ export default function Page() {
                 <p className="mt-2 text-xs text-[#6a8588]">{item.durationHours} {es ? 'horas · Guía local incluido' : 'hours · Local guide included'}</p>
                 <div className="mt-4 flex items-end justify-between border-t border-[#edf0ed] pt-3">
                   <span><span className="text-xs text-[#6a8588]">{es ? 'Desde' : 'From'}</span> <strong className="text-lg">${item.priceUsd}</strong> <span className="text-xs text-[#6a8588]">{es ? '/ persona' : '/ person'}</span></span>
-                  <button className="text-xs font-bold text-[#b8481c]">{es ? 'Ver más' : 'See more'}</button>
+                  <a href={`/reservar/${item.id}`} className="rounded-full bg-[#b8481c] px-3.5 py-1.5 text-xs font-bold text-white transition hover:bg-[#963b18] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#173f45]">{es ? 'Reservar' : 'Book'}</a>
                 </div>
               </div>
             </article>
