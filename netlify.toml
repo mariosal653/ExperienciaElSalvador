@@ -1,0 +1,14 @@
+# Netlify detecta Next.js y aplica su adaptador oficial (OpenNext) solo:
+# no hace falta instalar ningún plugin. Este archivo fija lo mínimo.
+#
+# ANTES DEL PRIMER DEPLOY: la base de datos debe ser PostgreSQL.
+# SQLite no funciona en Netlify. Ver docs/DEPLOY_NETLIFY.md.
+
+[build]
+  command = "pnpm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  # La misma versión de pnpm que generó pnpm-lock.yaml.
+  PNPM_VERSION = "12.3.4"

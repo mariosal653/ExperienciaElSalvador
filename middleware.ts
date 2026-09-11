@@ -9,8 +9,10 @@ import type { NextRequest } from 'next/server'
  * la hace cada pagina y cada endpoint con `auth()` en el servidor, que si
  * valida la sesion contra la base. Esto es un atajo para redirigir pronto,
  * no la unica defensa.
+ *
+ * Reservar NO esta aqui: la compra no exige cuenta (guest checkout).
  */
-const PROTECTED = ['/cuenta', '/reservar']
+const PROTECTED = ['/cuenta']
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -33,5 +35,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/cuenta/:path*', '/reservar/:path*'],
+  matcher: ['/cuenta/:path*'],
 }

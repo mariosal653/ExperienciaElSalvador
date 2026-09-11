@@ -22,6 +22,9 @@ import { useLanguage } from '@/components/i18n/language-provider'
 import { ReviewsSection } from '@/components/reviews/reviews-section'
 import { SessionNav } from '@/components/auth/session-nav'
 import { WelcomeModal } from '@/components/benefits/welcome-modal'
+import { LanguageSwitch } from '@/components/i18n/language-switch'
+import { ReelsSection } from '@/components/reels/reels-section'
+import { SiteFooter } from '@/components/site/site-footer'
 import {
   categories,
   emptyCriteria,
@@ -50,35 +53,6 @@ function formatDate(iso: string, lang: Locale): string {
   const date = parseLocalDate(iso)
   if (!date) return iso
   return `${date.getDate()} ${MONTHS_SHORT[lang][date.getMonth()]}`
-}
-
-/**
- * Selector de idioma. Un conmutador con las dos opciones a la vista es más
- * claro que un botón que solo muestra el idioma actual: se ve de un vistazo
- * qué idiomas hay y cuál está activo.
- */
-function LanguageSwitch({ lang, onChange }: { lang: Locale; onChange: (lang: Locale) => void }) {
-  return (
-    <div
-      role="group"
-      aria-label={lang === 'ES' ? 'Idioma' : 'Language'}
-      className="flex items-center rounded-full border border-white/40 bg-white/10 p-0.5 backdrop-blur-sm"
-    >
-      {(['EN', 'ES'] as const).map((option) => (
-        <button
-          key={option}
-          type="button"
-          onClick={() => onChange(option)}
-          aria-pressed={lang === option}
-          className={`rounded-full px-3 py-1 text-xs font-bold transition ${
-            lang === option ? 'bg-white text-[#173f45]' : 'text-white/80 hover:text-white'
-          }`}
-        >
-          {option}
-        </button>
-      ))}
-    </div>
-  )
 }
 
 export default function Page() {
@@ -155,9 +129,13 @@ export default function Page() {
               <a href="#opiniones" onClick={() => setMenuOpen(false)}>{es ? 'Opiniones' : 'Reviews'}</a>
               <a href="#como-funciona" onClick={() => setMenuOpen(false)}>{es ? 'Cómo funciona' : 'How it works'}</a>
             </nav>
-            {/* El selector de idioma también en móvil: antes solo existía en escritorio. */}
-            <div className="mt-4 border-t border-white/20 pt-4">
+            {/*
+              Idioma y sesión también en móvil: antes el acceso a la cuenta
+              solo existía en escritorio.
+            */}
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-4 border-t border-white/20 pt-4">
               <LanguageSwitch lang={language} onChange={setLang} />
+              <SessionNav />
             </div>
           </div>
         )}
@@ -170,7 +148,19 @@ export default function Page() {
       */}
       <section id="inicio" className="relative flex min-h-[620px] items-center bg-[#174b51] pt-24">
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,43,48,.86)_0%,rgba(10,43,48,.55)_45%,rgba(10,43,48,.15)_100%)]" />
-        <img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1800&q=90" alt={es ? 'Playa tropical de El Salvador al atardecer' : 'Tropical beach in El Salvador at sunset'} className="absolute inset-0 h-full w-full object-cover" />
+        {/*
+          Imagen del LCP: prioridad alta y tamaños por ancho de pantalla. Antes
+          un móvil descargaba la versión de 1800 px.
+        */}
+        <img
+          src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1800&q=80"
+          srcSet={[800, 1200, 1800, 2400].map((w) => `https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=${w}&q=80 ${w}w`).join(', ')}
+          sizes="100vw"
+          fetchPriority="high"
+          decoding="async"
+          alt={es ? 'Playa tropical de El Salvador al atardecer' : 'Tropical beach in El Salvador at sunset'}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(12,55,61,.35),rgba(12,55,61,.1)_45%,rgba(251,250,247,.9)_100%)]" />
         {/*
           Capa 30. Este div crea el contexto de apilamiento donde viven los
@@ -206,7 +196,12 @@ export default function Page() {
         Capa 20: por encima del degradado del héroe, gracias al -mt-3 que la
         solapa, pero por debajo del buscador (capa 30).
       */}
-      <section className="relative z-20 mx-auto -mt-3 max-w-7xl px-5 lg:px-8"><div className="flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none]">
+      {/*
+        pt-2 / -mt-5: el contenedor con scroll horizontal recorta también en
+        vertical, y cortaba el anillo de la categoría activa y el salto del
+        hover. El margen compensa para que la tira quede donde estaba.
+      */}
+      <section className="relative z-20 mx-auto -mt-5 max-w-7xl px-5 lg:px-8"><div className="flex gap-3 overflow-x-auto px-1 pb-2 pt-2 [scrollbar-width:none]">
         {categories.map((category) => {
           const Icon = CATEGORY_ICONS[category.icon]
           const isActive = activeCategory === category.id
@@ -217,7 +212,7 @@ export default function Page() {
               aria-pressed={isActive}
               className={`group relative h-24 min-w-40 shrink-0 overflow-hidden rounded-2xl text-left shadow-lg transition hover:-translate-y-1 ${isActive ? 'ring-2 ring-[#f4b942] ring-offset-2' : ''}`}
             >
-              <img src={category.image} alt="" className="absolute inset-0 h-full w-full object-cover transition group-hover:scale-105" />
+              <img src={category.image} alt="" width={320} height={192} decoding="async" className="absolute inset-0 h-full w-full object-cover transition group-hover:scale-105" />
               <span className="absolute inset-0 bg-[#103f44]/55" />
               <span className="relative flex h-full flex-col justify-between p-4 text-white"><Icon size={20} /><span className="font-semibold">{category.label[language]}</span></span>
             </button>
@@ -225,7 +220,10 @@ export default function Page() {
         })}
       </div></section>
 
-      <section id="experiencias" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+      {/* Reels: justo debajo del héroe y sus categorías, antes del catálogo. */}
+      <ReelsSection />
+
+      <section id="experiencias" className="mx-auto max-w-7xl px-5 pb-20 pt-16 lg:px-8">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
             <p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-[#b8481c]">{es ? 'Para empezar' : 'To get started'}</p>
@@ -266,10 +264,17 @@ export default function Page() {
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">{results.map((item) => {
           const saved = favorites.includes(item.id)
+          const detailHref = `/experiences/${item.id}`
+          // Si el visitante ya buscó, el checkout llega con su fecha y viajeros.
+          const bookQuery = new URLSearchParams()
+          if (applied?.date) bookQuery.set('date', applied.date)
+          if (applied && applied.people !== emptyCriteria.people) bookQuery.set('people', String(applied.people))
+          const query = bookQuery.toString()
+          const bookHref = `/checkout/${item.id}${query ? `?${query}` : ''}`
           return (
             <article key={item.id} className="group overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_rgba(26,65,69,.08)]">
               <div className="relative h-56 overflow-hidden">
-                <img src={item.image} alt={item.imageAlt[language]} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                <a href={detailHref} tabIndex={-1} aria-hidden="true" className="block h-full"><img src={item.image} alt={item.imageAlt[language]} loading="lazy" decoding="async" width={600} height={448} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /></a>
                 {item.tag && <span className="absolute left-3 top-3 rounded-full bg-[#f4d27c] px-3 py-1 text-[11px] font-bold text-[#173f45]">{item.tag[language]}</span>}
                 <button
                   onClick={() => setFavorites((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])}
@@ -285,11 +290,11 @@ export default function Page() {
                   <span className="flex items-center gap-1"><MapPin size={13} />{item.destination}</span>
                   <span className="flex items-center gap-1 font-semibold text-[#173f45]"><Star size={13} fill="#f4b942" className="text-[#f4b942]" />{item.rating.toFixed(1)} ({item.reviews})</span>
                 </div>
-                <h3 className="text-lg font-semibold">{item.title}</h3>
+                <h3 className="text-lg font-semibold"><a href={detailHref} className="transition hover:text-[#b8481c]">{item.title}</a></h3>
                 <p className="mt-2 text-xs text-[#6a8588]">{item.durationHours} {es ? 'horas · Guía local incluido' : 'hours · Local guide included'}</p>
-                <div className="mt-4 flex items-end justify-between border-t border-[#edf0ed] pt-3">
+                <div className="mt-4 flex flex-wrap items-end justify-between gap-2 border-t border-[#edf0ed] pt-3">
                   <span><span className="text-xs text-[#6a8588]">{es ? 'Desde' : 'From'}</span> <strong className="text-lg">${item.priceUsd}</strong> <span className="text-xs text-[#6a8588]">{es ? '/ persona' : '/ person'}</span></span>
-                  <a href={`/reservar/${item.id}`} className="rounded-full bg-[#b8481c] px-3.5 py-1.5 text-xs font-bold text-white transition hover:bg-[#963b18] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#173f45]">{es ? 'Reservar' : 'Book'}</a>
+                  <a href={bookHref} className="rounded-full bg-[#b8481c] px-3.5 py-1.5 text-xs font-bold text-white transition hover:bg-[#963b18] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#173f45]">{es ? 'Reservar' : 'Book Now'}</a>
                 </div>
               </div>
             </article>
@@ -319,9 +324,9 @@ export default function Page() {
 
       <section id="como-funciona" className="bg-[#eaf1ed] py-20"><div className="mx-auto max-w-7xl px-5 lg:px-8"><div className="grid items-center gap-12 lg:grid-cols-[.9fr_1.1fr]"><div><p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-[#b8481c]">{es ? 'Viajar es fácil' : 'Travel made easy'}</p><h2 className="max-w-md text-3xl font-semibold tracking-tight md:text-4xl">{es ? <>Lo local se vive <em className="font-serif font-normal">mejor.</em></> : <>Local is simply <em className="font-serif font-normal">better.</em></>}</h2><p className="mt-5 max-w-md leading-relaxed text-[#547176]">{es ? 'Conectamos tus ganas de explorar con quienes conocen cada rincón de El Salvador. Tú eliges el plan, nosotros cuidamos los detalles.' : 'We connect your urge to explore with the people who know every corner of El Salvador. You pick the plan, we handle the details.'}</p><button className="mt-7 flex items-center gap-2 rounded-full bg-[#173f45] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#0e3035]">{es ? 'Conoce cómo funciona' : 'See how it works'} <ArrowRight size={17} /></button></div><div className="grid gap-4 sm:grid-cols-3">{(es ? [['01','Elige','Encuentra el destino o experiencia que te mueve.'],['02','Reserva','Confirma en pocos pasos y recibe todo al instante.'],['03','Disfruta','Vive el momento con anfitriones locales.']] : [['01','Choose','Find the destination or experience that moves you.'],['02','Book','Confirm in a few steps and get everything instantly.'],['03','Enjoy','Live the moment with local hosts.']]).map(([number, title, description]) => <div key={number} className="rounded-2xl bg-white p-5"><span className="text-4xl font-light text-[#f0b649]">{number}</span><h3 className="mt-8 font-semibold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-[#6a8588]">{description}</p><Check className="mt-5 text-[#b8481c]" size={19} /></div>)}</div></div></div></section>
 
-      <section id="destinos" className="mx-auto max-w-7xl px-5 py-20 lg:px-8"><div className="rounded-[2rem] bg-[#173f45] p-7 text-white md:p-12"><div className="flex flex-col justify-between gap-8 md:flex-row md:items-end"><div><p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-[#f4d27c]">{es ? 'Tu próxima historia' : 'Your next story'}</p><h2 className="max-w-xl text-3xl font-semibold tracking-tight md:text-5xl">{es ? <>Hay mucho más por <em className="font-serif font-normal text-[#f4c45e]">descubrir.</em></> : <>There is much more to <em className="font-serif font-normal text-[#f4c45e]">discover.</em></>}</h2></div><a href="#experiencias" className="flex shrink-0 items-center gap-2 rounded-full bg-[#b8481c] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#963b18]">{es ? 'Explorar destinos' : 'Explore destinations'} <ArrowRight size={17} /></a></div><div className="mt-10 grid gap-3 sm:grid-cols-3"><div className="relative h-48 overflow-hidden rounded-2xl sm:col-span-2"><img src="https://images.unsplash.com/photo-1530789253388-582c481c54b0?auto=format&fit=crop&w=1000&q=85" alt={es ? 'Paisaje montañoso de El Salvador' : 'Mountain landscape in El Salvador'} className="h-full w-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" /><span className="absolute bottom-4 left-4 font-semibold">Ruta de las Flores</span></div><div className="relative h-48 overflow-hidden rounded-2xl"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=700&q=85" alt={es ? 'Paisaje natural salvadoreño' : 'Salvadoran natural landscape'} className="h-full w-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" /><span className="absolute bottom-4 left-4 font-semibold">Suchitoto</span></div></div></div></section>
+      <section id="destinos" className="mx-auto max-w-7xl px-5 py-20 lg:px-8"><div className="rounded-[2rem] bg-[#173f45] p-7 text-white md:p-12"><div className="flex flex-col justify-between gap-8 md:flex-row md:items-end"><div><p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-[#f4d27c]">{es ? 'Tu próxima historia' : 'Your next story'}</p><h2 className="max-w-xl text-3xl font-semibold tracking-tight md:text-5xl">{es ? <>Hay mucho más por <em className="font-serif font-normal text-[#f4c45e]">descubrir.</em></> : <>There is much more to <em className="font-serif font-normal text-[#f4c45e]">discover.</em></>}</h2></div><a href="#experiencias" className="flex shrink-0 items-center gap-2 rounded-full bg-[#b8481c] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#963b18]">{es ? 'Explorar destinos' : 'Explore destinations'} <ArrowRight size={17} /></a></div><div className="mt-10 grid gap-3 sm:grid-cols-3"><div className="relative h-48 overflow-hidden rounded-2xl sm:col-span-2"><img src="/img/experiences/ruta-de-las-flores.jpg" alt={es ? 'Iglesia de Juayúa, en la Ruta de las Flores' : 'Juayúa church on the Ruta de las Flores'} loading="lazy" decoding="async" className="h-full w-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" /><span className="absolute bottom-4 left-4 font-semibold">Ruta de las Flores</span></div><div className="relative h-48 overflow-hidden rounded-2xl"><img src="/img/reels/thumbs/suchitoto.jpg" alt={es ? 'Calle empedrada de Suchitoto' : 'Cobblestone street in Suchitoto'} loading="lazy" decoding="async" className="h-full w-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" /><span className="absolute bottom-4 left-4 font-semibold">Suchitoto</span></div></div></div></section>
 
-      <footer className="border-t border-[#dce7e1] px-5 py-8 text-sm text-[#6a8588]"><div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 sm:flex-row"><span className="font-bold text-[#173f45]">Experience <span className="text-[#b8481c]">El Salvador</span></span><span>{es ? 'Hecho con cariño desde El Salvador · © 2026' : 'Made with care in El Salvador · © 2026'}</span><span>{es ? 'Español · Términos · Privacidad' : 'English · Terms · Privacy'}</span></div></footer>
+      <SiteFooter />
     </main>
   )
 }

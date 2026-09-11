@@ -52,6 +52,10 @@ async function createBooking(userId: string, discountPct = 0) {
     data: {
       code: `TST-${String(counter).padStart(4, '0')}`,
       userId,
+      customerName: 'Cliente de prueba',
+      customerEmail: `cliente${counter}@test.sv`,
+      customerPhone: '+50370000000',
+      accessToken: `token-${counter}-${Date.now()}`,
       experienceId: 'volcan-santa-ana',
       experienceTitle: 'Volcán de Santa Ana',
       destination: 'Volcán de Santa Ana',

@@ -4,6 +4,7 @@ import { LanguageProvider } from '@/components/i18n/language-provider'
 import { SessionBoundary } from '@/components/auth/session-boundary'
 import { WhatsAppProvider } from '@/components/whatsapp/whatsapp-provider'
 import { WhatsAppWidget } from '@/components/whatsapp/whatsapp-widget'
+import { getSiteUrl } from '@/lib/site'
 import './globals.css'
 
 const SITE_NAME = 'Experience El Salvador'
@@ -19,6 +20,8 @@ const SITE_DESCRIPTION =
   'Find local experiences, tours and unforgettable destinations across El Salvador.'
 
 export const metadata: Metadata = {
+  // Base para las URL absolutas de Open Graph (imágenes de cada experiencia).
+  metadataBase: new URL(getSiteUrl()),
   title: {
     default: `${SITE_NAME} | ${SITE_TAGLINE}`,
     template: `%s | ${SITE_NAME}`,
@@ -66,7 +69,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             </WhatsAppProvider>
           </LanguageProvider>
         </SessionBoundary>
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        {/*
+          Vercel Analytics solo existe en Vercel. En Netlify su script pediría
+          /_vercel/insights y fallaría en cada visita.
+        */}
+        {process.env.NODE_ENV === 'production' && process.env.VERCEL === '1' && <Analytics />}
       </body>
     </html>
   )

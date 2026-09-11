@@ -16,10 +16,14 @@ type BookingView = {
   total: string
   discountCents: number
   hasReview: boolean
+  /** Enlace a la reserva y sus entradas. */
+  href: string
+  isTest?: boolean
 }
 
 const STATUS_STYLE: Record<string, { label: string; className: string }> = {
-  PENDING: { label: 'Pendiente', className: 'bg-[#fdf2dc] text-[#8a5d0c] border-[#e2c483]' },
+  PENDING_PAYMENT: { label: 'Pago pendiente', className: 'bg-[#fdf2dc] text-[#8a5d0c] border-[#e2c483]' },
+  PAID: { label: 'Pagada', className: 'bg-[#e0eef1] text-[#1d5966] border-[#a8ccd4]' },
   CONFIRMED: { label: 'Confirmada', className: 'bg-[#e0eef1] text-[#1d5966] border-[#a8ccd4]' },
   COMPLETED: { label: 'Completada', className: 'bg-[#e3f0e9] text-[#256b54] border-[#a4cdbc]' },
   CANCELLED: { label: 'Cancelada', className: 'bg-[#fae6e0] text-[#a3341c] border-[#e3b3a4]' },
@@ -54,6 +58,9 @@ export function BookingCard({ booking }: { booking: BookingView }) {
               {status.label}
             </span>
             <span className="font-mono text-[11px] text-[#6a8588]">{booking.code}</span>
+            {booking.isTest && (
+              <span className="rounded-full bg-[#eef1f0] px-2.5 py-1 text-[11px] font-bold text-[#50686b]">Prueba</span>
+            )}
             {booking.discountCents > 0 && (
               <span className="flex items-center gap-1 rounded-full bg-[#f4d27c] px-2.5 py-1 text-[11px] font-bold text-[#173f45]">
                 <Ticket size={11} /> 25% aplicado
@@ -80,6 +87,16 @@ export function BookingCard({ booking }: { booking: BookingView }) {
               <span className="text-xs text-[#6a8588]">Total </span>
               <strong className="text-lg text-[#173f45]">{booking.total}</strong>
             </span>
+
+            {(booking.status === 'CONFIRMED' || booking.status === 'PENDING_PAYMENT') && (
+              <a
+                href={booking.href}
+                className="flex items-center gap-1.5 rounded-full border border-[#dce7e1] px-4 py-2 text-xs font-bold text-[#173f45] transition hover:bg-[#eaf1ed]"
+              >
+                <Ticket size={13} />
+                {booking.status === 'CONFIRMED' ? 'Ver entradas' : 'Completar pago'}
+              </a>
+            )}
 
             {booking.status === 'COMPLETED' && !booking.hasReview && (
               <button

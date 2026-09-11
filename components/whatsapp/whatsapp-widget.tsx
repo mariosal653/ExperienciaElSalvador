@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import { useWhatsAppLead } from './whatsapp-provider'
+import { useLanguage } from '@/components/i18n/language-provider'
 import { buildWhatsAppUrl, whatsappConfig } from '@/lib/whatsapp'
 
 /** Glifo de WhatsApp. Se dibuja aquí porque lucide no incluye marcas. */
@@ -24,7 +25,12 @@ const BUBBLE_DISMISSED_KEY = 'wa-bubble-dismissed'
  * escritorio, WhatsApp Web o la app de escritorio.
  */
 export function WhatsAppWidget() {
-  const { lead } = useWhatsAppLead()
+  const { lead: pageLead } = useWhatsAppLead()
+  // El idioma sale del selector, no del contexto de la página: las páginas
+  // que no publican contexto (reserva, entradas, legales) dejaban el valor
+  // por defecto en español aunque el sitio estuviera en inglés.
+  const { lang } = useLanguage()
+  const lead = { ...pageLead, lang }
   const [mounted, setMounted] = useState(false)
   const [showBubble, setShowBubble] = useState(false)
 

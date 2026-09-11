@@ -63,3 +63,35 @@
 }
 
 .font-serif { font-family: Georgia, 'Times New Roman', serif; }
+
+/* ---------------------------------------------------------------------
+   REELS
+   El visor es un <dialog> modal: vive en la capa superior del navegador,
+   fuera de la escala de z-index de arriba.
+   --------------------------------------------------------------------- */
+.reel-dialog { overscroll-behavior: contain; }
+.reel-dialog::backdrop { background: rgb(7 31 34 / 0.7); }
+
+/* Foto sin vídeo: movimiento lento de cámara, estilo «historia». */
+@keyframes reel-kenburns {
+  from { transform: scale(1.02) translate3d(0, 0, 0); }
+  to { transform: scale(1.14) translate3d(-2%, -2%, 0); }
+}
+.reel-kenburns { animation: reel-kenburns 7s ease-out forwards; }
+
+@keyframes reel-progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+.reel-progress { animation-name: reel-progress; animation-timing-function: linear; animation-fill-mode: forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reel-kenburns { animation: none; }
+}
+
+/* Entradas: al imprimir, solo lo esencial y una entrada por página. */
+@media print {
+  .no-print { display: none !important; }
+  .print-ticket { break-inside: avoid; page-break-inside: avoid; }
+  body { background: #fff !important; }
+}

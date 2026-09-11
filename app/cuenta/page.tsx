@@ -66,6 +66,7 @@ export default async function AccountPage() {
                   {benefit.status === 'USED' &&
                     `Utilizado el ${benefit.usedAt?.toLocaleDateString('es-SV') ?? ''}.`}
                   {benefit.status === 'EXPIRED' && 'Este beneficio ya venció.'}
+                  {benefit.status === 'RESERVED' && 'Apartado para un pago en curso. Si no se completa, vuelve a estar disponible.'}
                 </p>
               </div>
             </div>
@@ -122,6 +123,8 @@ export default async function AccountPage() {
                   total: formatCents(booking.totalCents),
                   discountCents: booking.discountCents,
                   hasReview: booking.review !== null,
+                  href: `/booking/${booking.accessToken}`,
+                  isTest: booking.isTest,
                 }}
               />
             ))}

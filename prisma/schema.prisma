@@ -7,12 +7,18 @@
 //
 // PARA PRODUCCIÓN hay que pasar a PostgreSQL: cambiar `provider` a
 // "postgresql", apuntar DATABASE_URL a la instancia y regenerar la
-// migración. SQLite NO sirve en Vercel: su sistema de archivos es de solo
-// lectura. Los tipos usados (String, Int, DateTime, Decimal evitado a
-// propósito) son compatibles con ambos motores.
+// migración. SQLite NO sirve en Netlify ni en Vercel: las funciones corren
+// en un sistema de archivos efímero y de solo lectura, así que la base ni
+// existe ni guardaría nada. Pasos completos en docs/DEPLOY_NETLIFY.md. Los
+// tipos usados (String, Int, DateTime, Decimal evitado a propósito) son
+// compatibles con ambos motores.
 
 generator client {
   provider = "prisma-client-js"
+  // "native" para desarrollo; "rhel-openssl-3.0.x" es el sistema de las
+  // funciones de Netlify (AWS Lambda, Node 20+). Sin él, el cliente no
+  // arranca en producción.
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
@@ -97,6 +103,9 @@ model VerificationToken {
 
 enum BenefitStatus {
   AVAILABLE
+  /// Apartado para una reserva cuyo pago está en curso. Vuelve a AVAILABLE
+  /// si ese pago no se completa; pasa a USED cuando se aprueba.
+  RESERVED
   USED
   EXPIRED
 }
@@ -133,8 +142,14 @@ model UserBenefit {
 // Reservas
 // ---------------------------------------------------------------------
 
+/// Ciclo de vida:
+///   PENDING_PAYMENT → PAID → CONFIRMED → COMPLETED
+///                 ↘ CANCELLED
+/// Solo el servidor mueve una reserva a PAID, y solo después de validar el
+/// pago con la pasarela (webhook firmado o consulta directa a su API).
 enum BookingStatus {
-  PENDING
+  PENDING_PAYMENT
+  PAID
   CONFIRMED
   COMPLETED
   CANCELLED
@@ -142,9 +157,37 @@ enum BookingStatus {
 
 model Booking {
   id           String        @id @default(cuid())
-  /// Número visible para el cliente: RCS-2026-0001
+  /// Número visible para el cliente: EES-7K3M9P
   code         String        @unique
-  userId       String
+
+  /// Null en las compras sin cuenta (guest checkout). Si el cliente tenía
+  /// la sesión iniciada al reservar, la reserva queda también en su perfil.
+  userId       String?
+
+  /// Datos del comprador. Obligatorios: una reserva sin cuenta necesita
+  /// un contacto para enviar las entradas.
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  customerCountry String?
+
+  /// Llave de acceso a la reserva para quien no tiene cuenta: la página de
+  /// confirmación y las entradas viven en /booking/<accessToken>. 256 bits
+  /// aleatorios; imposible de adivinar.
+  accessToken  String        @unique
+
+  /// Evita reservas duplicadas por doble clic o reintento de red: el mismo
+  /// formulario envía siempre la misma llave.
+  idempotencyKey String?     @unique
+
+  /// true = creada con pagos de prueba (mock o sandbox). Sus entradas se
+  /// muestran marcadas y no sirven para entrar en producción.
+  isTest       Boolean       @default(false)
+
+  /// Hasta cuándo se guardan las plazas mientras el pago está pendiente.
+  holdExpiresAt DateTime?
+  termsAcceptedAt DateTime?
+  locale       String        @default("EN")
 
   /// Identificador de la experiencia en lib/data.ts. El catálogo sigue en
   /// código; solo se guarda la referencia y una copia de los datos que el
@@ -168,19 +211,143 @@ model Booking {
   benefitCode  String?
   discountPct  Int           @default(0)
 
-  status       BookingStatus @default(CONFIRMED)
+  status       BookingStatus @default(PENDING_PAYMENT)
 
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  paidAt       DateTime?
+  confirmedAt  DateTime?
   completedAt  DateTime?
   cancelledAt  DateTime?
+  /// Se marca ANTES de enviar el correo (y se limpia si el envío falla):
+  /// así dos procesos simultáneos no mandan dos confirmaciones.
+  confirmationEmailSentAt DateTime?
 
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  review  Review?
+  user     User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  review   Review?
+  payments Payment[]
+  tickets  Ticket[]
 
   @@index([userId, createdAt])
   @@index([status])
+  @@index([experienceId, date, status])
+  @@index([customerEmail])
   @@map("bookings")
+}
+
+// ---------------------------------------------------------------------
+// Disponibilidad — excepciones al calendario del catálogo
+// ---------------------------------------------------------------------
+//
+// Por defecto una experiencia sale los días de la semana definidos en
+// lib/data.ts, con cupo `maxPeople`. Una fila aquí cambia UNA fecha
+// concreta: cerrarla (feriado, clima) o darle otro cupo.
+
+model Availability {
+  id           String   @id @default(cuid())
+  experienceId String
+  date         String   // AAAA-MM-DD
+  /// Null = usar `maxPeople` del catálogo.
+  capacity     Int?
+  closed       Boolean  @default(false)
+  note         String?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([experienceId, date])
+  @@map("availability")
+}
+
+// ---------------------------------------------------------------------
+// Pagos
+// ---------------------------------------------------------------------
+//
+// NUNCA se guardan datos de tarjeta: el cliente los escribe en la página de
+// Wompi, no en la nuestra. Aquí solo quedan referencias y resultados.
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  DECLINED
+  REFUNDED
+}
+
+model Payment {
+  id           String        @id @default(cuid())
+  bookingId    String
+
+  /// 'wompi' | 'mock'
+  provider     String
+  /// 'mock' | 'sandbox' | 'production' — con qué configuración se creó.
+  environment  String
+
+  status       PaymentStatus @default(PENDING)
+  amountCents  Int
+  currency     String        @default("USD")
+
+  /// Nuestra referencia, enviada a Wompi como `identificadorEnlaceComercio`.
+  /// Lleva una parte aleatoria: aparece en la URL de retorno.
+  reference    String        @unique
+
+  /// Enlace de pago en la pasarela.
+  providerLinkId String?
+  checkoutUrl    String?
+
+  /// Id de la transacción aprobada. ÚNICO: es la llave de idempotencia de
+  /// los webhooks. El mismo aviso recibido dos veces no puede aprobar dos
+  /// pagos ni emitir dos juegos de entradas.
+  providerTransactionId String?  @unique
+  authorizationCode     String?
+  /// false = transacción de prueba según la propia pasarela.
+  isRealTransaction     Boolean?
+  failureReason         String?
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  approvedAt   DateTime?
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([status])
+  @@map("payments")
+}
+
+// ---------------------------------------------------------------------
+// Entradas — una por viajero, solo para reservas pagadas
+// ---------------------------------------------------------------------
+
+enum TicketStatus {
+  ACTIVE
+  USED
+  CANCELLED
+}
+
+model Ticket {
+  id           String       @id @default(cuid())
+  /// Identificador legible: EES-7K3M9P-1
+  code         String       @unique
+  bookingId    String
+  /// 1..people. Con el índice único de abajo impide emitir dos veces la
+  /// misma entrada aunque dos procesos lo intenten a la vez.
+  number       Int
+  experienceId String
+  date         String       // AAAA-MM-DD
+
+  /// Lo único que lleva el QR (dentro de una URL). 192 bits aleatorios.
+  token        String       @unique
+  status       TicketStatus @default(ACTIVE)
+
+  createdAt    DateTime     @default(now())
+  usedAt       DateTime?
+  cancelledAt  DateTime?
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@unique([bookingId, number])
+  @@index([experienceId, date])
+  @@map("tickets")
 }
 
 // ---------------------------------------------------------------------

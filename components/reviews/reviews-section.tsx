@@ -117,9 +117,15 @@ export function ReviewsSection() {
         {!loading && hasReviews && (
           <>
             <div className="relative">
+              {/*
+                `relative` en el carrusel: los textos .sr-only de las tarjetas
+                son absolutos y, sin él, se posicionaban respecto al div
+                exterior, escapaban del recorte y daban a toda la página en
+                móvil ~1 100 px de scroll horizontal.
+              */}
               <div
                 ref={trackRef}
-                className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                className="relative flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               >
                 {reviews.map((review) => (
                   <ReviewCard key={`${review.source}-${review.id}`} review={review} lang={lang} />

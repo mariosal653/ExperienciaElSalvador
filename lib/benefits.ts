@@ -76,6 +76,80 @@ export async function dismissWelcomeModal(userId: string) {
   })
 }
 
+/* ------------------------------------------------------------------ */
+/* Con pago: apartar → usar / liberar                                  */
+/* ------------------------------------------------------------------ */
+//
+// Con pasarela de pago, la reserva no se confirma al enviarla sino cuando
+// el pago se aprueba, minutos después. Por eso el descuento se APARTA al
+// crear la reserva (AVAILABLE → RESERVED) y se da por USADO al aprobarse
+// el pago. Si el pago no llega, se LIBERA y vuelve a estar disponible.
+//
+// Apartarlo es un update condicional: dos pestañas con el mismo descuento
+// no pueden llevarlo a dos pagos distintos.
+
+/**
+ * Libera el descuento apartado para una reserva cuyo pago ya no va a
+ * llegar (apartado vencido o reserva cancelada). Se llama antes de mirar
+ * si hay descuento disponible.
+ */
+export async function releaseStaleReservation(client: Client, userId: string, now = new Date()) {
+  const benefit = await client.userBenefit.findUnique({
+    where: { userId_code: { userId, code: WELCOME_BENEFIT_CODE } },
+  })
+  if (!benefit || benefit.status !== 'RESERVED' || !benefit.usedOnBookingId) return
+
+  const booking = await client.booking.findUnique({
+    where: { id: benefit.usedOnBookingId },
+    select: { status: true, holdExpiresAt: true },
+  })
+
+  const stale =
+    !booking ||
+    booking.status === 'CANCELLED' ||
+    (booking.status === 'PENDING_PAYMENT' && booking.holdExpiresAt !== null && booking.holdExpiresAt < now)
+
+  if (stale) {
+    await client.userBenefit.updateMany({
+      where: { id: benefit.id, status: 'RESERVED', usedOnBookingId: benefit.usedOnBookingId },
+      data: { status: 'AVAILABLE', usedOnBookingId: null },
+    })
+  }
+}
+
+/** Aparta el descuento para una reserva. @returns true si lo consiguió. */
+export async function reserveWelcomeBenefit(client: Client, userId: string, bookingId: string): Promise<boolean> {
+  const result = await client.userBenefit.updateMany({
+    where: {
+      userId,
+      code: WELCOME_BENEFIT_CODE,
+      status: 'AVAILABLE',
+      OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+    },
+    data: { status: 'RESERVED', usedOnBookingId: bookingId },
+  })
+  return result.count === 1
+}
+
+/**
+ * Pago aprobado: el descuento pasa a USADO.
+ *
+ * Acepta RESERVED para esta reserva, o AVAILABLE si el apartado se liberó
+ * porque el cliente tardó en pagar. Si otra reserva lo gastó entretanto,
+ * devuelve false: el pago ya está hecho y se respeta, pero queda registrado.
+ */
+export async function finalizeWelcomeBenefit(client: Client, userId: string, bookingId: string): Promise<boolean> {
+  const result = await client.userBenefit.updateMany({
+    where: {
+      userId,
+      code: WELCOME_BENEFIT_CODE,
+      OR: [{ status: 'RESERVED', usedOnBookingId: bookingId }, { status: 'AVAILABLE' }],
+    },
+    data: { status: 'USED', usedAt: new Date(), usedOnBookingId: bookingId },
+  })
+  return result.count === 1
+}
+
 /**
  * Consume el beneficio de forma atómica.
  *

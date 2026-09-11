@@ -45,6 +45,8 @@ export default async function MyExperiencesPage() {
                 total: formatCents(booking.totalCents),
                 discountCents: booking.discountCents,
                 hasReview: booking.review !== null,
+                href: `/booking/${booking.accessToken}`,
+                isTest: booking.isTest,
               }}
             />
           ))}
