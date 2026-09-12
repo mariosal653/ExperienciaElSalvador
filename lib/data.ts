@@ -95,13 +95,15 @@ export const categories: Category[] = [
     id: 'playas',
     label: { ES: 'Playas', EN: 'Beaches' },
     icon: 'waves',
-    image: 'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&w=600&q=80',
+    // Roca de El Tunco, La Libertad (créditos en lib/credits.ts).
+    image: '/img/categoria-playas.jpg',
   },
   {
     id: 'volcanes',
     label: { ES: 'Volcanes', EN: 'Volcanoes' },
     icon: 'compass',
-    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80',
+    // Complejo Los Volcanes: Izalco, Cerro Verde y Santa Ana.
+    image: '/img/categoria-volcanes.jpg',
   },
   {
     id: 'cultura',
@@ -319,8 +321,8 @@ export const experiences: Experience[] = [
     rating: 4.6,
     reviews: 71,
     durationHours: 5,
-    image: 'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=900&q=85',
-    imageAlt: { ES: 'Playa del Pacífico salvadoreño', EN: 'Salvadoran Pacific beach' },
+    image: '/img/experiences/surf-city-el-sunzal.jpg',
+    imageAlt: { ES: 'Palmeras y ola en la playa El Sunzal, Surf City', EN: 'Palms and a breaking wave at El Sunzal beach, Surf City' },
     maxPeople: 18,
     weekdays: [0, 1, 2, 3, 4, 5, 6],
     description: {
@@ -341,8 +343,8 @@ export const experiences: Experience[] = [
     rating: 4.7,
     reviews: 64,
     durationHours: 9,
-    image: 'https://images.unsplash.com/photo-1530789253388-582c481c54b0?auto=format&fit=crop&w=900&q=85',
-    imageAlt: { ES: 'Cordillera volcánica salvadoreña', EN: 'Salvadoran volcanic range' },
+    image: '/img/experiences/volcan-izalco.jpg',
+    imageAlt: { ES: 'Volcán de Izalco visto desde el mirador de Cerro Verde', EN: 'Izalco volcano seen from the Cerro Verde viewpoint' },
     maxPeople: 12,
     weekdays: [0, 6],
     description: {
@@ -363,8 +365,8 @@ export const experiences: Experience[] = [
     rating: 4.5,
     reviews: 39,
     durationHours: 4,
-    image: 'https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=900&q=85',
-    imageAlt: { ES: 'Costa de La Libertad al atardecer', EN: 'La Libertad coast at sunset' },
+    image: '/img/experiences/malecon-la-libertad.jpg',
+    imageAlt: { ES: 'Malecón y muelle del Puerto de La Libertad al atardecer', EN: 'Waterfront and pier of Puerto de La Libertad at sunset' },
     maxPeople: 20,
     weekdays: [0, 1, 2, 3, 4, 5, 6],
     description: {

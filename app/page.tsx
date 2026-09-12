@@ -149,17 +149,21 @@ export default function Page() {
       <section id="inicio" className="relative flex min-h-[620px] items-center bg-[#174b51] pt-24">
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,43,48,.86)_0%,rgba(10,43,48,.55)_45%,rgba(10,43,48,.15)_100%)]" />
         {/*
-          Imagen del LCP: prioridad alta y tamaños por ancho de pantalla. Antes
-          un móvil descargaba la versión de 1800 px.
+          Imagen del LCP: prioridad alta y tamaños por ancho de pantalla.
+          Cerro Verde y el volcán de Izalco (créditos en lib/credits.ts). El
+          Izalco está a la derecha de la foto: en móvil, donde el recorte
+          vertical es fuerte, se desplaza el encuadre para que no quede fuera.
         */}
         <img
-          src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1800&q=80"
-          srcSet={[800, 1200, 1800, 2400].map((w) => `https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=${w}&q=80 ${w}w`).join(', ')}
+          src="/img/hero/cerro-verde-izalco-1920.jpg"
+          srcSet="/img/hero/cerro-verde-izalco-960.jpg 960w, /img/hero/cerro-verde-izalco-1920.jpg 1920w"
           sizes="100vw"
+          width={1920}
+          height={1080}
           fetchPriority="high"
           decoding="async"
-          alt={es ? 'Playa tropical de El Salvador al atardecer' : 'Tropical beach in El Salvador at sunset'}
-          className="absolute inset-0 h-full w-full object-cover"
+          alt={es ? 'Cerro Verde y el volcán de Izalco, El Salvador' : 'Cerro Verde and Izalco volcano, El Salvador'}
+          className="absolute inset-0 h-full w-full object-cover object-[74%_50%] md:object-center"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(12,55,61,.35),rgba(12,55,61,.1)_45%,rgba(251,250,247,.9)_100%)]" />
         {/*

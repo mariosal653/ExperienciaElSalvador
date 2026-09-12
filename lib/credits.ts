@@ -14,7 +14,7 @@ export type Credit = {
   file: string
   title: string
   author: string
-  license: 'CC BY 2.0' | 'CC BY 4.0' | 'CC BY-SA 3.0' | 'CC BY-SA 4.0'
+  license: 'CC BY 2.0' | 'CC BY 3.0' | 'CC BY 4.0' | 'CC BY-SA 3.0' | 'CC BY-SA 4.0'
   /** Página del archivo en Commons. */
   source: string
 }
@@ -23,6 +23,7 @@ const COMMONS = 'https://commons.wikimedia.org/wiki/File:'
 
 export const LICENSE_URLS: Record<Credit['license'], string> = {
   'CC BY 2.0': 'https://creativecommons.org/licenses/by/2.0/',
+  'CC BY 3.0': 'https://creativecommons.org/licenses/by/3.0/',
   'CC BY 4.0': 'https://creativecommons.org/licenses/by/4.0/',
   'CC BY-SA 3.0': 'https://creativecommons.org/licenses/by-sa/3.0/',
   'CC BY-SA 4.0': 'https://creativecommons.org/licenses/by-sa/4.0/',
@@ -91,6 +92,48 @@ export const credits = {
     author: 'Mario Pleitez',
     license: 'CC BY 2.0',
     source: `${COMMONS}Palacio_Nacional_de_El_Salvador_(San_Salvador).jpg`,
+  },
+  cerroVerdeIzalco: {
+    file: '/img/hero/cerro-verde-izalco-960.jpg',
+    title: 'Cerro Verde and Izalco Volcano',
+    author: 'Dead.rabbit',
+    license: 'CC BY-SA 4.0',
+    source: `${COMMONS}Cerro_Verde_and_Izalco_Volcano.jpg`,
+  },
+  losVolcanes: {
+    file: '/img/categoria-volcanes.jpg',
+    title: 'Complejo Los Volcanes',
+    author: 'JMRAFFi',
+    license: 'CC BY 4.0',
+    source: `${COMMONS}Complejo_Los_Volcanes.jpg`,
+  },
+  tuncoBoulder: {
+    file: '/img/categoria-playas.jpg',
+    title: 'El Tunco boulder, El Sunzal, El Salvador',
+    author: 'Hermann Luyken',
+    license: 'CC BY-SA 3.0',
+    source: `${COMMONS}2010.05.05.124022_El_Tunco_El_Sunzal_El_Salvador.jpg`,
+  },
+  sunzalPalms: {
+    file: '/img/experiences/surf-city-el-sunzal.jpg',
+    title: 'Palmeras y ola, El Sunzal, El Salvador',
+    author: 'Hermann Luyken',
+    license: 'CC BY-SA 3.0',
+    source: `${COMMONS}2010.05.05.085439_Palmeras_ola_El_Sunzal_El_Salvador.jpg`,
+  },
+  izalcoCerroVerde: {
+    file: '/img/experiences/volcan-izalco.jpg',
+    title: 'Volcán de Izalco desde mirador del Hotel (Cerro Verde)',
+    author: 'davidjoviera',
+    license: 'CC BY 3.0',
+    source: `${COMMONS}Volcan_de_Izalco_desde_mirador_del_Hotel_-_panoramio.jpg`,
+  },
+  puertoLaLibertad: {
+    file: '/img/experiences/malecon-la-libertad.jpg',
+    title: 'Puerto de La Libertad',
+    author: 'Ayaita',
+    license: 'CC BY-SA 3.0',
+    source: `${COMMONS}PuertoLaLibertad.jpg`,
   },
   montecristo: {
     file: '/img/experiences/bosque-montecristo.jpg',
