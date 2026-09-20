@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { parseFilters, hasFilters } from '../lib/admin/filters'
+import { parseFilters, hasFilters, toSearchParams, describeFilters } from '../lib/admin/filters'
 import { experiences } from '../lib/data'
 
 /**
@@ -20,7 +20,8 @@ describe('filtros del panel', () => {
       experienceId: null,
       destination: null,
       status: null,
-      includeTest: false,
+      paymentStatus: null,
+      onlyReal: false,
     })
     expect(hasFilters(filters)).toBe(false)
   })
@@ -91,14 +92,66 @@ describe('filtros del panel', () => {
     expect(parseFilters({ estado: 'CUALQUIERA' }).status).toBeNull()
   })
 
-  it('las reservas de prueba quedan fuera salvo que se pidan a propósito', () => {
-    expect(parseFilters({}).includeTest).toBe(false)
-    expect(parseFilters({ pruebas: '0' }).includeTest).toBe(false)
-    expect(parseFilters({ pruebas: 'true' }).includeTest).toBe(false)
-    expect(parseFilters({ pruebas: '1' }).includeTest).toBe(true)
+  it('por defecto se ven TODAS las reservas, incluidas las de prueba', () => {
+    // Al reves —que era como estaba— el panel salia vacio mientras el
+    // proyecto funcionara en modo de pruebas, que es su estado normal.
+    expect(parseFilters({}).onlyReal).toBe(false)
+    expect(parseFilters({ solo: '' }).onlyReal).toBe(false)
+    expect(parseFilters({ solo: 'todas' }).onlyReal).toBe(false)
+    expect(parseFilters({ solo: 'reales' }).onlyReal).toBe(true)
+    expect(hasFilters(parseFilters({ solo: 'reales' }))).toBe(true)
+  })
+
+  it('solo acepta estados reales de pago', () => {
+    expect(parseFilters({ pago: 'APPROVED' }).paymentStatus).toBe('APPROVED')
+    expect(parseFilters({ pago: 'NONE' }).paymentStatus).toBe('NONE')
+    expect(parseFilters({ pago: 'aprobado' }).paymentStatus).toBeNull()
+    expect(parseFilters({ pago: 'PAID' }).paymentStatus).toBeNull()
   })
 
   it('se queda con el primer valor cuando un parámetro llega repetido', () => {
     expect(parseFilters({ from: ['2026-09-01', '2026-01-01'] }).from).toBe('2026-09-01')
+  })
+})
+
+describe('filtros hacia la URL de descarga', () => {
+  it('lo que se ve es lo que se exporta: mismos parametros', () => {
+    const filters = parseFilters({
+      from: '2026-09-01',
+      to: '2026-09-30',
+      experiencia: experiences[0].id,
+      estado: 'CONFIRMED',
+      pago: 'APPROVED',
+      solo: 'reales',
+    })
+    const params = toSearchParams(filters)
+
+    expect(params.get('from')).toBe('2026-09-01')
+    expect(params.get('to')).toBe('2026-09-30')
+    expect(params.get('experiencia')).toBe(experiences[0].id)
+    expect(params.get('estado')).toBe('CONFIRMED')
+    expect(params.get('pago')).toBe('APPROVED')
+    expect(params.get('solo')).toBe('reales')
+  })
+
+  it('un filtro vacio no ensucia la URL', () => {
+    expect(toSearchParams(parseFilters({})).toString()).toBe('')
+  })
+
+  it('volver a leer los parametros generados da los mismos filtros', () => {
+    const original = parseFilters({ mes: '2026-09', estado: 'COMPLETED', pago: 'DECLINED' })
+    const params = Object.fromEntries(toSearchParams(original))
+    expect(parseFilters(params)).toEqual(original)
+  })
+
+  it('el PDF describe los filtros aplicados en una linea', () => {
+    expect(describeFilters(parseFilters({}))).toMatch(/Sin filtros/)
+    const texto = describeFilters(
+      parseFilters({ from: '2026-09-01', to: '2026-09-30', estado: 'CONFIRMED', solo: 'reales' }),
+    )
+    expect(texto).toContain('2026-09-01')
+    expect(texto).toContain('2026-09-30')
+    expect(texto).toContain('Confirmada')
+    expect(texto).toContain('Solo cobros reales')
   })
 })

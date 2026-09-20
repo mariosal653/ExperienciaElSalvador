@@ -3,6 +3,8 @@ import { Filter, RotateCcw } from 'lucide-react'
 import {
   BOOKING_STATUSES,
   BOOKING_STATUS_LABEL,
+  PAYMENT_STATUSES,
+  PAYMENT_STATUS_LABEL,
   hasFilters,
   type AdminFilters as Filters,
 } from '@/lib/admin/filters'
@@ -69,6 +71,16 @@ export function AdminFilters({ filters, catalogo, destinos, hoy }: {
         </div>
 
         <div>
+          <label htmlFor="f-pago" className={label}>Estado del pago</label>
+          <select id="f-pago" name="pago" defaultValue={filters.paymentStatus ?? ''} className={field}>
+            <option value="">Todos</option>
+            {PAYMENT_STATUSES.map((status) => (
+              <option key={status} value={status}>{PAYMENT_STATUS_LABEL[status]}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
           <label htmlFor="f-destino" className={label}>Ubicación</label>
           <select id="f-destino" name="destino" defaultValue={filters.destination ?? ''} className={field}>
             <option value="">Todas</option>
@@ -82,14 +94,14 @@ export function AdminFilters({ filters, catalogo, destinos, hoy }: {
           <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-[#dce7e1] px-3 py-2.5 text-sm">
             <input
               type="checkbox"
-              name="pruebas"
-              value="1"
-              defaultChecked={filters.includeTest}
+              name="solo"
+              value="reales"
+              defaultChecked={filters.onlyReal}
               className="mt-0.5 h-4 w-4 shrink-0 accent-[#b8481c]"
             />
             <span className="text-[#547176]">
-              <span className="block font-semibold text-[#173f45]">Incluir pruebas</span>
-              Reservas con pago simulado o sandbox.
+              <span className="block font-semibold text-[#173f45]">Solo cobros reales</span>
+              Deja fuera las reservas pagadas con la pasarela simulada o en sandbox.
             </span>
           </label>
         </div>

@@ -18,6 +18,13 @@ const SECURITY_HEADERS = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  /**
+   * exceljs y pdfkit generan los informes del panel. Se dejan FUERA del
+   * bundle del servidor: pdfkit lee sus archivos de fuentes (.afm) del
+   * propio paquete en tiempo de ejecucion, y empaquetarlo rompe esa
+   * lectura. Next los carga como dependencias de Node normales.
+   */
+  serverExternalPackages: ['pdfkit', 'exceljs'],
   typescript: {
     // El build FALLA si hay errores de tipos. Antes estaba en true y un
     // error de tipos podía llegar a producción sin que nadie lo viera.

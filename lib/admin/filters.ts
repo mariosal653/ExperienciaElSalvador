@@ -2,9 +2,10 @@ import { experiences } from '../data'
 
 /**
  * Filtros del panel. Viven en la URL (?from=…&to=…&experiencia=…), no en
- * estado de cliente: así el enlace se puede compartir y guardar, y la
+ * estado de cliente: así el enlace se puede compartir y guardar, la
  * página sigue siendo un Server Component que consulta con los filtros ya
- * aplicados.
+ * aplicados, y las descargas de PDF y Excel pueden reutilizar exactamente
+ * los mismos parámetros.
  *
  * TODO valor que llega por la URL se valida aquí antes de tocar la base:
  * una fecha tiene que ser AAAA-MM-DD, la experiencia tiene que existir en
@@ -31,14 +32,38 @@ export const BOOKING_STATUS_LABEL: Record<BookingStatusFilter, string> = {
   CANCELLED: 'Cancelada',
 }
 
+/** Estados de Payment, más «sin pago» para las reservas que no llegaron a crearlo. */
+export const PAYMENT_STATUSES = ['APPROVED', 'PENDING', 'DECLINED', 'REFUNDED', 'NONE'] as const
+
+export type PaymentStatusFilter = (typeof PAYMENT_STATUSES)[number]
+
+export const PAYMENT_STATUS_LABEL: Record<PaymentStatusFilter, string> = {
+  APPROVED: 'Aprobado',
+  PENDING: 'Pendiente',
+  DECLINED: 'Rechazado',
+  REFUNDED: 'Reembolsado',
+  NONE: 'Sin intento de pago',
+}
+
 export type AdminFilters = {
   from: string | null
   to: string | null
   experienceId: string | null
   destination: string | null
   status: BookingStatusFilter | null
-  /** Incluir reservas creadas con pagos simulados o en sandbox. */
-  includeTest: boolean
+  paymentStatus: PaymentStatusFilter | null
+  /**
+   * Dejar fuera las reservas creadas con pasarelas que no cobran (mock o
+   * sandbox).
+   *
+   * POR DEFECTO ES false, o sea que el panel MUESTRA TODO. Al revés —que
+   * era como estaba— el panel se veía vacío mientras el proyecto
+   * funcionara en modo de pruebas, que es su estado normal hasta que haya
+   * credenciales reales: las reservas existían en la base pero ninguna
+   * llegaba a la pantalla. Lo que no se oculta es el origen del dinero:
+   * los ingresos se desglosan siempre entre cobros reales y de prueba.
+   */
+  onlyReal: boolean
 }
 
 export type AdminSearchParams = Record<string, string | string[] | undefined>
@@ -90,6 +115,7 @@ export function parseFilters(params: AdminSearchParams): AdminFilters {
   const experienceId = one(params.experiencia)
   const destination = one(params.destino)
   const status = one(params.estado)
+  const paymentStatus = one(params.pago)
 
   return {
     from,
@@ -99,13 +125,57 @@ export function parseFilters(params: AdminSearchParams): AdminFilters {
     status: (BOOKING_STATUSES as readonly string[]).includes(status)
       ? (status as BookingStatusFilter)
       : null,
-    includeTest: one(params.pruebas) === '1',
+    paymentStatus: (PAYMENT_STATUSES as readonly string[]).includes(paymentStatus)
+      ? (paymentStatus as PaymentStatusFilter)
+      : null,
+    onlyReal: one(params.solo) === 'reales',
   }
 }
 
 /** ¿Hay algún filtro activo? Para mostrar el botón de «limpiar». */
 export function hasFilters(filters: AdminFilters): boolean {
   return Boolean(
-    filters.from || filters.to || filters.experienceId || filters.destination || filters.status || filters.includeTest,
+    filters.from ||
+      filters.to ||
+      filters.experienceId ||
+      filters.destination ||
+      filters.status ||
+      filters.paymentStatus ||
+      filters.onlyReal,
   )
+}
+
+/**
+ * Los filtros, de vuelta a parámetros de URL. Es lo que permite que el
+ * botón de descargar PDF o Excel se lleve EXACTAMENTE lo que el
+ * administrador está viendo, sin volver a construir los parámetros a mano
+ * en cada sitio.
+ */
+export function toSearchParams(filters: AdminFilters): URLSearchParams {
+  const params = new URLSearchParams()
+  if (filters.from) params.set('from', filters.from)
+  if (filters.to) params.set('to', filters.to)
+  if (filters.experienceId) params.set('experiencia', filters.experienceId)
+  if (filters.destination) params.set('destino', filters.destination)
+  if (filters.status) params.set('estado', filters.status)
+  if (filters.paymentStatus) params.set('pago', filters.paymentStatus)
+  if (filters.onlyReal) params.set('solo', 'reales')
+  return params
+}
+
+/** Descripción en una línea de los filtros activos. Se imprime en el PDF. */
+export function describeFilters(filters: AdminFilters, experienceTitle?: string | null): string {
+  const parts: string[] = []
+
+  if (filters.from && filters.to) parts.push(`Fechas ${filters.from} a ${filters.to}`)
+  else if (filters.from) parts.push(`Desde ${filters.from}`)
+  else if (filters.to) parts.push(`Hasta ${filters.to}`)
+
+  if (filters.experienceId) parts.push(`Experiencia: ${experienceTitle ?? filters.experienceId}`)
+  if (filters.destination) parts.push(`Ubicacion: ${filters.destination}`)
+  if (filters.status) parts.push(`Estado: ${BOOKING_STATUS_LABEL[filters.status]}`)
+  if (filters.paymentStatus) parts.push(`Pago: ${PAYMENT_STATUS_LABEL[filters.paymentStatus]}`)
+  if (filters.onlyReal) parts.push('Solo cobros reales')
+
+  return parts.length ? parts.join(' · ') : 'Sin filtros: todas las reservas'
 }

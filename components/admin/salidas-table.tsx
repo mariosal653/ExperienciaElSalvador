@@ -116,7 +116,7 @@ export function SalidasTable({
                     <td className="whitespace-nowrap px-4 py-3 capitalize text-[#547176]">{fecha(row.fecha)}</td>
                     <td className="px-4 py-3 text-[#547176]">{row.destino}</td>
                     <td className="px-4 py-3 text-right tabular-nums text-[#547176]">
-                      {row.duracionHoras === null ? dash : `${row.duracionHoras} h`}
+                      {row.durationHours === null ? dash : `${row.durationHours} h`}
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums text-[#547176]">
                       {row.precioUnitarioCents === null ? dash : formatCents(row.precioUnitarioCents)}
