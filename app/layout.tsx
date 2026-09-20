@@ -7,7 +7,7 @@ import { WhatsAppWidget } from '@/components/whatsapp/whatsapp-widget'
 import { getSiteUrl } from '@/lib/site'
 import './globals.css'
 
-const SITE_NAME = 'Experience El Salvador'
+const SITE_NAME = 'Experiences El Salvador'
 
 /**
  * Los metadatos van en INGLÉS porque es el idioma por defecto del sitio y

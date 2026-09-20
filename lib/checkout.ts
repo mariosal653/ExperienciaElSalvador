@@ -35,6 +35,12 @@ export const checkoutSchema = z.object({
   /** Lo genera el formulario una vez; los reintentos mandan la misma. */
   idempotencyKey: z.string().regex(/^[A-Za-z0-9-]{16,64}$/),
   locale: z.enum(['ES', 'EN']).optional().default('EN'),
+  /**
+   * Pasarela elegida. Por defecto Wompi, que es la que existía antes de
+   * añadir PayPal: un cliente que no mande el campo sigue funcionando.
+   * Que el método esté realmente disponible lo comprueba el endpoint.
+   */
+  paymentMethod: z.enum(['wompi', 'paypal']).optional().default('wompi'),
 })
 
 export type CheckoutInput = z.infer<typeof checkoutSchema>

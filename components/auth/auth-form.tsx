@@ -167,7 +167,7 @@ export function AuthForm({ mode, socialProviders }: { mode: Mode; socialProvider
           <Compass size={20} strokeWidth={2.5} />
         </span>
         <span className="text-lg font-bold tracking-tight text-[#173f45]">
-          Experience <span className="text-[#b8481c]">El Salvador</span>
+          Experiences <span className="text-[#b8481c]">El Salvador</span>
         </span>
       </div>
 

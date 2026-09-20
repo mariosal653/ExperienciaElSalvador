@@ -4,8 +4,9 @@ import { issueTickets } from '../tickets'
 import { sendConfirmationEmail } from '../email'
 import { getSiteUrl } from '../site'
 import { randomCode } from '../security'
-import { getPaymentConfig, type PaymentConfig } from './config'
+import { getPayPalConfig, getPaymentConfig, type PaymentConfig, type PaymentMethod } from './config'
 import { createPaymentLink, getTransaction, WompiError } from './wompi'
+import { captureOrder, createOrder, PayPalError } from './paypal'
 
 /**
  * Núcleo del flujo de pago. SOLO SERVIDOR.
@@ -113,6 +114,97 @@ export async function createPaymentForBooking(
     })
     throw new PaymentProviderError('linkCreationFailed')
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Crear el cobro con PayPal                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Crea el registro de pago y la orden en PayPal.
+ *
+ * Mismo contrato que `createPaymentForBooking`: devuelve la URL a la que
+ * mandar al comprador. Lo que cambia es que PayPal cobra en un segundo
+ * paso —la captura— y esa la dispara la página de retorno.
+ *
+ * El `environment` del pago se guarda como 'sandbox' o 'production' igual
+ * que con Wompi, así `approvePayment` sigue rechazando por sí solo una
+ * transacción de prueba en un entorno productivo.
+ */
+export async function createPayPalPaymentForBooking(
+  booking: BookingForPayment,
+  requestOrigin: string | null,
+  locale: 'ES' | 'EN' = 'EN',
+): Promise<{ checkoutUrl: string; reference: string }> {
+  const paypal = getPayPalConfig()
+  if (paypal.status !== 'ready') {
+    console.error('[payments] PayPal no está configurado', { reason: paypal.reason })
+    throw new PaymentProviderError('paypalNotConfigured')
+  }
+
+  const site = getSiteUrl(requestOrigin)
+  const reference = `${booking.code}-${randomCode(16)}`
+
+  const payment = await prisma.payment.create({
+    data: {
+      bookingId: booking.id,
+      provider: 'paypal',
+      environment: paypal.config.mode,
+      amountCents: booking.totalCents,
+      currency: booking.currency,
+      reference,
+    },
+  })
+
+  try {
+    const order = await createOrder(paypal.config, {
+      reference,
+      amountCents: booking.totalCents,
+      currency: booking.currency,
+      description: `${booking.experienceTitle} — ${booking.date} — ${booking.people} pax`,
+      brandName: 'Experiences El Salvador',
+      locale,
+      returnUrl: `${site}/checkout/return?ref=${encodeURIComponent(reference)}&provider=paypal`,
+      cancelUrl: `${site}/checkout/return?ref=${encodeURIComponent(reference)}&provider=paypal&cancelado=1`,
+    })
+
+    await prisma.payment.update({
+      where: { id: payment.id },
+      // providerLinkId guarda el id de la orden: es lo que hace falta para
+      // capturar, y no depende de que la URL de retorno lo traiga.
+      data: { providerLinkId: order.orderId, checkoutUrl: order.approveUrl },
+    })
+
+    return { checkoutUrl: order.approveUrl, reference }
+  } catch (error) {
+    const message = error instanceof PayPalError ? error.message : error instanceof Error ? error.message : String(error)
+    console.error('[payments] no se pudo crear la orden de PayPal', { booking: booking.code, message })
+    await prisma.payment.update({
+      where: { id: payment.id },
+      data: { status: 'DECLINED', failureReason: 'orderCreationFailed' },
+    })
+    throw new PaymentProviderError('orderCreationFailed')
+  }
+}
+
+/**
+ * Punto único de entrada del checkout: elige pasarela según lo que pidió
+ * el comprador. Existe para que el endpoint no tenga que saber cómo
+ * funciona cada una.
+ */
+export async function createCheckoutPayment(
+  booking: BookingForPayment,
+  method: PaymentMethod,
+  requestOrigin: string | null,
+  locale: 'ES' | 'EN' = 'EN',
+): Promise<{ checkoutUrl: string; reference: string }> {
+  if (method === 'paypal') {
+    return createPayPalPaymentForBooking(booking, requestOrigin, locale)
+  }
+
+  const config = getPaymentConfig()
+  if (config.status !== 'ready') throw new PaymentProviderError('paymentsDisabled')
+  return createPaymentForBooking(booking, config, requestOrigin)
 }
 
 /* ------------------------------------------------------------------ */
@@ -298,6 +390,89 @@ async function sendConfirmationOnce(bookingId: string) {
     // la página de retorno) pueda enviarlo.
     await prisma.booking.update({ where: { id: bookingId }, data: { confirmationEmailSentAt: null } })
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Captura de PayPal                                                   */
+/* ------------------------------------------------------------------ */
+
+export type PayPalCaptureOutcome =
+  | ApprovalResult
+  | { outcome: 'declined'; reason: string }
+  | { outcome: 'pending'; reason: string }
+  | { outcome: 'unavailable' }
+
+/**
+ * Cobra la orden de PayPal asociada a un pago y registra el resultado.
+ *
+ * ESTO es lo que convierte una reserva en pagada. Volver de PayPal no
+ * basta: solo significa que el comprador pulsó «Pagar ahora». Aquí se
+ * llama a la API, se comprueba que la captura está COMPLETED y que el
+ * importe coincide, y solo entonces se aprueba.
+ *
+ * Idempotente por partida doble:
+ *   - en PayPal, con la cabecera PayPal-Request-Id;
+ *   - aquí, porque `approvePayment` usa updates condicionales y el id de
+ *     la captura es único en la tabla de pagos.
+ * Recargar la página de retorno no cobra dos veces.
+ */
+export async function capturePayPalPayment(paymentId: string): Promise<PayPalCaptureOutcome> {
+  const paypal = getPayPalConfig()
+  if (paypal.status !== 'ready') return { outcome: 'unavailable' }
+
+  const payment = await prisma.payment.findUnique({
+    where: { id: paymentId },
+    select: { id: true, provider: true, status: true, providerLinkId: true, amountCents: true, reference: true, bookingId: true },
+  })
+  if (!payment || payment.provider !== 'paypal') return { outcome: 'unavailable' }
+
+  // Ya cobrado: no se vuelve a llamar a PayPal. Se rematan las entradas y
+  // el correo por si quedaron a medias.
+  if (payment.status === 'APPROVED') {
+    await finalizeBooking(payment.bookingId)
+    return { outcome: 'alreadyProcessed', bookingId: payment.bookingId }
+  }
+
+  if (!payment.providerLinkId) {
+    log('pago de PayPal sin orden asociada', { payment: payment.id })
+    return { outcome: 'declined', reason: 'noOrder' }
+  }
+
+  let result
+  try {
+    result = await captureOrder(paypal.config, payment.providerLinkId, `capture-${payment.reference}`)
+  } catch (error) {
+    // Un fallo de red o un 5xx de PayPal NO es un pago rechazado: puede
+    // haberse cobrado. Se deja PENDING para reintentarlo.
+    console.error('[payments] no se pudo capturar la orden de PayPal', {
+      payment: payment.id,
+      message: error instanceof Error ? error.message : String(error),
+    })
+    return { outcome: 'unavailable' }
+  }
+
+  if (result.outcome === 'declined') {
+    await declinePayment(payment.id, `paypal:${result.reason}`)
+    return { outcome: 'declined', reason: result.reason }
+  }
+
+  if (result.outcome === 'pending') {
+    // PayPal retuvo el cobro para revisarlo. Ni se confirma ni se
+    // rechaza: queda pendiente y se resuelve al volver a consultar.
+    log('captura de PayPal pendiente de revisión', { payment: payment.id, reason: result.reason })
+    return { outcome: 'pending', reason: result.reason }
+  }
+
+  return approvePayment({
+    paymentId: payment.id,
+    transactionId: result.captureId,
+    amountCents: result.amountCents,
+    authorizationCode: null,
+    // En sandbox el dinero no es real; en live sí. El entorno del pago ya
+    // se guardó al crearlo, así que approvePayment puede compararlos.
+    isReal: paypal.config.mode === 'production',
+    source: 'redirect',
+  })
 }
 
 /* ------------------------------------------------------------------ */

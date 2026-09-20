@@ -4,18 +4,25 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { getPaymentConfig } from '@/lib/payments/config'
 import { verifyRedirectSignature } from '@/lib/payments/wompi'
-import { reconcileWompiTransaction } from '@/lib/payments/process'
+import { capturePayPalPayment, declinePayment, reconcileWompiTransaction } from '@/lib/payments/process'
 
 /**
- * Retorno desde el enlace de pago de Wompi.
+ * Retorno desde la pasarela. Sirve a las dos.
  *
- * Wompi redirige aquí con: identificadorEnlaceComercio, idTransaccion,
+ * WOMPI redirige aquí con: identificadorEnlaceComercio, idTransaccion,
  * idEnlace, monto y hash. NADA de eso se da por bueno: con el
  * idTransaccion se pregunta a la API de Wompi y se actúa según su
  * respuesta. El hash solo sirve para detectar enlaces manipulados.
  *
- * Si el cliente cierra la pestaña antes de llegar aquí no pasa nada: el
- * webhook confirma el pago igualmente.
+ * PAYPAL redirige aquí con ?provider=paypal. Es EL punto donde se cobra:
+ * la aprobación del comprador no mueve dinero, lo mueve la captura, que
+ * se hace desde el servidor contra la API de PayPal. Igual que con
+ * Wompi, no se cree nada de lo que traiga la URL: la reserva se marca
+ * pagada con lo que responda PayPal, y solo si el importe coincide.
+ *
+ * Si el cliente cierra la pestaña antes de llegar aquí: con Wompi el
+ * webhook confirma igualmente; con PayPal la orden queda aprobada pero
+ * sin capturar, o sea sin cobro, y la reserva caduca sola.
  */
 
 export const dynamic = 'force-dynamic'
@@ -39,7 +46,7 @@ export default async function PaymentReturnPage({ searchParams }: { searchParams
   const payment = reference
     ? await prisma.payment.findUnique({
         where: { reference },
-        select: { id: true, reference: true, booking: { select: { accessToken: true } } },
+        select: { id: true, reference: true, provider: true, booking: { select: { accessToken: true } } },
       })
     : null
 
@@ -60,6 +67,21 @@ export default async function PaymentReturnPage({ searchParams }: { searchParams
     )
   }
 
+  /* ----------------------------- PayPal ----------------------------- */
+  if (payment.provider === 'paypal') {
+    if (one(query.cancelado) === '1') {
+      // El comprador pulsó «Cancelar» en PayPal. No hay cobro. La reserva
+      // sigue apartada hasta que venza, así que puede reintentar.
+      await declinePayment(payment.id, 'paypal:cancelledByPayer')
+    } else {
+      // Captura en servidor: aquí es donde se cobra de verdad.
+      await capturePayPalPayment(payment.id)
+    }
+
+    redirect(`/booking/${payment.booking.accessToken}`)
+  }
+
+  /* ------------------------------ Wompi ----------------------------- */
   const config = getPaymentConfig()
   if (transactionId && config.status === 'ready' && config.mode !== 'mock') {
     const signed = verifyRedirectSignature(

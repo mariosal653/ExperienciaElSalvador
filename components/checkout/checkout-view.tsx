@@ -29,11 +29,23 @@ type ExperienceView = {
   weekdays: number[]
 }
 
+type PaymentMethod = 'wompi' | 'paypal'
+
+/**
+ * Qué pasarelas puede usar el comprador. Lo decide el servidor según las
+ * credenciales configuradas; aquí solo llegan los modos, nunca claves.
+ */
+type Methods = {
+  wompi: { available: boolean; mode: 'mock' | 'sandbox' | 'production' | null }
+  paypal: { available: boolean; mode: 'sandbox' | 'production' | null }
+  any: boolean
+}
+
 type Props = {
   experience: ExperienceView
   user: { name: string; email: string } | null
   discountPct: number
-  payment: { enabled: boolean; mode: 'mock' | 'sandbox' | 'production' | null }
+  methods: Methods
   range: { first: string; last: string }
   initialDate: string | null
   initialPeople: number | null
@@ -69,7 +81,7 @@ const SERVER_ERRORS: Record<string, Record<Locale, string>> = {
   generic: { ES: 'No se pudo iniciar el pago. Inténtalo de nuevo.', EN: 'We could not start the payment. Please try again.' },
 }
 
-export function CheckoutView({ experience, user, discountPct, payment, range, initialDate, initialPeople }: Props) {
+export function CheckoutView({ experience, user, discountPct, methods, range, initialDate, initialPeople }: Props) {
   const { lang } = useLanguage()
   const es = lang === 'ES'
   const t = (es_: string, en: string) => (es ? es_ : en)
@@ -104,6 +116,14 @@ export function CheckoutView({ experience, user, discountPct, payment, range, in
   const [submitting, setSubmitting] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
 
+  // Método de pago. Se preselecciona el primero disponible; si solo hay
+  // uno, el selector ni se muestra.
+  const [method, setMethod] = useState<PaymentMethod>(() => (methods.wompi.available ? 'wompi' : 'paypal'))
+  const choices: PaymentMethod[] = [
+    ...(methods.wompi.available ? (['wompi'] as const) : []),
+    ...(methods.paypal.available ? (['paypal'] as const) : []),
+  ]
+
   const idempotencyKey = useRef<string>('')
   if (!idempotencyKey.current) idempotencyKey.current = newKey()
 
@@ -119,7 +139,7 @@ export function CheckoutView({ experience, user, discountPct, payment, range, in
   // compra genera otra; un doble clic sin cambios reutiliza la misma.
   useEffect(() => {
     idempotencyKey.current = newKey()
-  }, [date, people, customer.email, useDiscount])
+  }, [date, people, customer.email, useDiscount, method])
 
   // Volver desde la pasarela con el botón «atrás» restaura la página desde
   // la caché del navegador con el botón aún en «cargando».
@@ -212,6 +232,7 @@ export function CheckoutView({ experience, user, discountPct, payment, range, in
           applyWelcomeDiscount: useDiscount && discountPct > 0,
           idempotencyKey: idempotencyKey.current,
           locale: lang,
+          paymentMethod: method,
         }),
       })
       const payload = await response.json().catch(() => ({}))
@@ -262,11 +283,15 @@ export function CheckoutView({ experience, user, discountPct, payment, range, in
     ) : null
   }
 
+  const mode = method === 'paypal' ? methods.paypal.mode : methods.wompi.mode
+
   const testBanner =
-    payment.mode === 'mock'
+    mode === 'mock'
       ? t('Modo de prueba: el pago es simulado y no se cobra nada.', 'Test mode: payment is simulated and nothing is charged.')
-      : payment.mode === 'sandbox'
-        ? t('Wompi en modo de pruebas: usa una tarjeta de prueba; no se cobra nada.', 'Wompi test mode: use a test card; nothing is charged.')
+      : mode === 'sandbox'
+        ? method === 'paypal'
+          ? t('PayPal en modo de pruebas (sandbox): usa una cuenta de prueba; no se cobra nada.', 'PayPal test mode (sandbox): use a test account; nothing is charged.')
+          : t('Wompi en modo de pruebas: usa una tarjeta de prueba; no se cobra nada.', 'Wompi test mode: use a test card; nothing is charged.')
         : null
 
   return (
@@ -561,6 +586,52 @@ export function CheckoutView({ experience, user, discountPct, payment, range, in
               </span>
             </label>
 
+            {/* Método de pago. Solo aparece si hay más de uno: con una
+                sola pasarela, elegir no aporta nada. */}
+            {choices.length > 1 && (
+              <fieldset className="mt-5">
+                <legend className="text-sm font-semibold">{t('Método de pago', 'Payment method')}</legend>
+                <div className="mt-2.5 grid gap-2">
+                  {choices.map((choice) => (
+                    <label
+                      key={choice}
+                      className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 text-sm transition ${
+                        method === choice ? 'border-[#173f45] bg-[#f4f7f5]' : 'border-[#dce7e1]'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value={choice}
+                        checked={method === choice}
+                        onChange={() => {
+                          setMethod(choice)
+                          setServerError(null)
+                        }}
+                        className="mt-0.5 h-4 w-4 shrink-0 accent-[#173f45]"
+                      />
+                      <span>
+                        <span className="block font-bold">
+                          {choice === 'paypal' ? 'PayPal' : t('Tarjeta con Wompi', 'Card with Wompi')}
+                        </span>
+                        <span className="mt-0.5 block text-xs text-[#6a8588]">
+                          {choice === 'paypal'
+                            ? t(
+                                'Paga con tu cuenta de PayPal o con tarjeta a través de PayPal.',
+                                'Pay with your PayPal account or with a card through PayPal.',
+                              )
+                            : t(
+                                'Tarjeta de crédito o débito en la página segura de Wompi.',
+                                'Credit or debit card on Wompi’s secure page.',
+                              )}
+                        </span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
+
             {serverError && (
               <p role="alert" className="mt-4 rounded-xl bg-[#fae6e0] px-4 py-3 text-sm font-medium text-[#a3341c]">
                 {serverError}
@@ -569,27 +640,34 @@ export function CheckoutView({ experience, user, discountPct, payment, range, in
 
             <button
               type="submit"
-              disabled={submitting || !payment.enabled}
+              disabled={submitting || !methods.any}
               className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-[#b8481c] px-6 py-4 text-sm font-bold text-white transition hover:bg-[#963b18] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#173f45] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting ? <Loader2 size={16} className="animate-spin" /> : <Lock size={15} />}
               {submitting
                 ? t('Preparando el pago…', 'Preparing payment…')
-                : payment.mode === 'mock'
+                : mode === 'mock'
                   ? t(`Continuar al pago de prueba · ${formatCents(price.totalCents)}`, `Continue to test payment · ${formatCents(price.totalCents)}`)
-                  : t(`Pagar ${formatCents(price.totalCents)} con Wompi`, `Pay ${formatCents(price.totalCents)} with Wompi`)}
+                  : method === 'paypal'
+                    ? t(`Pagar ${formatCents(price.totalCents)} con PayPal`, `Pay ${formatCents(price.totalCents)} with PayPal`)
+                    : t(`Pagar ${formatCents(price.totalCents)} con Wompi`, `Pay ${formatCents(price.totalCents)} with Wompi`)}
             </button>
 
-            {!payment.enabled && (
+            {!methods.any && (
               <p className="mt-3 text-center text-xs font-medium text-[#a3341c]">{SERVER_ERRORS.paymentsDisabled[lang]}</p>
             )}
 
             <p className="mt-3 flex items-start justify-center gap-1.5 text-center text-xs text-[#6a8588]">
               <ShieldCheck size={14} className="mt-px shrink-0 text-[#256b54]" />
-              {t(
-                'Pagas en la página segura de Wompi. Nunca vemos ni guardamos los datos de tu tarjeta.',
-                "You pay on Wompi's secure page. We never see or store your card details.",
-              )}
+              {method === 'paypal'
+                ? t(
+                    'Pagas en la página segura de PayPal. Nunca vemos ni guardamos los datos de tu tarjeta.',
+                    "You pay on PayPal's secure page. We never see or store your card details.",
+                  )
+                : t(
+                    'Pagas en la página segura de Wompi. Nunca vemos ni guardamos los datos de tu tarjeta.',
+                    "You pay on Wompi's secure page. We never see or store your card details.",
+                  )}
             </p>
           </aside>
         </form>

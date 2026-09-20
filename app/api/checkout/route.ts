@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { cancelUnpaidBooking, checkoutSchema, createPendingBooking } from '@/lib/checkout'
-import { getPaymentConfig } from '@/lib/payments/config'
-import { createPaymentForBooking, PaymentProviderError } from '@/lib/payments/process'
+import { availablePaymentMethods, getPaymentConfig } from '@/lib/payments/config'
+import { createCheckoutPayment, PaymentProviderError } from '@/lib/payments/process'
 import { originOf } from '@/lib/site'
 import { clientIp, rateLimit } from '@/lib/rate-limit'
 
@@ -11,13 +11,15 @@ import { clientIp, rateLimit } from '@/lib/rate-limit'
  *
  * 1. Valida (esquema + reglas de negocio) en el servidor.
  * 2. Crea la reserva en PENDING_PAYMENT, apartando plazas 30 minutos.
- * 3. Crea el cobro en la pasarela y devuelve su URL.
+ * 3. Crea el cobro en la pasarela elegida (Wompi o PayPal) y devuelve su
+ *    URL. Las dos se configuran por separado: basta con que haya una.
  *
  * NO confirma nada: la reserva pasa a PAID solo cuando el pago se valida
- * con la pasarela (webhook o consulta a su API). Tampoco emite entradas.
+ * con la pasarela —webhook o consulta a su API en Wompi, captura en
+ * servidor en PayPal—. Tampoco emite entradas.
  *
  * RESPUESTAS
- *   201 { ok: true, bookingCode, accessToken, checkoutUrl, mode }
+ *   201 { ok: true, bookingCode, accessToken, checkoutUrl, method }
  *   200 { ok: true, ..., reused: true }   mismo envío repetido
  *   400 invalidBody · 422 validation / invalidCustomer / fecha
  *   409 soldOut / benefitUnavailable · 429 tooManyRequests
@@ -35,9 +37,11 @@ export async function POST(request: Request) {
     )
   }
 
-  const config = getPaymentConfig()
-  if (config.status !== 'ready') {
-    console.error('[checkout] pagos desactivados', { reason: config.reason })
+  // Basta con que haya UNA pasarela disponible: Wompi y PayPal se
+  // configuran por separado y el comprador elige entre las que existan.
+  const methods = availablePaymentMethods()
+  if (!methods.any) {
+    console.error('[checkout] pagos desactivados: no hay ninguna pasarela configurada')
     return NextResponse.json({ ok: false, code: 'paymentsDisabled' }, { status: 503 })
   }
 
@@ -59,10 +63,21 @@ export async function POST(request: Request) {
   const session = await auth()
   const userId = session?.user?.id ?? null
 
-  const result = await createPendingBooking(parsed.data, {
-    userId,
-    isTest: config.mode !== 'production',
-  })
+  // Se respeta lo que pidió el comprador solo si esa pasarela existe; si
+  // no, se usa la otra. Así un formulario en caché con el método antiguo
+  // no deja la compra bloqueada.
+  const requested = parsed.data.paymentMethod
+  const method = methods[requested].available ? requested : requested === 'paypal' ? 'wompi' : 'paypal'
+
+  // Una reserva es de prueba salvo que la pasarela elegida esté cobrando
+  // de verdad: mock y sandbox no mueven dinero.
+  const wompi = getPaymentConfig()
+  const isTest =
+    method === 'paypal'
+      ? methods.paypal.mode !== 'production'
+      : wompi.status !== 'ready' || wompi.mode !== 'production'
+
+  const result = await createPendingBooking(parsed.data, { userId, isTest })
 
   if (!result.ok) {
     const { status, ...rest } = result.failure
@@ -88,19 +103,19 @@ export async function POST(request: Request) {
       bookingCode: booking.code,
       accessToken: booking.accessToken,
       checkoutUrl: booking.pendingCheckoutUrl,
-      mode: config.mode,
+      method,
     })
   }
 
   try {
-    const payment = await createPaymentForBooking(booking, config, originOf(request))
+    const payment = await createCheckoutPayment(booking, method, originOf(request), parsed.data.locale)
     return NextResponse.json(
       {
         ok: true,
         bookingCode: booking.code,
         accessToken: booking.accessToken,
         checkoutUrl: payment.checkoutUrl,
-        mode: config.mode,
+        method,
       },
       { status: 201 },
     )

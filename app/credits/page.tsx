@@ -3,7 +3,7 @@ import { CreditsView } from '@/components/legal/credits-view'
 
 export const metadata: Metadata = {
   title: 'Photo credits',
-  description: 'Authors and licenses of the photos and videos used on Experience El Salvador.',
+  description: 'Authors and licenses of the photos and videos used on Experiences El Salvador.',
   alternates: { canonical: '/credits' },
 }
 

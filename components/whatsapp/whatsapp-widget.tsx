@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { X } from 'lucide-react'
 import { useWhatsAppLead } from './whatsapp-provider'
 import { useLanguage } from '@/components/i18n/language-provider'
@@ -25,6 +26,9 @@ const BUBBLE_DISMISSED_KEY = 'wa-bubble-dismissed'
  * escritorio, WhatsApp Web o la app de escritorio.
  */
 export function WhatsAppWidget() {
+  // El panel de administración no es una página de venta: ahí el botón de
+  // «¿Planeando tu viaje?» sobra y tapa la tabla de datos.
+  const pathname = usePathname()
   const { lead: pageLead } = useWhatsAppLead()
   // El idioma sale del selector, no del contexto de la página: las páginas
   // que no publican contexto (reserva, entradas, legales) dejaban el valor
@@ -68,6 +72,9 @@ export function WhatsAppWidget() {
       // Sin almacenamiento: se oculta solo durante esta sesión de página.
     }
   }
+
+  // Los hooks van todos arriba: la salida temprana tiene que ir después.
+  if (pathname?.startsWith('/admin')) return null
 
   // El safe-area va en la propia clase y no en un `style` inline: así sigue
   // habiendo variante md y no se pierde el responsive.

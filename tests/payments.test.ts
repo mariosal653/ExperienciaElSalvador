@@ -166,6 +166,7 @@ function input(overrides: Partial<import('../lib/checkout').CheckoutInput> = {})
     applyWelcomeDiscount: false,
     idempotencyKey: `test-key-${keyCounter}-${Date.now()}`,
     locale: 'EN' as const,
+    paymentMethod: 'wompi' as const,
     ...overrides,
   }
 }

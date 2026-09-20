@@ -59,7 +59,7 @@ export default async function ExperiencePage({ params }: Params) {
     image,
     touristType: experience.category,
     itinerary: { '@type': 'Place', name: experience.destination, address: { '@type': 'PostalAddress', addressCountry: 'SV' } },
-    provider: { '@type': 'Organization', name: 'Experience El Salvador', url: site },
+    provider: { '@type': 'Organization', name: 'Experiences El Salvador', url: site },
     offers: {
       '@type': 'Offer',
       price: experience.priceUsd.toFixed(2),

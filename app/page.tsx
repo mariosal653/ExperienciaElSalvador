@@ -105,9 +105,9 @@ export default function Page() {
       {/* Capa 40 — ver la escala documentada en app/globals.css */}
       <header className="absolute inset-x-0 top-0 z-40 border-b border-white/20 text-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
-          <a href="#inicio" className="flex items-center gap-2.5" aria-label="Experience El Salvador · Inicio">
+          <a href="#inicio" className="flex items-center gap-2.5" aria-label="Experiences El Salvador · Inicio">
             <span className="grid h-9 w-9 place-items-center rounded-full bg-[#f4b942] text-[#173f45]"><Compass size={21} strokeWidth={2.5} /></span>
-            <span className="text-lg font-bold tracking-tight">Experience <span className="text-[#f4b942]">El Salvador</span></span>
+            <span className="text-lg font-bold tracking-tight">Experiences <span className="text-[#f4b942]">El Salvador</span></span>
           </a>
           <nav className="hidden items-center gap-8 text-sm font-medium md:flex" aria-label={es ? 'Navegación principal' : 'Main navigation'}>
             <a href="#experiencias" className="transition hover:text-[#f4b942]">{es ? 'Explorar' : 'Explore'}</a>

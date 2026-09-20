@@ -21,12 +21,12 @@ export function AccountShell({
     <div className="min-h-screen bg-[#fbfaf7]">
       <header className="border-b border-[#dce7e1] bg-[#173f45] text-white">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-5 py-4 lg:px-8">
-          <Link href="/" className="flex items-center gap-2.5" aria-label="Experience El Salvador · Inicio">
+          <Link href="/" className="flex items-center gap-2.5" aria-label="Experiences El Salvador · Inicio">
             <span className="grid h-8 w-8 place-items-center rounded-full bg-[#f4b942] text-[#173f45]">
               <Compass size={18} strokeWidth={2.5} />
             </span>
             <span className="text-base font-bold tracking-tight">
-              Experience <span className="text-[#f4b942]">El Salvador</span>
+              Experiences <span className="text-[#f4b942]">El Salvador</span>
             </span>
           </Link>
           <SignOutButton />

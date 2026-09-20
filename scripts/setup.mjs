@@ -33,7 +33,7 @@ const always = (message) => console.log(message)
 
 let didSomething = false
 
-log('\nPreparando Experience El Salvador\n')
+log('\nPreparando Experiences El Salvador\n')
 
 // --- 1. Archivo de entorno -------------------------------------------
 if (!existsSync(ENV_FILE)) {

@@ -1,4 +1,4 @@
-// Experience El Salvador — esquema de datos
+// Experiences El Salvador — esquema de datos
 //
 // PROVEEDOR: SQLite. El proyecto no tenía base de datos ni ORM, y no hay
 // un servidor PostgreSQL disponible en este entorno. SQLite permite tener
@@ -30,6 +30,16 @@ datasource db {
 // Autenticación — esquema estándar de Auth.js más los campos propios
 // ---------------------------------------------------------------------
 
+/// Perfil de acceso. ADMIN es lo único que abre /admin.
+///
+/// Se guarda en base de datos y NO en el token de sesión: la estrategia es
+/// JWT y un token no se puede revocar. Si el rol viajara dentro, quitarle
+/// el permiso a alguien no tendría efecto hasta que su sesión caducara.
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -43,6 +53,10 @@ model User {
 
   phone         String?
   locale        String    @default("EN")
+
+  /// Ver el comentario de UserRole. Toda cuenta nace como USER: el
+  /// administrador se provisiona a propósito con `pnpm admin:setup`.
+  role          UserRole  @default(USER)
 
   accounts      Account[]
   sessions      Session[]

@@ -19,7 +19,7 @@ export function SiteFooter() {
     <footer className="no-print border-t border-[#dce7e1] px-5 py-8 text-sm text-[#6a8588]">
       <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 md:flex-row md:items-center">
         <span className="font-bold text-[#173f45]">
-          Experience <span className="text-[#b8481c]">El Salvador</span>
+          Experiences <span className="text-[#b8481c]">El Salvador</span>
         </span>
         <span>{es ? 'Hecho con cariño desde El Salvador · © 2026' : 'Made with care in El Salvador · © 2026'}</span>
         <nav aria-label={es ? 'Enlaces legales' : 'Legal links'} className="flex flex-wrap gap-x-4 gap-y-2">

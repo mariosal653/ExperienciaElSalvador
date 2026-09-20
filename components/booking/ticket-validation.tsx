@@ -116,7 +116,7 @@ export function TicketValidation({
             <span className="grid h-8 w-8 place-items-center rounded-full bg-[#f4b942] text-[#173f45]">
               <Compass size={18} strokeWidth={2.5} />
             </span>
-            Experience <span className="text-[#b8481c]">El Salvador</span>
+            Experiences <span className="text-[#b8481c]">El Salvador</span>
           </span>
           <div className="rounded-full bg-[#173f45] p-0.5">
             <LanguageSwitch lang={lang} onChange={setLang} />

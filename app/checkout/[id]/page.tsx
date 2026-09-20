@@ -4,7 +4,7 @@ import { experiences } from '@/lib/data'
 import { getUser } from '@/lib/session'
 import { prisma } from '@/lib/db'
 import { getUsableWelcomeBenefit, releaseStaleReservation } from '@/lib/benefits'
-import { publicPaymentInfo } from '@/lib/payments/config'
+import { availablePaymentMethods } from '@/lib/payments/config'
 import { bookableRange } from '@/lib/dates'
 import { CheckoutView } from '@/components/checkout/checkout-view'
 
@@ -68,7 +68,7 @@ export default async function CheckoutPage({ params, searchParams }: Props) {
       }}
       user={user ? { name: user.name ?? '', email: user.email ?? '' } : null}
       discountPct={discountPct}
-      payment={publicPaymentInfo()}
+      methods={availablePaymentMethods()}
       range={bookableRange()}
       initialDate={/^\d{4}-\d{2}-\d{2}$/.test(query.date ?? '') ? (query.date as string) : null}
       initialPeople={Number.isFinite(initialPeople) ? initialPeople : null}

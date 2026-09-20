@@ -20,8 +20,8 @@ export const whatsappConfig = {
 
   /** Mensaje cuando el visitante no ha elegido nada todavía. */
   defaultMessage: {
-    ES: 'Hola 👋, estoy visitando Experience El Salvador y quisiera recibir más información sobre las experiencias disponibles.',
-    EN: 'Hi 👋, I am browsing Experience El Salvador and would like more information about the available experiences.',
+    ES: 'Hola 👋, estoy visitando Experiences El Salvador y quisiera recibir más información sobre las experiencias disponibles.',
+    EN: 'Hi 👋, I am browsing Experiences El Salvador and would like more information about the available experiences.',
   } satisfies Record<Locale, string>,
 
   /** Segundos antes de mostrar la burbuja de ayuda. */

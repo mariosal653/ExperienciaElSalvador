@@ -77,3 +77,96 @@ export function publicPaymentInfo(): { enabled: boolean; mode: PaymentMode | nul
     ? { enabled: true, mode: config.mode }
     : { enabled: false, mode: null }
 }
+
+/* ==================================================================== */
+/* PayPal                                                               */
+/* ==================================================================== */
+
+/**
+ * PayPal se configura APARTE de Wompi y se añade como opción, no lo
+ * sustituye: un comercio puede tener las dos, una o ninguna.
+ *
+ * PAYPAL_ENVIRONMENT
+ *   sandbox     cuentas de prueba de developer.paypal.com. No cobra.
+ *   production  cobro real (PayPal lo llama «live»; se acepta ese nombre).
+ *
+ * Sin PAYPAL_ENVIRONMENT, o sin las dos claves, PayPal simplemente NO
+ * aparece como método de pago. No se cae a una simulación: un botón que
+ * dice «Pagar con PayPal» y no cobra es peor que no tener el botón.
+ *
+ * Panel de PayPal → Apps & Credentials:
+ *   PAYPAL_CLIENT_ID      = Client ID
+ *   PAYPAL_CLIENT_SECRET  = Secret
+ *
+ * Ninguna lleva NEXT_PUBLIC_: las dos se quedan en el servidor.
+ */
+
+const PAYPAL_API_SANDBOX = 'https://api-m.sandbox.paypal.com'
+const PAYPAL_API_LIVE = 'https://api-m.paypal.com'
+
+export type PayPalConfig = {
+  mode: 'sandbox' | 'production'
+  clientId: string
+  clientSecret: string
+  apiBase: string
+}
+
+export type PayPalConfigResult =
+  | { status: 'ready'; config: PayPalConfig }
+  | { status: 'disabled'; reason: 'notConfigured' | 'missingKeys' | 'invalidEnvironment' }
+
+export function getPayPalConfig(): PayPalConfigResult {
+  const raw = process.env.PAYPAL_ENVIRONMENT?.trim().toLowerCase()
+  if (!raw) return { status: 'disabled', reason: 'notConfigured' }
+
+  // PayPal llama «live» a producción; se admiten los dos nombres para no
+  // obligar a recordar cuál usa este proyecto.
+  const mode = raw === 'live' || raw === 'production' ? 'production' : raw === 'sandbox' ? 'sandbox' : null
+  if (!mode) return { status: 'disabled', reason: 'invalidEnvironment' }
+
+  const clientId = process.env.PAYPAL_CLIENT_ID?.trim()
+  const clientSecret = process.env.PAYPAL_CLIENT_SECRET?.trim()
+  if (!clientId || !clientSecret) return { status: 'disabled', reason: 'missingKeys' }
+
+  return {
+    status: 'ready',
+    config: {
+      mode,
+      clientId,
+      clientSecret,
+      apiBase:
+        process.env.PAYPAL_API_URL?.trim() ||
+        (mode === 'production' ? PAYPAL_API_LIVE : PAYPAL_API_SANDBOX),
+    },
+  }
+}
+
+/* ==================================================================== */
+/* Métodos disponibles                                                  */
+/* ==================================================================== */
+
+export type PaymentMethod = 'wompi' | 'paypal'
+
+/** Qué puede elegir el comprador. El navegador ve esto; nunca las claves. */
+export type AvailableMethods = {
+  wompi: { available: boolean; mode: PaymentMode | null }
+  paypal: { available: boolean; mode: 'sandbox' | 'production' | null }
+  /** true si hay al menos una forma de pagar. */
+  any: boolean
+}
+
+export function availablePaymentMethods(): AvailableMethods {
+  const wompi = getPaymentConfig()
+  const paypal = getPayPalConfig()
+
+  const wompiInfo = {
+    available: wompi.status === 'ready',
+    mode: wompi.status === 'ready' ? wompi.mode : null,
+  }
+  const paypalInfo = {
+    available: paypal.status === 'ready',
+    mode: paypal.status === 'ready' ? paypal.config.mode : null,
+  }
+
+  return { wompi: wompiInfo, paypal: paypalInfo, any: wompiInfo.available || paypalInfo.available }
+}

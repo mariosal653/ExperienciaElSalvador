@@ -11,7 +11,7 @@ import { parseLocalDate } from './data'
  *   RESEND_API_KEY   clave de Resend. Sin ella, NO se envía nada y se deja
  *                    constancia en el log. La reserva sigue confirmada.
  *   EMAIL_FROM       remitente verificado en Resend, p. ej.
- *                    "Experience El Salvador <reservas@tu-dominio.com>".
+ *                    "Experiences El Salvador <reservas@tu-dominio.com>".
  */
 
 export type ConfirmationEmail = {
@@ -61,7 +61,7 @@ export function renderConfirmationEmail(data: ConfirmationEmail): { subject: str
   const html = `<!doctype html><html><body style="margin:0;background:#fbfaf7;font-family:Arial,Helvetica,sans-serif;color:#173f45">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:28px 14px">
 <table role="presentation" width="100%" style="max-width:560px;background:#ffffff;border-radius:18px;padding:28px" cellpadding="0" cellspacing="0"><tr><td>
-<p style="font-weight:bold;font-size:18px;margin:0 0 22px">Experience <span style="color:#b8481c">El Salvador</span></p>
+<p style="font-weight:bold;font-size:18px;margin:0 0 22px">Experiences <span style="color:#b8481c">El Salvador</span></p>
 ${testBanner}
 <h1 style="font-size:24px;margin:0 0 8px">${es ? `¡Listo, ${name}!` : `You're all set, ${name}!`}</h1>
 <p style="margin:0 0 22px;color:#547176">${es ? 'Tu reserva está confirmada y tus entradas están listas.' : 'Your booking is confirmed and your tickets are ready.'}</p>
