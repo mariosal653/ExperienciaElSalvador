@@ -4,6 +4,7 @@ import { issueTickets } from '../tickets'
 import { sendConfirmationEmail } from '../email'
 import { getSiteUrl } from '../site'
 import { randomCode } from '../security'
+import { HOLD_MINUTES } from '../availability'
 import { getPayPalConfig, getPaymentConfig, type PaymentConfig, type PaymentMethod } from './config'
 import { createPaymentLink, getTransaction, WompiError } from './wompi'
 import { captureOrder, createOrder, PayPalError } from './paypal'
@@ -90,7 +91,12 @@ export async function createPaymentForBooking(
       description: `${booking.experienceTitle} — ${booking.date} — ${booking.people} pax`,
       imageUrl,
       redirectUrl: `${site}/checkout/return?ref=${encodeURIComponent(reference)}`,
+      // Mismo camino que el «cancelar» de PayPal: vuelve a nuestra página
+      // de retorno, que marca el intento como rechazado y deja la reserva
+      // apartada para que el cliente pueda reintentar.
+      returnUrl: `${site}/checkout/return?ref=${encodeURIComponent(reference)}&cancelado=1`,
       webhookUrl: `${site}/api/payments/wompi/webhook`,
+      expiresInMinutes: HOLD_MINUTES,
     })
 
     await prisma.payment.update({

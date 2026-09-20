@@ -104,7 +104,22 @@ export type CreateLinkInput = {
   description: string
   imageUrl?: string
   redirectUrl: string
+  /**
+   * Botón «regresar» que Wompi muestra ANTES de que el cliente escriba la
+   * tarjeta (`configuracion.urlRetorno`). Sin él, quien se arrepiente se
+   * queda atrapado en la pasarela o acaba en la web del comercio.
+   */
+  returnUrl: string
   webhookUrl: string
+  /**
+   * Minutos que la interfaz de pago sigue siendo válida
+   * (`configuracion.duracionInterfazIntentoMinutos`).
+   *
+   * Se ata al tiempo que se apartan las plazas: si la pantalla viviera más
+   * que el apartado, alguien podría pagar una plaza ya liberada y habría
+   * que vender de más o devolver el dinero.
+   */
+  expiresInMinutes: number
 }
 
 export type CreatedLink = { linkId: string; checkoutUrl: string; isProduction: boolean }
@@ -124,11 +139,17 @@ export async function createPaymentLink(config: WompiConfig, input: CreateLinkIn
     },
     configuracion: {
       urlRedirect: input.redirectUrl,
+      urlRetorno: input.returnUrl,
       urlWebhook: input.webhookUrl,
+      duracionInterfazIntentoMinutos: input.expiresInMinutes,
       notificarTransaccionCliente: true,
       ...(notifyEmails ? { emailsNotificacion: notifyEmails } : {}),
     },
     // Un enlace, un pago: impide que alguien pague dos veces la misma reserva.
+    //
+    // `cantidadMaximaPagosFallidos` se deja SIN definir a propósito: limita
+    // los intentos fallidos antes de desactivar el enlace, y un cliente al
+    // que le rechazan la tarjeta tiene que poder probar con otra.
     limitesDeUso: { cantidadMaximaPagosExitosos: 1 },
   }
 

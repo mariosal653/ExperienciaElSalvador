@@ -2,6 +2,28 @@
 
 Referencia oficial: <https://docs.wompi.sv>
 
+## Contrastado con la documentación (20/09/2026)
+
+Cada punto donde esta aplicación habla con Wompi se verificó contra la página
+oficial correspondiente. Si algún día Wompi cambia algo, estas son las páginas
+que hay que volver a mirar:
+
+| Qué | Cómo está implementado | Página oficial |
+|---|---|---|
+| Token | `POST https://id.wompi.sv/connect/token`, form-urlencoded con `grant_type=client_credentials`, `audience=wompi_api`, `client_id`, `client_secret` | [autenticacion](https://docs.wompi.sv/autenticacion/autenticacion.md) |
+| Enlace de pago | `POST https://api.wompi.sv/EnlacePago`; respuesta `idEnlace`, `urlEnlace`, `estaProductivo` | [enlace-de-pago](https://docs.wompi.sv/metodos-api/enlace-de-pago.md) |
+| Consulta de transacción | `GET /TransaccionCompra/{id}`; se leen `idTransaccion`, `esAprobada`, `esReal`, `monto`, `codigoAutorizacion`, `mensaje` | [obtener-transaccion-compra-por-id](https://docs.wompi.sv/metodos-api/obtener-transaccion-compra-por-id.md) |
+| Firma del webhook | cabecera `wompi_hash` = HMAC-SHA256 del **cuerpo crudo** con el API Secret, en hexadecimal | [validar-webhook](https://docs.wompi.sv/webhook/validar-webhook.md) |
+| Hash de la redirección | HMAC-SHA256 de `identificadorEnlaceComercio + idTransaccion + idEnlace + monto` con el API Secret | [validar-parametros-url-redirect](https://docs.wompi.sv/redirect-url/validar-parametros-url-redirect.md) |
+| Cuerpo del webhook | PascalCase: `IdTransaccion`, `ResultadoTransaccion`, `Monto`, `EsProductiva`, `EnlacePago.IdentificadorEnlaceComercio` | [definicion-webhook](https://docs.wompi.sv/webhook/definicion-webhook.md) |
+
+Las dos firmas están fijadas con pruebas en `tests/payments.test.ts`, así que un
+cambio accidental en el algoritmo rompe la suite.
+
+Un detalle que parece un error y no lo es: el campo del formulario de pago se
+llama `permitirTarjetaCreditoDebido`. La errata está en la API de Wompi, no en
+este proyecto; escribirlo «bien» haría que Wompi lo ignorara.
+
 ## Cómo está montado
 
 ```
@@ -31,6 +53,16 @@ POST /api/payments/wompi/webhook   GET /checkout/return?ref=…&idTransaccion=�
   es un update condicional; las entradas tienen `@@unique([bookingId, number])`.
   El mismo webhook diez veces = un pago y un juego de entradas.
 - Los datos de tarjeta nunca pasan por esta aplicación.
+- El enlace se crea con `configuracion.urlRetorno` (el botón «regresar» que
+  Wompi muestra antes de pedir la tarjeta) apuntando a nuestra página de
+  retorno con `&cancelado=1`: así, quien se arrepiente vuelve al sitio, el
+  intento queda `DECLINED` y la reserva sigue apartada para reintentar.
+- `configuracion.duracionInterfazIntentoMinutos` se ata a los 30 minutos que
+  se apartan las plazas. Si la pantalla de pago viviera más que el apartado,
+  alguien podría pagar una plaza ya liberada.
+- `limitesDeUso.cantidadMaximaPagosExitosos: 1` impide pagar dos veces la misma
+  reserva. `cantidadMaximaPagosFallidos` se deja sin definir a propósito: un
+  cliente al que le rechazan la tarjeta tiene que poder probar con otra.
 
 ## Variables de entorno
 

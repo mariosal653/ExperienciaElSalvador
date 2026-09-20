@@ -82,6 +82,15 @@ export default async function PaymentReturnPage({ searchParams }: { searchParams
   }
 
   /* ------------------------------ Wompi ----------------------------- */
+
+  // El cliente pulsó «regresar» en la pantalla de Wompi, antes de escribir
+  // la tarjeta (configuracion.urlRetorno). No hay cobro. La reserva sigue
+  // apartada hasta que venza el plazo, así que puede reintentar.
+  if (one(query.cancelado) === '1' && !transactionId) {
+    await declinePayment(payment.id, 'wompi:cancelledByPayer')
+    redirect(`/booking/${payment.booking.accessToken}`)
+  }
+
   const config = getPaymentConfig()
   if (transactionId && config.status === 'ready' && config.mode !== 'mock') {
     const signed = verifyRedirectSignature(
