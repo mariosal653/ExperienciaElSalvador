@@ -14,8 +14,19 @@ export type Credit = {
   file: string
   title: string
   author: string
-  license: 'CC BY 2.0' | 'CC BY 3.0' | 'CC BY 4.0' | 'CC BY-SA 3.0' | 'CC BY-SA 4.0'
-  /** Página del archivo en Commons. */
+  license:
+    | 'CC BY 2.0'
+    | 'CC BY 3.0'
+    | 'CC BY 4.0'
+    | 'CC BY-SA 3.0'
+    | 'CC BY-SA 4.0'
+    /**
+     * Pixabay NO exige citar al autor. Se cita igual: la página existe
+     * para saber de dónde sale cada imagen, y una foto de banco tiene que
+     * poder distinguirse de una fotografía real de El Salvador.
+     */
+    | 'Licencia de contenido de Pixabay'
+  /** Página del archivo en su origen (Commons, Pixabay…). */
   source: string
 }
 
@@ -27,6 +38,7 @@ export const LICENSE_URLS: Record<Credit['license'], string> = {
   'CC BY 4.0': 'https://creativecommons.org/licenses/by/4.0/',
   'CC BY-SA 3.0': 'https://creativecommons.org/licenses/by-sa/3.0/',
   'CC BY-SA 4.0': 'https://creativecommons.org/licenses/by-sa/4.0/',
+  'Licencia de contenido de Pixabay': 'https://pixabay.com/service/license-summary/',
 }
 
 export const credits = {
@@ -141,6 +153,17 @@ export const credits = {
     author: 'ElmerGuevara',
     license: 'CC BY-SA 3.0',
     source: `${COMMONS}Bosque_interior_Parque_Nacional_Montecristo_01.JPG`,
+  },
+  // ÚNICA imagen de banco del sitio. Las demás son fotografías reales de
+  // los lugares, de Wikimedia Commons. Esta ilustra una clase de surf al
+  // atardecer, pero NO está tomada en El Zonte: por eso su texto
+  // alternativo describe la escena y no dice el nombre de la playa.
+  surfElZonte: {
+    file: '/img/experiences/surf-el-zonte.jpg',
+    title: 'Surfistas al atardecer (imagen de banco, no es El Zonte)',
+    author: 'MMckein',
+    license: 'Licencia de contenido de Pixabay',
+    source: 'https://pixabay.com/es/photos/surf-playa-beach-arena-deportes-2363367/',
   },
 } satisfies Record<string, Credit>
 

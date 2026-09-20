@@ -17,8 +17,8 @@ export function CreditsView() {
         <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">{es ? 'Créditos de fotos y vídeo' : 'Photo & video credits'}</h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#547176]">
           {es
-            ? 'Estas imágenes de El Salvador provienen de Wikimedia Commons y se usan bajo licencias Creative Commons, que permiten su uso citando al autor. Las fotografías de Unsplash del resto del sitio se usan bajo la Licencia de Unsplash.'
-            : 'These images of El Salvador come from Wikimedia Commons and are used under Creative Commons licenses, which allow reuse with attribution. Unsplash photos elsewhere on the site are used under the Unsplash License.'}
+            ? 'Casi todas estas imágenes son fotografías reales de El Salvador tomadas de Wikimedia Commons, y se usan bajo licencias Creative Commons, que permiten su uso citando al autor. La excepción es una imagen de banco de Pixabay, señalada como tal: Pixabay no exige citar al autor, pero se cita igual para que se distinga de las fotos del país.'
+            : 'Almost all of these images are real photographs of El Salvador taken from Wikimedia Commons, used under Creative Commons licenses, which allow reuse with attribution. The exception is one stock image from Pixabay, labelled as such: Pixabay does not require attribution, but it is credited anyway so it can be told apart from the photos of the country.'}
         </p>
 
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -39,7 +39,7 @@ export function CreditsView() {
                     {credit.license}
                   </a>
                   <a href={credit.source} target="_blank" rel="noopener noreferrer" className="font-semibold text-[#173f45] hover:underline">
-                    Wikimedia Commons
+                    {sourceName(credit.source)}
                   </a>
                 </p>
               </div>
@@ -50,4 +50,20 @@ export function CreditsView() {
       <SiteFooter />
     </div>
   )
+}
+
+/**
+ * Nombre del sitio de origen, deducido del enlace.
+ *
+ * Antes estaba escrito «Wikimedia Commons» a mano, y al añadir la primera
+ * imagen de Pixabay la ficha mandaba a Pixabay diciendo que era Commons.
+ */
+function sourceName(source: string): string {
+  if (source.includes('commons.wikimedia.org')) return 'Wikimedia Commons'
+  if (source.includes('pixabay.com')) return 'Pixabay'
+  try {
+    return new URL(source).hostname.replace(/^www\./, '')
+  } catch {
+    return source
+  }
 }

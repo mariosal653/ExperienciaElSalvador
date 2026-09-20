@@ -225,8 +225,13 @@ export const experiences: Experience[] = [
     rating: 4.8,
     reviews: 142,
     durationHours: 2,
-    image: 'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&w=900&q=85',
-    imageAlt: { ES: 'Playa de El Zonte al amanecer', EN: 'El Zonte beach at sunrise' },
+    image: '/img/experiences/surf-el-zonte.jpg',
+    // La foto es de banco (Pixabay) y no está tomada en El Zonte, así que
+    // el texto describe la escena sin nombrar la playa. Ver lib/credits.ts.
+    imageAlt: {
+      ES: 'Surfistas con sus tablas entrando al mar al atardecer',
+      EN: 'Surfers carrying their boards into the sea at sunset',
+    },
     maxPeople: 8,
     weekdays: [0, 1, 2, 3, 4, 5, 6],
     description: {
