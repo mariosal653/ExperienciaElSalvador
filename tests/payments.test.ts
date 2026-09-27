@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest'
+import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest'
 import { execSync } from 'node:child_process'
 import { createHmac } from 'node:crypto'
 
@@ -358,5 +358,81 @@ describe('reserva ahora, paga después', () => {
     const booking = await m.prisma.booking.findUniqueOrThrow({ where: { id: result.booking.id }, include: { tickets: true } })
     expect(booking.status).toBe('CONFIRMED')
     expect(booking.tickets).toHaveLength(booking.people)
+  })
+})
+
+/* ------------------------------------------------------------------ */
+
+describe('enlace de pago de Wompi (según su especificación OpenAPI)', () => {
+  const config = {
+    status: 'ready' as const,
+    mode: 'sandbox' as const,
+    clientId: 'app-de-prueba',
+    clientSecret: 'secreto-de-prueba',
+    webhookSecret: 'secreto-de-prueba',
+    apiBase: 'https://api.wompi.test',
+    authUrl: 'https://id.wompi.test/connect/token',
+  }
+
+  function stubWompi() {
+    const calls: { url: string; method: string; body: unknown }[] = []
+    vi.stubGlobal('fetch', async (url: string, init: RequestInit = {}) => {
+      const body = typeof init.body === 'string' && init.body.startsWith('{') ? JSON.parse(init.body) : init.body
+      calls.push({ url: String(url), method: init.method ?? 'GET', body })
+      if (String(url).includes('/connect/token')) return Response.json({ access_token: 'token', expires_in: 3600 })
+      if (String(url).endsWith('/EnlacePago')) return Response.json({ idEnlace: 123, urlEnlace: 'https://lk.wompi.sv/abc', estaProductivo: false })
+      return Response.json({})
+    })
+    return calls
+  }
+
+  it('el enlace caduca con el apartado y lleva el número de reserva', async () => {
+    const calls = stubWompi()
+    try {
+      const before = Date.now()
+      const link = await m.wompi.createPaymentLink(config as never, {
+        reference: 'EES-TEST-REF',
+        amountCents: 9000,
+        productName: 'Volcán de Santa Ana · EES-TEST',
+        description: 'prueba',
+        redirectUrl: 'https://example.com/checkout/return',
+        returnUrl: 'https://example.com/checkout/return?cancelado=1',
+        webhookUrl: 'https://example.com/api/payments/wompi/webhook',
+        expiresInMinutes: 30,
+        bookingCode: 'EES-TEST',
+      })
+      expect(link).toEqual({ linkId: '123', checkoutUrl: 'https://lk.wompi.sv/abc', isProduction: false })
+
+      const body = calls.find((call) => call.url.endsWith('/EnlacePago'))?.body as {
+        monto: number
+        vigencia: { fechaInicio: string; fechaFin: string }
+        datosAdicionales: Record<string, string>
+        limitesDeUso: { cantidadMaximaPagosExitosos: number }
+        configuracion: { duracionInterfazIntentoMinutos: number }
+      }
+      expect(body.monto).toBe(90)
+      expect(body.datosAdicionales).toEqual({ reserva: 'EES-TEST' })
+      expect(body.limitesDeUso.cantidadMaximaPagosExitosos).toBe(1)
+      expect(body.configuracion.duracionInterfazIntentoMinutos).toBe(30)
+      const end = new Date(body.vigencia.fechaFin).getTime()
+      expect(end - before).toBeGreaterThanOrEqual(30 * 60_000 - 1000)
+      expect(end - before).toBeLessThanOrEqual(30 * 60_000 + 5000)
+      expect(new Date(body.vigencia.fechaInicio).getTime()).toBeLessThan(before)
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it('desactiva un enlace con PUT /EnlacePago/{id}/desactivar', async () => {
+    const calls = stubWompi()
+    try {
+      await m.wompi.deactivatePaymentLink(config as never, '123')
+      const call = calls.find((item) => item.url.includes('/EnlacePago/'))
+      expect(call?.url).toBe('https://api.wompi.test/EnlacePago/123/desactivar')
+      expect(call?.method).toBe('PUT')
+      await expect(m.wompi.deactivatePaymentLink(config as never, '../x')).rejects.toThrow()
+    } finally {
+      vi.unstubAllGlobals()
+    }
   })
 })

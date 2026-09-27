@@ -1,10 +1,9 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
-import { finalizeBooking } from '@/lib/payments/process'
+import { cancelBookingAndLinks, finalizeBooking } from '@/lib/payments/process'
 import { ticketQrSvg, ticketUrl } from '@/lib/tickets'
 import { availablePaymentMethods, publicPaymentInfo } from '@/lib/payments/config'
-import { cancelUnpaidBooking } from '@/lib/checkout'
 import { BookingView } from '@/components/booking/booking-view'
 
 /**
@@ -35,7 +34,7 @@ export default async function BookingPage({ params }: { params: Promise<{ access
   // plazas y descuento. El cupo ya lo ignoraba (solo cuenta apartados
   // vigentes); esto deja el estado claro para el cliente y para el panel.
   if (booking.payLater && booking.status === 'PENDING_PAYMENT' && booking.holdExpiresAt && booking.holdExpiresAt <= new Date()) {
-    await cancelUnpaidBooking(booking.id, booking.userId)
+    await cancelBookingAndLinks(booking.id, booking.userId)
   }
 
   // Pagada pero sin entradas todavía (p. ej. el proceso se cortó entre los

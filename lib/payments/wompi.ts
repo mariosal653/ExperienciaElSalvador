@@ -4,10 +4,13 @@ import type { PaymentConfig } from './config'
 /**
  * Cliente de la API de Wompi El Salvador. SOLO SERVIDOR.
  *
- * Referencia: https://docs.wompi.sv
+ * Referencia: https://docs.wompi.sv y la especificación OpenAPI en
+ * https://api.wompi.sv/index.html (swagger/v1/swagger.json).
  *   Autenticación         POST https://id.wompi.sv/connect/token
  *   Crear enlace de pago  POST https://api.wompi.sv/EnlacePago
+ *   Desactivar enlace     PUT  https://api.wompi.sv/EnlacePago/{id}/desactivar
  *   Consultar transacción GET  https://api.wompi.sv/TransaccionCompra/{id}
+ *   Datos del aplicativo  GET  https://api.wompi.sv/Aplicativo
  *   Webhook               cabecera `wompi_hash` = HMAC-SHA256(cuerpo, API Secret)
  *   Redirección           `hash` = HMAC-SHA256(identificadorEnlaceComercio
  *                         + idTransaccion + idEnlace + monto, API Secret)
@@ -120,12 +123,15 @@ export type CreateLinkInput = {
    * que vender de más o devolver el dinero.
    */
   expiresInMinutes: number
+  /** Número de reserva: viaja en `datosAdicionales` y sale en reportes y webhooks de Wompi. */
+  bookingCode?: string
 }
 
 export type CreatedLink = { linkId: string; checkoutUrl: string; isProduction: boolean }
 
 export async function createPaymentLink(config: WompiConfig, input: CreateLinkInput): Promise<CreatedLink> {
   const notifyEmails = process.env.WOMPI_NOTIFY_EMAILS?.trim()
+  const now = Date.now()
 
   const body = {
     identificadorEnlaceComercio: input.reference,
@@ -151,6 +157,16 @@ export async function createPaymentLink(config: WompiConfig, input: CreateLinkIn
     // los intentos fallidos antes de desactivar el enlace, y un cliente al
     // que le rechazan la tarjeta tiene que poder probar con otra.
     limitesDeUso: { cantidadMaximaPagosExitosos: 1 },
+    // El ENLACE caduca a la vez que el apartado de plazas (`vigencia.fechaFin`).
+    // `duracionInterfazIntentoMinutos` solo limita cada pantalla de pago: sin
+    // fecha de fin, el mismo enlace se podía volver a abrir y pagar horas o
+    // días después, con las plazas ya liberadas y quizá vendidas a otro.
+    // El inicio se adelanta unos minutos por si el reloj de Wompi va detrás.
+    vigencia: {
+      fechaInicio: new Date(now - 5 * 60_000).toISOString(),
+      fechaFin: new Date(now + input.expiresInMinutes * 60_000).toISOString(),
+    },
+    ...(input.bookingCode ? { datosAdicionales: { reserva: input.bookingCode } } : {}),
   }
 
   const payload = await wompiFetch<{
@@ -167,6 +183,46 @@ export async function createPaymentLink(config: WompiConfig, input: CreateLinkIn
     linkId: String(payload.idEnlace),
     checkoutUrl: payload.urlEnlace,
     isProduction: Boolean(payload.estaProductivo),
+  }
+}
+
+/**
+ * Desactiva un enlace para que no admita más pagos. Se usa al liberar o
+ * vencer una reserva que tenía un enlace abierto.
+ */
+export async function deactivatePaymentLink(config: WompiConfig, linkId: string): Promise<void> {
+  if (!/^\d{1,12}$/.test(linkId)) throw new WompiError('invalid link id')
+  await wompiFetch<unknown>(config, `/EnlacePago/${linkId}/desactivar`, { method: 'PUT' })
+}
+
+/* ------------------------------------------------------------------ */
+/* Aplicativo — para comprobar las credenciales antes de cobrar        */
+/* ------------------------------------------------------------------ */
+
+export type WompiApplication = {
+  id: string | null
+  name: string | null
+  url: string | null
+  /** false = todo lo que se cobre con este aplicativo será de prueba. */
+  isProduction: boolean
+}
+
+/**
+ * Datos del aplicativo con el que se autentica la app. Nunca devuelve el
+ * `clientSecret` que también trae la respuesta de Wompi.
+ */
+export async function getApplication(config: WompiConfig): Promise<WompiApplication> {
+  const payload = await wompiFetch<{
+    idAplicativo?: string
+    nombre?: string
+    urlAplicativo?: string
+    estaProductivo?: boolean
+  }>(config, '/Aplicativo')
+  return {
+    id: payload.idAplicativo ?? null,
+    name: payload.nombre ?? null,
+    url: payload.urlAplicativo ?? null,
+    isProduction: payload.estaProductivo === true,
   }
 }
 

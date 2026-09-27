@@ -6,7 +6,8 @@ import { getSiteUrl } from '../site'
 import { randomCode } from '../security'
 import { HOLD_MINUTES } from '../availability'
 import { getPayPalConfig, getPaymentConfig, type PaymentConfig, type PaymentMethod } from './config'
-import { createPaymentLink, getTransaction, WompiError } from './wompi'
+import { createPaymentLink, deactivatePaymentLink, getTransaction, WompiError } from './wompi'
+import { cancelUnpaidBooking } from '../checkout'
 import { captureOrder, createOrder, PayPalError } from './paypal'
 
 /**
@@ -44,6 +45,12 @@ export type BookingForPayment = {
   people: number
   totalCents: number
   currency: string
+  /**
+   * Fin del apartado de plazas. Si llega, el enlace de Wompi no dura más
+   * que él (caso «pagar ahora» de una reserva apartada cuyo plazo vence
+   * en menos de 30 minutos).
+   */
+  holdExpiresAt?: Date | null
 }
 
 export class PaymentProviderError extends Error {}
@@ -96,7 +103,8 @@ export async function createPaymentForBooking(
       // apartada para que el cliente pueda reintentar.
       returnUrl: `${site}/checkout/return?ref=${encodeURIComponent(reference)}&cancelado=1`,
       webhookUrl: `${site}/api/payments/wompi/webhook`,
-      expiresInMinutes: HOLD_MINUTES,
+      expiresInMinutes: linkMinutes(booking.holdExpiresAt),
+      bookingCode: booking.code,
     })
 
     await prisma.payment.update({
@@ -119,6 +127,43 @@ export async function createPaymentForBooking(
       data: { status: 'DECLINED', failureReason: 'linkCreationFailed' },
     })
     throw new PaymentProviderError('linkCreationFailed')
+  }
+}
+
+/** Vida del enlace: 30 minutos, o lo que le quede al apartado si es menos. */
+function linkMinutes(holdExpiresAt: Date | null | undefined, now = Date.now()): number {
+  if (!holdExpiresAt) return HOLD_MINUTES
+  const left = Math.floor((holdExpiresAt.getTime() - now) / 60_000)
+  return Math.max(1, Math.min(HOLD_MINUTES, left))
+}
+
+/**
+ * Cancela una reserva sin pagar y desactiva en Wompi los enlaces que
+ * siguieran abiertos, para que nadie pague plazas ya liberadas.
+ *
+ * La desactivación es de mejor esfuerzo: si Wompi no responde, la reserva
+ * se cancela igual y el enlace caduca solo (lleva `vigencia.fechaFin`).
+ */
+export async function cancelBookingAndLinks(bookingId: string, userId: string | null): Promise<void> {
+  await cancelUnpaidBooking(bookingId, userId)
+
+  const config = getPaymentConfig()
+  if (config.status !== 'ready' || config.mode === 'mock') return
+
+  const open = await prisma.payment.findMany({
+    where: { bookingId, provider: 'wompi', status: 'PENDING', providerLinkId: { not: null } },
+    select: { id: true, providerLinkId: true },
+  })
+  for (const payment of open) {
+    try {
+      await deactivatePaymentLink(config, payment.providerLinkId as string)
+      await prisma.payment.update({ where: { id: payment.id }, data: { failureReason: 'linkDeactivated' } })
+    } catch (error) {
+      log('no se pudo desactivar el enlace', {
+        payment: payment.id,
+        message: error instanceof Error ? error.message : String(error),
+      })
+    }
   }
 }
 

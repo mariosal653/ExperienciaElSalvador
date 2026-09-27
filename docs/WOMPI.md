@@ -1,8 +1,9 @@
 # Pagos con Wompi El Salvador
 
-Referencia oficial: <https://docs.wompi.sv>
+Referencia oficial: <https://docs.wompi.sv> y la especificación OpenAPI
+completa en <https://api.wompi.sv/index.html> (`/swagger/v1/swagger.json`).
 
-## Contrastado con la documentación (20/09/2026)
+## Contrastado con la documentación (20/09/2026, especificación OpenAPI 27/09/2026)
 
 Cada punto donde esta aplicación habla con Wompi se verificó contra la página
 oficial correspondiente. Si algún día Wompi cambia algo, estas son las páginas
@@ -11,7 +12,11 @@ que hay que volver a mirar:
 | Qué | Cómo está implementado | Página oficial |
 |---|---|---|
 | Token | `POST https://id.wompi.sv/connect/token`, form-urlencoded con `grant_type=client_credentials`, `audience=wompi_api`, `client_id`, `client_secret` | [autenticacion](https://docs.wompi.sv/autenticacion/autenticacion.md) |
-| Enlace de pago | `POST https://api.wompi.sv/EnlacePago`; respuesta `idEnlace`, `urlEnlace`, `estaProductivo` | [enlace-de-pago](https://docs.wompi.sv/metodos-api/enlace-de-pago.md) |
+| Enlace de pago | `POST https://api.wompi.sv/EnlacePago` (`CrearEnlaceDto`); respuesta `idEnlace`, `urlEnlace`, `estaProductivo` | [enlace-de-pago](https://docs.wompi.sv/metodos-api/enlace-de-pago.md) |
+| Caducidad del enlace | `vigencia.fechaInicio` / `vigencia.fechaFin` (date-time) | swagger · `EnlaceVigencia` |
+| Número de reserva | `datosAdicionales: { reserva: <código> }` (mapa texto→texto; sale en reportes y webhooks) | swagger · `CrearEnlaceDto` |
+| Desactivar enlace | `PUT /EnlacePago/{id}/desactivar`, sin cuerpo | swagger · `EnlacePago` |
+| Datos del aplicativo | `GET /Aplicativo`; se lee `nombre` y `estaProductivo` (nunca se muestra `clientSecret`) | swagger · `AplicativoOutputDto` |
 | Consulta de transacción | `GET /TransaccionCompra/{id}`; se leen `idTransaccion`, `esAprobada`, `esReal`, `monto`, `codigoAutorizacion`, `mensaje` | [obtener-transaccion-compra-por-id](https://docs.wompi.sv/metodos-api/obtener-transaccion-compra-por-id.md) |
 | Firma del webhook | cabecera `wompi_hash` = HMAC-SHA256 del **cuerpo crudo** con el API Secret, en hexadecimal | [validar-webhook](https://docs.wompi.sv/webhook/validar-webhook.md) |
 | Hash de la redirección | HMAC-SHA256 de `identificadorEnlaceComercio + idTransaccion + idEnlace + monto` con el API Secret | [validar-parametros-url-redirect](https://docs.wompi.sv/redirect-url/validar-parametros-url-redirect.md) |
@@ -60,6 +65,15 @@ POST /api/payments/wompi/webhook   GET /checkout/return?ref=…&idTransaccion=�
 - `configuracion.duracionInterfazIntentoMinutos` se ata a los 30 minutos que
   se apartan las plazas. Si la pantalla de pago viviera más que el apartado,
   alguien podría pagar una plaza ya liberada.
+- Además, el **enlace** caduca con `vigencia.fechaFin` a la misma hora. La
+  duración de la interfaz solo limita cada pantalla: sin fecha de fin, el
+  mismo enlace se podía volver a abrir y pagar después. Si la reserva es de
+  «pagar después» y su plazo vence antes de 30 minutos, el enlace dura solo
+  hasta el plazo.
+- Al liberar una reserva «pagar después» o al vencer su plazo, los enlaces
+  pendientes se desactivan en Wompi (`PUT /EnlacePago/{id}/desactivar`). Es de
+  mejor esfuerzo: si Wompi no responde, la reserva se cancela igual y el enlace
+  caduca solo por su `vigencia`.
 - `limitesDeUso.cantidadMaximaPagosExitosos: 1` impide pagar dos veces la misma
   reserva. `cantidadMaximaPagosFallidos` se deja sin definir a propósito: un
   cliente al que le rechazan la tarjeta tiene que poder probar con otra.
@@ -114,10 +128,35 @@ llegan con `esReal: false`.
 6. Verás `/booking/<llave>` pasar de «Pago pendiente» a «Booking confirmed»
    con una entrada QR por viajero.
 
-## Pasar a producción
+## Comprobar las credenciales: `pnpm wompi:check`
 
-1. Saca el negocio del modo de pruebas en el panel de Wompi.
-2. `WOMPI_ENVIRONMENT=production`. A partir de aquí se rechaza cualquier
-   transacción con `esReal: false`, y las entradas de reservas de prueba no
-   sirven para entrar.
-3. Revisa los textos de `/legal/*` (plazos de cancelación y reembolso).
+Antes de cobrar (y cada vez que cambien las claves) ejecuta:
+
+```bash
+pnpm wompi:check
+```
+
+Lee las mismas variables que la app, obtiene un token, consulta
+`GET /Aplicativo` y avisa si Wompi tiene el aplicativo en pruebas mientras
+`WOMPI_ENVIRONMENT=production` (o al revés). También muestra la URL de webhook
+que corresponde a `SITE_URL`. No crea enlaces ni cobros y nunca imprime claves.
+Sale con código 1 si algo impide cobrar, así que sirve también en un pipeline.
+
+## Pasar a producción — lista de verificación
+
+1. En el panel de Wompi, saca el negocio del modo de pruebas (o pide a Wompi que
+   pase el aplicativo a producción).
+2. Variables en Netlify (Site configuration → Environment variables):
+   `WOMPI_ENVIRONMENT=production`, `WOMPI_PUBLIC_KEY` (App ID),
+   `WOMPI_PRIVATE_KEY` (API Secret) y `SITE_URL` con `https://`.
+3. Ejecuta `pnpm wompi:check` con esas variables: debe terminar en
+   «Listo para cobrar de verdad».
+4. La base de datos de producción tiene que ser PostgreSQL (ver
+   `DEPLOY_NETLIFY.md`) y con las migraciones aplicadas
+   (`prisma migrate deploy`), incluida la de «pagar después».
+5. Haz una compra real de importe bajo, confirma que llega el webhook
+   (la reserva pasa a «confirmada» sin recargar) y reembólsala desde el panel
+   de Wompi.
+6. A partir de aquí se rechaza cualquier transacción con `esReal: false`, y
+   las entradas de reservas de prueba no sirven para entrar.
+7. Revisa los textos de `/legal/*` (plazos de cancelación y reembolso).

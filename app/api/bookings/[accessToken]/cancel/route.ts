@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { cancelUnpaidBooking } from '@/lib/checkout'
+import { cancelBookingAndLinks } from '@/lib/payments/process'
 import { clientIp, rateLimit } from '@/lib/rate-limit'
 
 /**
@@ -33,6 +33,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ acc
     return NextResponse.json({ ok: false, code: 'notCancellable', status: booking.status }, { status: 409 })
   }
 
-  await cancelUnpaidBooking(booking.id, booking.userId)
+  await cancelBookingAndLinks(booking.id, booking.userId)
   return NextResponse.json({ ok: true })
 }
