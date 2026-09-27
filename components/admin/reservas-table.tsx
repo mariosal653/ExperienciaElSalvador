@@ -58,6 +58,11 @@ export function PagoTexto({ reserva }: { reserva: ReservaRow }) {
       <span className={`ml-1.5 font-semibold ${PAGO_CLASS[reserva.paymentStatus] ?? ''}`}>
         {PAYMENT_STATUS_LABEL[reserva.paymentStatus]}
       </span>
+      {reserva.payLater && reserva.status === 'PENDING_PAYMENT' && (
+        <span className="ml-1.5 rounded-full bg-[#eaf1ed] px-2 py-0.5 text-[11px] font-semibold text-[#173f45]" title={reserva.holdExpiresAt ? `Plazo: ${reserva.holdExpiresAt.toLocaleString('es-SV', { timeZone: 'America/El_Salvador' })}` : undefined}>
+          Paga después
+        </span>
+      )}
     </span>
   )
 }

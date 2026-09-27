@@ -91,23 +91,86 @@ ${testBanner}
 }
 
 export async function sendConfirmationEmail(data: ConfirmationEmail): Promise<EmailResult> {
+  return deliver(data.to, data.bookingCode, renderConfirmationEmail(data))
+}
+
+/* ------------------------------------------------------------------ */
+/* Reserva apartada («reserva ahora, paga después»)                    */
+/* ------------------------------------------------------------------ */
+
+export type HoldEmail = Omit<ConfirmationEmail, 'isTest'> & {
+  isTest: boolean
+  /** Plazo para pagar, ya formateado en el idioma del cliente. */
+  deadlineLabel: string
+}
+
+export function renderHoldEmail(data: HoldEmail): { subject: string; html: string; text: string } {
+  const es = data.locale === 'ES'
+  const name = escapeHtml(data.customerName.split(' ')[0] ?? data.customerName)
+  const title = escapeHtml(data.experienceTitle)
+  const date = escapeHtml(formatDate(data.date, es))
+  const total = formatCents(data.totalCents, data.currency)
+  const url = escapeHtml(data.bookingUrl)
+  const code = escapeHtml(data.bookingCode)
+  const deadline = escapeHtml(data.deadlineLabel)
+
+  const subject = `${data.isTest ? '[TEST] ' : ''}${es ? 'Tu lugar está apartado' : 'Your spot is held'} · ${data.bookingCode}`
+
+  const html = `<!doctype html><html><body style="margin:0;background:#fbfaf7;font-family:Arial,Helvetica,sans-serif;color:#173f45">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:28px 14px">
+<table role="presentation" width="100%" style="max-width:560px;background:#ffffff;border-radius:18px;padding:28px" cellpadding="0" cellspacing="0"><tr><td>
+<p style="font-weight:bold;font-size:18px;margin:0 0 22px">Experiences <span style="color:#b8481c">El Salvador</span></p>
+<h1 style="font-size:24px;margin:0 0 8px">${es ? `Tu lugar está apartado, ${name}` : `Your spot is held, ${name}`}</h1>
+<p style="margin:0 0 8px;color:#547176">${es ? 'Aún no se ha cobrado nada. Paga cuando quieras antes de:' : 'Nothing has been charged yet. Pay whenever you like before:'}</p>
+<p style="margin:0 0 22px;font-weight:bold;color:#b8481c">${deadline}</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;border-top:1px solid #edf0ed">
+<tr><td style="padding:10px 0;color:#6a8588">${es ? 'Número de reserva' : 'Booking number'}</td><td align="right" style="padding:10px 0;font-weight:bold;font-family:monospace">${code}</td></tr>
+<tr><td style="padding:10px 0;color:#6a8588">${es ? 'Experiencia' : 'Experience'}</td><td align="right" style="padding:10px 0;font-weight:bold">${title}</td></tr>
+<tr><td style="padding:10px 0;color:#6a8588">${es ? 'Fecha' : 'Date'}</td><td align="right" style="padding:10px 0">${date}</td></tr>
+<tr><td style="padding:10px 0;color:#6a8588">${es ? 'Viajeros' : 'Travelers'}</td><td align="right" style="padding:10px 0">${data.people}</td></tr>
+<tr><td style="padding:10px 0;color:#6a8588;border-top:1px solid #edf0ed">${es ? 'Total a pagar' : 'Total due'}</td><td align="right" style="padding:10px 0;font-weight:bold;border-top:1px solid #edf0ed">${total}</td></tr>
+</table>
+<p style="margin:26px 0 0"><a href="${url}" style="display:inline-block;background:#b8481c;color:#ffffff;text-decoration:none;font-weight:bold;padding:13px 22px;border-radius:999px">${es ? 'Pagar mi reserva' : 'Pay for my booking'}</a></p>
+<p style="margin:18px 0 0;font-size:12px;color:#6a8588">${es ? 'Si no pagas antes del plazo, la reserva vence sola y las plazas se liberan, sin ningún cargo. Las entradas con QR llegan cuando se confirme el pago.' : 'If you do not pay by the deadline, the booking expires on its own and the spots are released, with no charge. QR tickets arrive once the payment is confirmed.'}</p>
+</td></tr></table></td></tr></table></body></html>`
+
+  const text = [
+    es ? `Tu lugar está apartado · ${data.bookingCode}` : `Your spot is held · ${data.bookingCode}`,
+    '',
+    `${es ? 'Paga antes de' : 'Pay before'}: ${data.deadlineLabel}`,
+    `${es ? 'Experiencia' : 'Experience'}: ${data.experienceTitle}`,
+    `${es ? 'Fecha' : 'Date'}: ${formatDate(data.date, es)}`,
+    `${es ? 'Viajeros' : 'Travelers'}: ${data.people}`,
+    `${es ? 'Total a pagar' : 'Total due'}: ${total}`,
+    '',
+    `${es ? 'Pagar' : 'Pay'}: ${data.bookingUrl}`,
+  ].join('\n')
+
+  return { subject, html, text }
+}
+
+export async function sendHoldEmail(data: HoldEmail): Promise<EmailResult> {
+  return deliver(data.to, data.bookingCode, renderHoldEmail(data))
+}
+
+async function deliver(
+  to: string,
+  bookingCode: string,
+  { subject, html, text }: { subject: string; html: string; text: string },
+): Promise<EmailResult> {
   const apiKey = process.env.RESEND_API_KEY?.trim()
   const from = process.env.EMAIL_FROM?.trim()
 
   if (!apiKey || !from) {
-    console.info('[email] RESEND_API_KEY o EMAIL_FROM sin definir: confirmación no enviada', {
-      booking: data.bookingCode,
-    })
+    console.info('[email] RESEND_API_KEY o EMAIL_FROM sin definir: correo no enviado', { booking: bookingCode })
     return { sent: false, reason: 'notConfigured' }
   }
-
-  const { subject, html, text } = renderConfirmationEmail(data)
 
   try {
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from, to: [data.to], subject, html, text }),
+      body: JSON.stringify({ from, to: [to], subject, html, text }),
       signal: AbortSignal.timeout(15_000),
     })
 

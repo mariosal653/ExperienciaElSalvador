@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Compass, User, CalendarRange } from 'lucide-react'
+import { Compass, User, CalendarRange, Heart } from 'lucide-react'
 import { SignOutButton } from './sign-out-button'
 
 /** Marco comun de las paginas de cuenta. Reutiliza el lenguaje visual del sitio. */
@@ -9,12 +9,13 @@ export function AccountShell({
   children,
 }: {
   user: { name?: string | null; email?: string | null; image?: string | null }
-  active: 'perfil' | 'experiencias'
+  active: 'perfil' | 'experiencias' | 'guardadas'
   children: React.ReactNode
 }) {
   const nav = [
     { key: 'perfil' as const, href: '/cuenta', label: 'Mi perfil', icon: User },
     { key: 'experiencias' as const, href: '/cuenta/experiencias', label: 'Mis experiencias', icon: CalendarRange },
+    { key: 'guardadas' as const, href: '/cuenta/guardadas', label: 'Guardadas', icon: Heart },
   ]
 
   return (

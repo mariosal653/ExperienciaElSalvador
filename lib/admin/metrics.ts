@@ -112,6 +112,10 @@ export type ReservaRow = {
   paymentEnvironment: string | null
   paymentReference: string | null
   isTest: boolean
+  /** «Reserva ahora, paga después». */
+  payLater: boolean
+  /** Plazo para pagar (pagar después) o fin del apartado de 30 min. */
+  holdExpiresAt: Date | null
   /** true si la reserva está asociada a una cuenta; false si fue sin registro. */
   hasAccount: boolean
   createdAt: Date
@@ -240,6 +244,8 @@ export async function getDashboard(filters: AdminFilters): Promise<AdminDashboar
       currency: true,
       status: true,
       isTest: true,
+      payLater: true,
+      holdExpiresAt: true,
       createdAt: true,
       paidAt: true,
       payments: {
@@ -277,6 +283,8 @@ export async function getDashboard(filters: AdminFilters): Promise<AdminDashboar
       paymentEnvironment: payment?.environment ?? null,
       paymentReference: payment?.reference ?? null,
       isTest: row.isTest,
+    payLater: row.payLater,
+    holdExpiresAt: row.holdExpiresAt,
       hasAccount: row.userId !== null,
       createdAt: row.createdAt,
       paidAt: row.paidAt,
@@ -498,6 +506,8 @@ export async function getReserva(code: string): Promise<ReservaRow | null> {
       currency: true,
       status: true,
       isTest: true,
+      payLater: true,
+      holdExpiresAt: true,
       createdAt: true,
       paidAt: true,
       payments: {
@@ -534,6 +544,8 @@ export async function getReserva(code: string): Promise<ReservaRow | null> {
     paymentEnvironment: payment?.environment ?? null,
     paymentReference: payment?.reference ?? null,
     isTest: row.isTest,
+    payLater: row.payLater,
+    holdExpiresAt: row.holdExpiresAt,
     hasAccount: row.userId !== null,
     createdAt: row.createdAt,
     paidAt: row.paidAt,

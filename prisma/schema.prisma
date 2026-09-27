@@ -63,6 +63,7 @@ model User {
   bookings      Booking[]
   reviews       Review[]
   benefits      UserBenefit[]
+  favorites     Favorite[]
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -199,7 +200,12 @@ model Booking {
   isTest       Boolean       @default(false)
 
   /// Hasta cuándo se guardan las plazas mientras el pago está pendiente.
+  /// En «reserva ahora, paga después» es el plazo para pagar (48 h antes
+  /// de la salida); en el pago normal, 30 minutos.
   holdExpiresAt DateTime?
+  /// true = el cliente eligió reservar ahora y pagar después. La reserva
+  /// nace sin cobro y guarda las plazas hasta `holdExpiresAt`.
+  payLater     Boolean       @default(false)
   termsAcceptedAt DateTime?
   locale       String        @default("EN")
 
@@ -247,6 +253,26 @@ model Booking {
   @@index([experienceId, date, status])
   @@index([customerEmail])
   @@map("bookings")
+}
+
+// ---------------------------------------------------------------------
+// Favoritos — experiencias guardadas por un usuario con cuenta
+// ---------------------------------------------------------------------
+//
+// Sin cuenta, los favoritos viven en el navegador (localStorage). Al
+// iniciar sesión se suben aquí y quedan disponibles en cualquier equipo.
+
+model Favorite {
+  id           String   @id @default(cuid())
+  userId       String
+  /// Identificador de la experiencia en lib/data.ts.
+  experienceId String
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, experienceId])
+  @@map("favorites")
 }
 
 // ---------------------------------------------------------------------

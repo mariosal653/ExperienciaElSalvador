@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import {
   AlertTriangle,
   ArrowRight,
+  CalendarClock,
   CalendarDays,
   Check,
   CheckCircle2,
@@ -23,6 +24,7 @@ import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
 import { formatCents } from '@/lib/pricing'
 import { experienceNameById, parseLocalDate } from '@/lib/data'
+import { formatDeadline } from '@/lib/pay-later'
 
 type BookingData = {
   code: string
@@ -42,7 +44,15 @@ type BookingData = {
   customerEmail: string
   isTest: boolean
   holdExpiresAt: string | null
+  payLater: boolean
   emailSent: boolean
+}
+
+/** Pasarelas disponibles, decididas en el servidor (sin claves). */
+type Methods = {
+  wompi: { available: boolean; mode: string | null }
+  paypal: { available: boolean; mode: string | null }
+  any: boolean
 }
 
 type TicketData = {
@@ -63,11 +73,13 @@ export function BookingView({
   booking,
   payment,
   paymentMode,
+  methods,
   tickets,
 }: {
   booking: BookingData
   payment: { status: string; checkoutUrl: string | null; failureReason: string | null } | null
   paymentMode: string | null
+  methods: Methods
   tickets: TicketData[]
 }) {
   const { lang } = useLanguage()
@@ -78,9 +90,65 @@ export function BookingView({
   const [pollExpired, setPollExpired] = useState(false)
 
   const confirmed = booking.status === 'CONFIRMED' || booking.status === 'COMPLETED'
-  const pending = booking.status === 'PENDING_PAYMENT' || booking.status === 'PAID'
-  const declined = booking.status === 'PENDING_PAYMENT' && payment?.status === 'DECLINED'
+  // «Reserva ahora, paga después» con el plazo vigente: se muestra su propio
+  // bloque (pagar o liberar) en lugar del de «pago en curso».
+  const heldForLater =
+    booking.payLater &&
+    booking.status === 'PENDING_PAYMENT' &&
+    booking.holdExpiresAt !== null &&
+    new Date(booking.holdExpiresAt).getTime() > Date.now()
+  const pending = (booking.status === 'PENDING_PAYMENT' || booking.status === 'PAID') && !heldForLater
+  const declined = booking.status === 'PENDING_PAYMENT' && payment?.status === 'DECLINED' && !heldForLater
   const cancelled = booking.status === 'CANCELLED'
+
+  const [paying, setPaying] = useState<'wompi' | 'paypal' | null>(null)
+  const [releasing, setReleasing] = useState(false)
+  const [actionError, setActionError] = useState<string | null>(null)
+
+  async function payNow(method: 'wompi' | 'paypal') {
+    setPaying(method)
+    setActionError(null)
+    try {
+      const response = await fetch(`/api/bookings/${encodeURIComponent(accessTokenFromUrl())}/pay`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ method, locale: lang }),
+      })
+      const payload = await response.json().catch(() => ({}))
+      if (response.ok && payload.checkoutUrl) {
+        window.location.assign(payload.checkoutUrl)
+        return
+      }
+      if (payload.code === 'notPayable') {
+        router.refresh()
+      }
+      setActionError(
+        payload.code === 'notPayable'
+          ? t('Esta reserva ya no se puede pagar: se pagó, se canceló o venció el plazo.', 'This booking can no longer be paid: it was paid, cancelled or the deadline passed.')
+          : t('No pudimos abrir la página de pago. Inténtalo de nuevo en un momento.', 'We could not open the payment page. Please try again in a moment.'),
+      )
+    } catch {
+      setActionError(t('Sin conexión. Revisa tu internet e inténtalo de nuevo.', 'No connection. Check your internet and try again.'))
+    }
+    setPaying(null)
+  }
+
+  async function release() {
+    const ok = window.confirm(
+      t('¿Liberar tu reserva? Las plazas quedarán disponibles para otros viajeros. No se cobra nada.', 'Release your booking? The spots will become available to other travelers. Nothing is charged.'),
+    )
+    if (!ok) return
+    setReleasing(true)
+    setActionError(null)
+    try {
+      const response = await fetch(`/api/bookings/${encodeURIComponent(accessTokenFromUrl())}/cancel`, { method: 'POST' })
+      if (!response.ok) throw new Error('cancel')
+      router.refresh()
+    } catch {
+      setActionError(t('No pudimos liberar la reserva. Inténtalo de nuevo o escríbenos por WhatsApp.', 'We could not release the booking. Try again or message us on WhatsApp.'))
+    }
+    setReleasing(false)
+  }
 
   // Mientras el pago se procesa (webhook en camino), refresca la página.
   useEffect(() => {
@@ -164,6 +232,74 @@ export function BookingView({
           </section>
         )}
 
+        {heldForLater && (
+          <section className="rounded-3xl border border-[#e2c483] bg-[#fdf8ec] p-6 text-center sm:p-10">
+            <CalendarClock size={46} className="mx-auto text-[#b8481c]" />
+            <h1 className="mt-4 text-2xl font-semibold sm:text-3xl">{t('Tu lugar está apartado', 'Your spot is held')}</h1>
+            <p className="mt-2 text-sm text-[#6b5a35]">
+              {t('Número de reserva', 'Booking number')}{' '}
+              <strong className="font-mono text-base text-[#173f45]">{booking.code}</strong>
+            </p>
+            <p className="mx-auto mt-3 max-w-md text-sm text-[#6b5a35]">
+              {t('Aún no se ha cobrado nada. Plazo para pagar:', 'Nothing has been charged yet. Pay before:')}
+            </p>
+            <p className="mt-1 text-base font-bold capitalize text-[#173f45]">
+              {formatDeadline(new Date(booking.holdExpiresAt as string), lang)}
+            </p>
+            <p className="mx-auto mt-2 max-w-md text-xs text-[#6b5a35]">
+              {t('Si no pagas a tiempo, la reserva vence sola y las plazas se liberan, sin ningún cargo.', 'If you do not pay in time, the booking expires on its own and the spots are released, with no charge.')}
+            </p>
+            {payment?.status === 'DECLINED' && (
+              <p className="mx-auto mt-3 max-w-md text-xs font-semibold text-[#a3341c]">
+                {t('El último intento de pago no se completó. Puedes intentarlo otra vez.', 'Your last payment attempt did not go through. You can try again.')}
+              </p>
+            )}
+
+            <div className="no-print mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+              {methods.wompi.available && (
+                <button
+                  onClick={() => payNow('wompi')}
+                  disabled={paying !== null || releasing}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#b8481c] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#963b18] disabled:opacity-60"
+                >
+                  {paying === 'wompi' ? <Loader2 size={16} className="animate-spin" /> : null}
+                  {methods.wompi.mode === 'mock'
+                    ? t('Pagar ahora (prueba)', 'Pay now (test)')
+                    : t('Pagar ahora con tarjeta', 'Pay now by card')}{' '}
+                  <ArrowRight size={16} />
+                </button>
+              )}
+              {methods.paypal.available && (
+                <button
+                  onClick={() => payNow('paypal')}
+                  disabled={paying !== null || releasing}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-[#173f45] bg-white px-6 py-3 text-sm font-bold text-[#173f45] transition hover:bg-[#f4f7f5] disabled:opacity-60"
+                >
+                  {paying === 'paypal' ? <Loader2 size={16} className="animate-spin" /> : null}
+                  {t('Pagar con PayPal', 'Pay with PayPal')}
+                </button>
+              )}
+            </div>
+            {!methods.any && (
+              <p className="mt-4 text-xs font-medium text-[#a3341c]">
+                {t('El pago en línea no está disponible en este momento. Escríbenos por WhatsApp y te ayudamos.', 'Online payment is unavailable right now. Message us on WhatsApp and we will help.')}
+              </p>
+            )}
+
+            <button
+              onClick={release}
+              disabled={paying !== null || releasing}
+              className="no-print mt-5 text-xs font-bold text-[#6a8588] underline underline-offset-4 hover:text-[#a3341c] disabled:opacity-60"
+            >
+              {releasing ? t('Liberando…', 'Releasing…') : t('Ya no puedo ir: liberar mi reserva', "I can't make it: release my booking")}
+            </button>
+
+            {actionError && (
+              <p role="alert" className="mx-auto mt-4 max-w-md text-sm font-medium text-[#a3341c]">{actionError}</p>
+            )}
+          </section>
+        )}
+
         {pending && !declined && (
           <section className="rounded-3xl border border-[#dce7e1] bg-white p-6 text-center sm:p-10" aria-live="polite">
             {pollExpired ? <Clock size={44} className="mx-auto text-[#b8481c]" /> : <Loader2 size={44} className="mx-auto animate-spin text-[#173f45]" />}
@@ -211,7 +347,9 @@ export function BookingView({
             <XCircle size={44} className="mx-auto text-[#6a8588]" />
             <h1 className="mt-4 text-2xl font-semibold">{t('Esta reserva no está activa', 'This booking is not active')}</h1>
             <p className="mx-auto mt-2 max-w-md text-sm text-[#6a8588]">
-              {t('El pago no se completó a tiempo o la reserva se canceló. Puedes reservar de nuevo.', 'The payment was not completed in time or the booking was cancelled. You can book again.')}
+              {booking.payLater
+                ? t('La reserva se liberó o venció el plazo para pagarla, sin ningún cargo. Puedes reservar de nuevo.', 'The booking was released or its payment deadline passed, with no charge. You can book again.')
+                : t('El pago no se completó a tiempo o la reserva se canceló. Puedes reservar de nuevo.', 'The payment was not completed in time or the booking was cancelled. You can book again.')}
             </p>
             <Link href={`/checkout/${booking.experienceId}`} className="no-print mt-6 inline-flex items-center gap-2 rounded-full bg-[#b8481c] px-6 py-3 text-sm font-bold text-white">
               {t('Reservar de nuevo', 'Book again')} <ArrowRight size={16} />
@@ -322,6 +460,11 @@ export function BookingView({
       <SiteFooter />
     </div>
   )
+}
+
+/** La llave de acceso es el último segmento de /booking/<accessToken>. */
+function accessTokenFromUrl(): string {
+  return window.location.pathname.split('/').filter(Boolean).pop() ?? ''
 }
 
 function TicketStatus({ status, es }: { status: string; es: boolean }) {

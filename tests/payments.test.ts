@@ -167,6 +167,7 @@ function input(overrides: Partial<import('../lib/checkout').CheckoutInput> = {})
     idempotencyKey: `test-key-${keyCounter}-${Date.now()}`,
     locale: 'EN' as const,
     paymentMethod: 'wompi' as const,
+    payLater: false,
     ...overrides,
   }
 }
@@ -298,5 +299,64 @@ describe('aprobación del pago', () => {
     })
     await m.process.approvePayment({ paymentId: payment.id, transactionId: 'tx-benefit', amountCents: payment.amountCents, authorizationCode: null, isReal: false, source: 'mock' })
     expect((await m.prisma.userBenefit.findFirstOrThrow({ where: { userId: user.id } })).status).toBe('USED')
+  })
+})
+
+/* ------------------------------------------------------------------ */
+
+describe('reserva ahora, paga después', () => {
+  it('el plazo vence 48 h antes de la salida (hora de El Salvador)', async () => {
+    const payLater = await import('../lib/pay-later')
+    const deadline = payLater.payLaterDeadline('2026-10-10')
+    // 10 oct 00:00 en El Salvador = 06:00 UTC; menos 48 h y un minuto.
+    expect(deadline?.toISOString()).toBe('2026-10-08T05:59:00.000Z')
+  })
+
+  it('solo se ofrece con al menos 24 h de margen hasta el plazo', async () => {
+    const payLater = await import('../lib/pay-later')
+    const now = new Date('2026-10-01T12:00:00Z')
+    expect(payLater.canPayLater('2026-10-03', now)).toBe(false) // plazo: 1 oct 05:59 UTC, ya pasó
+    expect(payLater.canPayLater('2026-10-04', now)).toBe(false) // plazo: 2 oct 05:59 UTC, faltan < 24 h
+    expect(payLater.canPayLater('2026-10-05', now)).toBe(true)
+  })
+
+  it('aparta las plazas hasta el plazo, sin crear ningún cobro', async () => {
+    const date = m.dates.addDaysIso(m.dates.bookableRange().first, 10)
+    const result = await m.checkout.createPendingBooking(input({ date, payLater: true }), { userId: null, isTest: true })
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+
+    const booking = await m.prisma.booking.findUniqueOrThrow({ where: { id: result.booking.id }, include: { payments: true } })
+    const payLater = await import('../lib/pay-later')
+    expect(booking.payLater).toBe(true)
+    expect(booking.status).toBe('PENDING_PAYMENT')
+    expect(booking.holdExpiresAt?.toISOString()).toBe(payLater.payLaterDeadline(date)?.toISOString())
+    expect(booking.payments).toHaveLength(0)
+
+    // Las plazas cuentan para el cupo mientras el plazo esté vigente.
+    expect(await m.availability.seatsTaken(m.prisma, booking.experienceId, date)).toBe(booking.people)
+  })
+
+  it('rechaza pagar después si la salida está demasiado cerca', async () => {
+    const result = await m.checkout.createPendingBooking(input({ payLater: true }), { userId: null, isTest: true })
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.failure.code).toBe('payLaterUnavailable')
+  })
+
+  it('pagada más tarde, se confirma como cualquier otra', async () => {
+    const date = m.dates.addDaysIso(m.dates.bookableRange().first, 10)
+    const result = await m.checkout.createPendingBooking(input({ date, payLater: true }), { userId: null, isTest: true })
+    if (!result.ok) throw new Error('no se creó la reserva')
+
+    const payment = await m.prisma.payment.create({
+      data: { bookingId: result.booking.id, provider: 'mock', environment: 'mock', amountCents: result.booking.totalCents, reference: `R-${m.security.randomCode(16)}` },
+    })
+    const approval = await m.process.approvePayment({ paymentId: payment.id, transactionId: 'tx-later', amountCents: payment.amountCents, authorizationCode: null, isReal: false, source: 'mock' })
+    expect(approval.outcome).toBe('approved')
+
+    const booking = await m.prisma.booking.findUniqueOrThrow({ where: { id: result.booking.id }, include: { tickets: true } })
+    expect(booking.status).toBe('CONFIRMED')
+    expect(booking.tickets).toHaveLength(booking.people)
   })
 })

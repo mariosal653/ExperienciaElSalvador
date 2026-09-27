@@ -11,6 +11,7 @@ import { DatePicker } from './date-picker'
 import { calculatePrice, formatCents } from '@/lib/pricing'
 import { experienceName, parseLocalDate, type Locale } from '@/lib/data'
 import { FREE_CANCELLATION_HOURS } from '@/lib/experience-details'
+import { canPayLater, formatDeadline, payLaterDeadline } from '@/lib/pay-later'
 import {
   CUSTOMER_ERROR_MESSAGES,
   validateCustomer,
@@ -69,6 +70,7 @@ function newKey(): string {
 
 const SERVER_ERRORS: Record<string, Record<Locale, string>> = {
   soldOut: { ES: 'Ya no quedan plazas suficientes para esa fecha. Elige otra fecha o menos viajeros.', EN: 'There are not enough spots left for that date. Pick another date or fewer travelers.' },
+  payLaterUnavailable: { ES: 'Para esta fecha ya no se puede pagar después: elige «Pagar ahora».', EN: 'Pay later is no longer available for this date: choose “Pay now”.' },
   benefitUnavailable: { ES: 'Tu descuento de bienvenida ya no está disponible. Desmárcalo para continuar.', EN: 'Your welcome discount is no longer available. Untick it to continue.' },
   dateTooSoon: { ES: 'Esa fecha ya no se puede reservar. Elige una a partir de mañana.', EN: 'That date can no longer be booked. Pick one from tomorrow onwards.' },
   dateTooFar: { ES: 'Solo se puede reservar con hasta un año de antelación.', EN: 'Bookings open up to one year ahead.' },
@@ -121,6 +123,13 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
   // Método de pago. Se preselecciona el primero disponible; si solo hay
   // uno, el selector ni se muestra.
   const [method, setMethod] = useState<PaymentMethod>(() => (methods.wompi.available ? 'wompi' : 'paypal'))
+
+  // «Reserva ahora, paga después»: solo si la salida está lo bastante lejos.
+  // El servidor lo vuelve a comprobar; aquí solo decide si se ofrece.
+  const [payLaterChoice, setPayLaterChoice] = useState(false)
+  const payLaterAllowed = date !== null && canPayLater(date)
+  const payLater = payLaterAllowed && payLaterChoice
+  const deadline = date ? payLaterDeadline(date) : null
   const choices: PaymentMethod[] = [
     ...(methods.wompi.available ? (['wompi'] as const) : []),
     ...(methods.paypal.available ? (['paypal'] as const) : []),
@@ -235,9 +244,16 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
           idempotencyKey: idempotencyKey.current,
           locale: lang,
           paymentMethod: method,
+          payLater,
         }),
       })
       const payload = await response.json().catch(() => ({}))
+
+      // Pagar después: no hay pasarela que visitar; se va a la reserva.
+      if (response.ok && payload.payLater && payload.accessToken) {
+        window.location.assign(`/booking/${payload.accessToken}`)
+        return
+      }
 
       if (response.ok && payload.checkoutUrl) {
         try {
@@ -588,9 +604,51 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
               </span>
             </label>
 
+            {/* Cuándo pagar. Solo si la fecha elegida lo permite. */}
+            {payLaterAllowed && methods.any && (
+              <fieldset className="mt-5">
+                <legend className="text-sm font-semibold">{t('¿Cuándo quieres pagar?', 'When would you like to pay?')}</legend>
+                <div className="mt-2.5 grid gap-2">
+                  {([false, true] as const).map((later) => (
+                    <label
+                      key={String(later)}
+                      className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 text-sm transition ${
+                        payLater === later ? 'border-[#173f45] bg-[#f4f7f5]' : 'border-[#dce7e1]'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="payWhen"
+                        checked={payLater === later}
+                        onChange={() => {
+                          setPayLaterChoice(later)
+                          setServerError(null)
+                        }}
+                        className="mt-0.5 h-4 w-4 shrink-0 accent-[#173f45]"
+                      />
+                      <span>
+                        <span className="block font-bold">
+                          {later ? t('Reserva ahora, paga después', 'Book now, pay later') : t('Pagar ahora', 'Pay now')}
+                        </span>
+                        <span className="mt-0.5 block text-xs text-[#6a8588]">
+                          {later
+                            ? t(
+                                `Aparta tu lugar sin pagar hoy. Paga cuando quieras antes del ${deadline ? formatDeadline(deadline, 'ES') : ''}.`,
+                                `Hold your spot without paying today. Pay any time before ${deadline ? formatDeadline(deadline, 'EN') : ''}.`,
+                              )
+                            : t('Recibe tus entradas con QR al instante.', 'Get your QR tickets instantly.')}
+                        </span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
+
             {/* Método de pago. Solo aparece si hay más de uno: con una
-                sola pasarela, elegir no aporta nada. */}
-            {choices.length > 1 && (
+                sola pasarela, elegir no aporta nada. Pagando después se
+                elige al pagar. */}
+            {choices.length > 1 && !payLater && (
               <fieldset className="mt-5">
                 <legend className="text-sm font-semibold">{t('Método de pago', 'Payment method')}</legend>
                 <div className="mt-2.5 grid gap-2">
@@ -647,8 +705,12 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
             >
               {submitting ? <Loader2 size={16} className="animate-spin" /> : <Lock size={15} />}
               {submitting
-                ? t('Preparando el pago…', 'Preparing payment…')
-                : mode === 'mock'
+                ? payLater
+                  ? t('Apartando tu lugar…', 'Holding your spot…')
+                  : t('Preparando el pago…', 'Preparing payment…')
+                : payLater
+                  ? t(`Reservar sin pagar hoy · ${formatCents(price.totalCents)}`, `Book without paying today · ${formatCents(price.totalCents)}`)
+                  : mode === 'mock'
                   ? t(`Continuar al pago de prueba · ${formatCents(price.totalCents)}`, `Continue to test payment · ${formatCents(price.totalCents)}`)
                   : method === 'paypal'
                     ? t(`Pagar ${formatCents(price.totalCents)} con PayPal`, `Pay ${formatCents(price.totalCents)} with PayPal`)
@@ -667,7 +729,9 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
               </li>
               <li className="flex items-start gap-2">
                 <Check size={14} className="mt-px shrink-0 text-[#2f7d63]" aria-hidden="true" />
-                {t('Confirmación y entradas con QR al instante en tu correo', 'Instant confirmation and QR tickets by email')}
+                {payLater
+                  ? t('Tus entradas con QR llegan a tu correo en cuanto pagues', 'Your QR tickets arrive by email as soon as you pay')
+                  : t('Confirmación y entradas con QR al instante en tu correo', 'Instant confirmation and QR tickets by email')}
               </li>
               <li className="flex items-start gap-2">
                 <Check size={14} className="mt-px shrink-0 text-[#2f7d63]" aria-hidden="true" />
@@ -677,7 +741,12 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
 
             <p className="mt-3 flex items-start justify-center gap-1.5 text-center text-xs text-[#6a8588]">
               <ShieldCheck size={14} className="mt-px shrink-0 text-[#256b54]" />
-              {method === 'paypal'
+              {payLater
+                ? t(
+                    'Hoy no se cobra nada. Te enviamos el enlace para pagar a tu correo.',
+                    'Nothing is charged today. We will email you the link to pay.',
+                  )
+                : method === 'paypal'
                 ? t(
                     'Pagas en la página segura de PayPal. Nunca vemos ni guardamos los datos de tu tarjeta.',
                     "You pay on PayPal's secure page. We never see or store your card details.",

@@ -10,6 +10,7 @@ import {
 import { capacityFor, checkBookableDate, findExperience, HOLD_MINUTES, seatsTaken } from './availability'
 import { validateCustomer, type CustomerErrors } from './checkout-validation'
 import { newBookingCode, randomToken, sanitizePhone, sanitizeText } from './security'
+import { canPayLater, payLaterDeadline } from './pay-later'
 
 /**
  * Creación de reservas desde el checkout. SOLO SERVIDOR.
@@ -41,6 +42,11 @@ export const checkoutSchema = z.object({
    * Que el método esté realmente disponible lo comprueba el endpoint.
    */
   paymentMethod: z.enum(['wompi', 'paypal']).optional().default('wompi'),
+  /**
+   * «Reserva ahora, paga después»: aparta las plazas sin cobrar. Solo se
+   * acepta si la salida está lo bastante lejos (lib/pay-later.ts).
+   */
+  payLater: z.boolean().optional().default(false),
 })
 
 export type CheckoutInput = z.infer<typeof checkoutSchema>
@@ -52,6 +58,7 @@ export type CheckoutFailure =
   | { code: 'tooManyPeople'; status: 422; max: number }
   | { code: 'soldOut'; status: 409; remaining: number }
   | { code: 'benefitUnavailable'; status: 409 }
+  | { code: 'payLaterUnavailable'; status: 422 }
 
 export type CreatedBooking = {
   id: string
@@ -64,6 +71,7 @@ export type CreatedBooking = {
   totalCents: number
   currency: string
   status: string
+  payLater: boolean
   /** true = ya existía (mismo idempotencyKey o reserva pendiente idéntica). */
   reused: boolean
   pendingCheckoutUrl: string | null
@@ -106,6 +114,12 @@ export async function createPendingBooking(
 
   if (input.people > experience.maxPeople) {
     return { ok: false, failure: { code: 'tooManyPeople', status: 422, max: experience.maxPeople } }
+  }
+
+  // Pagar después: el plazo lo calcula el servidor, nunca el navegador.
+  const deadline = input.payLater ? payLaterDeadline(input.date) : null
+  if (input.payLater && (!deadline || !canPayLater(input.date))) {
+    return { ok: false, failure: { code: 'payLaterUnavailable', status: 422 } }
   }
 
   // 1. ¿Este mismo envío ya se procesó?
@@ -178,7 +192,8 @@ export async function createPendingBooking(
               accessToken: randomToken(32),
               idempotencyKey: input.idempotencyKey,
               isTest: options.isTest,
-              holdExpiresAt: new Date(now.getTime() + HOLD_MINUTES * 60_000),
+              holdExpiresAt: deadline ?? new Date(now.getTime() + HOLD_MINUTES * 60_000),
+              payLater: input.payLater,
               termsAcceptedAt: now,
               locale: input.locale,
               experienceId: experience.id,
@@ -251,6 +266,7 @@ function toCreated(
     totalCents: number
     currency: string
     status: string
+    payLater: boolean
   },
   reused: boolean,
   pendingCheckoutUrl: string | null,
@@ -266,6 +282,7 @@ function toCreated(
     totalCents: booking.totalCents,
     currency: booking.currency,
     status: booking.status,
+    payLater: booking.payLater,
     reused,
     pendingCheckoutUrl,
   }

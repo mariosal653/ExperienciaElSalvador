@@ -15,6 +15,7 @@ import {
   Clock,
   ExternalLink,
   Gauge,
+  Heart,
   Languages,
   MapPin,
   QrCode,
@@ -30,6 +31,8 @@ import { SiteFooter } from '@/components/site/site-footer'
 import { RatingBadge } from '@/components/reviews/rating-badge'
 import { ExperienceReviews } from '@/components/reviews/experience-reviews'
 import { useReviewStats } from '@/components/reviews/use-review-stats'
+import { useFavorites } from '@/components/favorites/use-favorites'
+import { destinationIdByName } from '@/lib/destination-details'
 import { experienceName, type Experience, type Locale } from '@/lib/data'
 import { departureLabel, formatDeparture, nextDepartures } from '@/lib/departures'
 import {
@@ -78,6 +81,9 @@ export function ExperienceDetail({
   const name = experienceName(experience, lang)
   const stats = useReviewStats()
   const rating = stats?.[experience.id]
+  const { ids: favorites, toggle: toggleFavorite } = useFavorites()
+  const saved = favorites.includes(experience.id)
+  const destinationId = destinationIdByName(experience.destination)
 
   const { setLead } = useWhatsAppLead()
   useEffect(() => {
@@ -164,9 +170,25 @@ export function ExperienceDetail({
           <Gallery images={images} tag={experience.tag?.[lang]} lang={lang} />
 
           <div className="flex flex-col">
-            <p className="flex items-center gap-1.5 text-sm font-semibold text-[#6a8588]">
-              <MapPin size={15} /> {experience.destination}
-            </p>
+            <div className="flex items-start justify-between gap-4">
+              {destinationId ? (
+                <Link href={`/destinos/${destinationId}`} className="flex items-center gap-1.5 text-sm font-semibold text-[#6a8588] hover:text-[#b8481c] hover:underline">
+                  <MapPin size={15} /> {experience.destination}
+                </Link>
+              ) : (
+                <p className="flex items-center gap-1.5 text-sm font-semibold text-[#6a8588]">
+                  <MapPin size={15} /> {experience.destination}
+                </p>
+              )}
+              <button
+                onClick={() => toggleFavorite(experience.id)}
+                aria-pressed={saved}
+                className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition ${saved ? 'border-[#b8481c] bg-[#fdf3ee] text-[#b8481c]' : 'border-[#dce7e1] bg-white text-[#173f45] hover:bg-[#eaf1ed]'}`}
+              >
+                <Heart size={14} fill={saved ? '#b8481c' : 'none'} />
+                {saved ? (es ? 'Guardada' : 'Saved') : es ? 'Guardar' : 'Save'}
+              </button>
+            </div>
             <h1 className="mt-2 text-3xl font-semibold leading-tight tracking-tight md:text-4xl">{name}</h1>
             <a href="#opiniones-experiencia" className="mt-2 inline-flex w-fit hover:underline">
               <RatingBadge rating={rating} loading={stats === undefined} lang={lang} size="md" />

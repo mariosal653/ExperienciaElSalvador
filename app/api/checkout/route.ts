@@ -3,7 +3,9 @@ import { auth } from '@/lib/auth'
 import { cancelUnpaidBooking, checkoutSchema, createPendingBooking } from '@/lib/checkout'
 import { availablePaymentMethods, getPaymentConfig } from '@/lib/payments/config'
 import { createCheckoutPayment, PaymentProviderError } from '@/lib/payments/process'
-import { originOf } from '@/lib/site'
+import { getSiteUrl, originOf } from '@/lib/site'
+import { sendHoldEmail } from '@/lib/email'
+import { formatDeadline, payLaterDeadline } from '@/lib/pay-later'
 import { clientIp, rateLimit } from '@/lib/rate-limit'
 
 /**
@@ -18,8 +20,13 @@ import { clientIp, rateLimit } from '@/lib/rate-limit'
  * con la pasarela —webhook o consulta a su API en Wompi, captura en
  * servidor en PayPal—. Tampoco emite entradas.
  *
+ * PAGAR DESPUÉS (`payLater: true`): se salta el paso 3. La reserva queda
+ * apartada hasta 48 h antes de la salida y el cliente paga desde
+ * /booking/<accessToken> (POST /api/bookings/<accessToken>/pay).
+ *
  * RESPUESTAS
  *   201 { ok: true, bookingCode, accessToken, checkoutUrl, method }
+ *   201 { ok: true, bookingCode, accessToken, payLater: true }
  *   200 { ok: true, ..., reused: true }   mismo envío repetido
  *   400 invalidBody · 422 validation / invalidCustomer / fecha
  *   409 soldOut / benefitUnavailable · 429 tooManyRequests
@@ -72,10 +79,15 @@ export async function POST(request: Request) {
   // Una reserva es de prueba salvo que la pasarela elegida esté cobrando
   // de verdad: mock y sandbox no mueven dinero.
   const wompi = getPaymentConfig()
-  const isTest =
-    method === 'paypal'
-      ? methods.paypal.mode !== 'production'
-      : wompi.status !== 'ready' || wompi.mode !== 'production'
+  const wompiLive = wompi.status === 'ready' && wompi.mode === 'production'
+  const paypalLive = methods.paypal.mode === 'production'
+  // Pagando después todavía no se sabe con qué pasarela: es real si alguna
+  // de las disponibles cobra de verdad.
+  const isTest = parsed.data.payLater
+    ? !(wompiLive || paypalLive)
+    : method === 'paypal'
+      ? !paypalLive
+      : !wompiLive
 
   const result = await createPendingBooking(parsed.data, { userId, isTest })
 
@@ -92,6 +104,33 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { ok: false, code: booking.status === 'CANCELLED' ? 'bookingCancelled' : 'alreadyPaid', accessToken: booking.status === 'CANCELLED' ? undefined : booking.accessToken },
       { status: 409 },
+    )
+  }
+
+  // Pagar después: no se crea ningún cobro. Se avisa por correo con el
+  // enlace a la reserva, desde donde podrá pagar hasta el plazo.
+  if (booking.payLater) {
+    if (!booking.reused) {
+      const deadline = payLaterDeadline(booking.date)
+      const locale = parsed.data.locale
+      await sendHoldEmail({
+        to: parsed.data.customer.email.trim().toLowerCase(),
+        customerName: parsed.data.customer.name,
+        bookingCode: booking.code,
+        experienceTitle: booking.experienceTitle,
+        date: booking.date,
+        people: booking.people,
+        totalCents: booking.totalCents,
+        currency: booking.currency,
+        bookingUrl: `${getSiteUrl(originOf(request))}/booking/${booking.accessToken}`,
+        isTest,
+        locale,
+        deadlineLabel: deadline ? formatDeadline(deadline, locale) : booking.date,
+      }).catch((error) => console.error('[checkout] no se pudo enviar el aviso de reserva apartada', error))
+    }
+    return NextResponse.json(
+      { ok: true, bookingCode: booking.code, accessToken: booking.accessToken, payLater: true, reused: booking.reused },
+      { status: booking.reused ? 200 : 201 },
     )
   }
 
