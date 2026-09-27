@@ -1,5 +1,5 @@
 import { googleProvider } from './google'
-import { fetchLocalReviews } from './local'
+import { fetchLocalReviews, fetchReviewStats } from './local'
 import { emptyResult, type ReviewProvider, type ReviewsPayload } from './types'
 
 /**
@@ -32,7 +32,7 @@ const planned = [
 
 export async function getReviews(locale: string): Promise<ReviewsPayload> {
   const [local, ...external] = await Promise.all([
-    fetchLocalReviews(),
+    fetchLocalReviews({ locale }),
     ...providers.map((provider) => provider.fetchReviews(locale)),
   ])
 
@@ -61,5 +61,14 @@ export async function getReviews(locale: string): Promise<ReviewsPayload> {
   }
 }
 
-export { googleProvider }
+/**
+ * Opiniones de UNA experiencia. Solo las propias: las de Google son del
+ * negocio en general y no dicen de qué experiencia hablan.
+ */
+export async function getExperienceReviews(locale: string, experienceId: string) {
+  const local = await fetchLocalReviews({ locale, experienceId, limit: 30 })
+  return { reviews: local.reviews, fetchedAt: new Date().toISOString() }
+}
+
+export { googleProvider, fetchReviewStats }
 export * from './types'

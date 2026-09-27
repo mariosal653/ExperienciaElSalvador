@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   ArrowRight,
+  CalendarCheck,
   Check,
-  ChevronDown,
   Compass,
   Heart,
   MapPin,
@@ -12,7 +12,6 @@ import {
   RotateCcw,
   ShieldCheck,
   Sparkles,
-  Star,
   Waves,
   X,
 } from 'lucide-react'
@@ -25,9 +24,15 @@ import { WelcomeModal } from '@/components/benefits/welcome-modal'
 import { LanguageSwitch } from '@/components/i18n/language-switch'
 import { ReelsSection } from '@/components/reels/reels-section'
 import { SiteFooter } from '@/components/site/site-footer'
+import { RatingBadge } from '@/components/reviews/rating-badge'
+import { useReviewStats } from '@/components/reviews/use-review-stats'
+import { departureLabel, nextDepartures } from '@/lib/departures'
+import { FREE_CANCELLATION_HOURS } from '@/lib/experience-details'
 import {
   categories,
   emptyCriteria,
+  experienceName,
+  experiences,
   filterExperiences,
   hasActiveCriteria,
   parseLocalDate,
@@ -43,6 +48,25 @@ const CATEGORY_ICONS = {
   sparkles: Sparkles,
   shield: ShieldCheck,
 } as const
+
+const FAVORITES_KEY = 'ees:favorites'
+
+type DestinationTile = { name: string; image: string; alt: Record<Locale, string>; count: number }
+
+/**
+ * Destinos con al menos una experiencia, para la sección «Destinos»: la
+ * foto es la de su primera experiencia y el contador dice cuántas hay.
+ */
+const DESTINATION_TILES: DestinationTile[] = Array.from(
+  experiences
+    .reduce((map, item) => {
+      const tile = map.get(item.destination)
+      if (tile) tile.count += 1
+      else map.set(item.destination, { name: item.destination, image: item.image, alt: item.imageAlt, count: 1 })
+      return map
+    }, new Map<string, DestinationTile>())
+    .values(),
+)
 
 const MONTHS_SHORT: Record<Locale, string[]> = {
   ES: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
@@ -60,6 +84,36 @@ export default function Page() {
   const { lang: language, setLang } = useLanguage()
   const [activeCategory, setActiveCategory] = useState<CategoryId | null>(null)
   const [favorites, setFavorites] = useState<string[]>([])
+  const [onlySaved, setOnlySaved] = useState(false)
+  const stats = useReviewStats()
+
+  /**
+   * «Hoy» solo se calcula en el navegador, tras montar: si el servidor y el
+   * navegador cayeran en días distintos (cerca de medianoche), la próxima
+   * salida no coincidiría y React avisaría de un desajuste de hidratación.
+   */
+  const [now, setNow] = useState<Date | null>(null)
+  useEffect(() => setNow(new Date()), [])
+
+  // Favoritos: se recuerdan en este navegador. Si el almacenamiento está
+  // bloqueado (modo privado estricto), la página funciona igual sin ellos.
+  useEffect(() => {
+    try {
+      const saved: unknown = JSON.parse(localStorage.getItem(FAVORITES_KEY) ?? '[]')
+      if (Array.isArray(saved)) setFavorites(saved.filter((id): id is string => typeof id === 'string'))
+    } catch {}
+  }, [])
+
+  function toggleFavorite(id: string) {
+    setFavorites((current) => {
+      const next = current.includes(id) ? current.filter((item) => item !== id) : [...current, id]
+      try {
+        localStorage.setItem(FAVORITES_KEY, JSON.stringify(next))
+      } catch {}
+      if (next.length === 0) setOnlySaved(false)
+      return next
+    })
+  }
 
   /** Criterios ya aplicados. `null` = todavía no se ha buscado. */
   const [applied, setApplied] = useState<SearchCriteria | null>(null)
@@ -73,11 +127,12 @@ export default function Page() {
 
   const criteria = applied ?? emptyCriteria
   const results = useMemo(
-    () => filterExperiences(criteria, activeCategory),
-    [criteria, activeCategory],
+    () =>
+      filterExperiences(criteria, activeCategory).filter((item) => !onlySaved || favorites.includes(item.id)),
+    [criteria, activeCategory, onlySaved, favorites],
   )
 
-  const isFiltered = (applied !== null && hasActiveCriteria(applied)) || activeCategory !== null
+  const isFiltered = (applied !== null && hasActiveCriteria(applied)) || activeCategory !== null || onlySaved
 
   // Publica el contexto para el widget de WhatsApp: si el visitante ya
   // busco, el mensaje llegara con destino, fecha y numero de viajeros.
@@ -94,7 +149,17 @@ export default function Page() {
   function resetAll() {
     setApplied(null)
     setActiveCategory(null)
+    setOnlySaved(false)
     setFormKey((value) => value + 1)
+  }
+
+  /** Desde la sección «Destinos»: filtra el catálogo y lleva a los resultados. */
+  function exploreDestination(name: string) {
+    setApplied({ ...(applied ?? emptyCriteria), destination: name })
+    setActiveCategory(null)
+    setOnlySaved(false)
+    setFormKey((value) => value + 1)
+    document.getElementById('experiencias')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   const es = language === 'ES'
@@ -235,7 +300,21 @@ export default function Page() {
               {es ? <>Experiencias que <em className="font-serif font-normal">dejan huella</em></> : <>Experiences that <em className="font-serif font-normal">leave a mark</em></>}
             </h2>
           </div>
-          <a href="#destinos" className="hidden items-center gap-2 text-sm font-bold text-[#b8481c] sm:flex">{es ? 'Ver todas' : 'See all'} <ArrowRight size={17} /></a>
+          <div className="flex shrink-0 items-center gap-3">
+            <p className="hidden text-sm text-[#6a8588] sm:block" aria-live="polite">
+              {results.length} {es ? (results.length === 1 ? 'experiencia' : 'experiencias') : results.length === 1 ? 'experience' : 'experiences'}
+            </p>
+            {favorites.length > 0 && (
+              <button
+                onClick={() => setOnlySaved((value) => !value)}
+                aria-pressed={onlySaved}
+                className={`flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-bold transition ${onlySaved ? 'border-[#b8481c] bg-[#b8481c] text-white' : 'border-[#dce7e1] text-[#173f45] hover:bg-[#eaf1ed]'}`}
+              >
+                <Heart size={14} fill={onlySaved ? '#fff' : 'none'} />
+                {es ? 'Guardadas' : 'Saved'} ({favorites.length})
+              </button>
+            )}
+          </div>
         </div>
 
         {isFiltered && (
@@ -256,6 +335,12 @@ export default function Page() {
                 {categories.find((category) => category.id === activeCategory)?.label[language]}
               </span>
             )}
+            {onlySaved && (
+              <span className="flex items-center gap-1.5 rounded-full bg-[#fbe3d7] px-3 py-1.5 text-xs font-bold text-[#963b18]">
+                <Heart size={12} fill="currentColor" />
+                {es ? 'Solo guardadas' : 'Saved only'}
+              </span>
+            )}
             <button
               onClick={resetAll}
               className="flex items-center gap-1.5 rounded-full border border-[#dce7e1] px-3 py-1.5 text-xs font-bold text-[#173f45] transition hover:bg-[#eaf1ed]"
@@ -268,6 +353,8 @@ export default function Page() {
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">{results.map((item) => {
           const saved = favorites.includes(item.id)
+          const name = experienceName(item, language)
+          const next = now ? nextDepartures(item.weekdays, 1, now)[0] : undefined
           const detailHref = `/experiences/${item.id}`
           // Si el visitante ya buscó, el checkout llega con su fecha y viajeros.
           const bookQuery = new URLSearchParams()
@@ -281,10 +368,10 @@ export default function Page() {
                 <a href={detailHref} tabIndex={-1} aria-hidden="true" className="block h-full"><img src={item.image} alt={item.imageAlt[language]} loading="lazy" decoding="async" width={600} height={448} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /></a>
                 {item.tag && <span className="absolute left-3 top-3 rounded-full bg-[#f4d27c] px-3 py-1 text-[11px] font-bold text-[#173f45]">{item.tag[language]}</span>}
                 <button
-                  onClick={() => setFavorites((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])}
+                  onClick={() => toggleFavorite(item.id)}
                   aria-pressed={saved}
-                  className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-[#173f45]"
-                  aria-label={`${es ? 'Guardar' : 'Save'} ${item.title}`}
+                  className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-[#173f45] transition hover:scale-105"
+                  aria-label={`${es ? 'Guardar' : 'Save'} ${name}`}
                 >
                   <Heart size={17} fill={saved ? '#b8481c' : 'none'} className={saved ? 'text-[#b8481c]' : ''} />
                 </button>
@@ -292,10 +379,25 @@ export default function Page() {
               <div className="p-4">
                 <div className="mb-2 flex items-center justify-between text-xs text-[#6a8588]">
                   <span className="flex items-center gap-1"><MapPin size={13} />{item.destination}</span>
-                  <span className="flex items-center gap-1 font-semibold text-[#173f45]"><Star size={13} fill="#f4b942" className="text-[#f4b942]" />{item.rating.toFixed(1)} ({item.reviews})</span>
+                  <RatingBadge rating={stats?.[item.id]} loading={stats === undefined} lang={language} />
                 </div>
-                <h3 className="text-lg font-semibold"><a href={detailHref} className="transition hover:text-[#b8481c]">{item.title}</a></h3>
+                <h3 className="text-lg font-semibold leading-snug"><a href={detailHref} className="transition hover:text-[#b8481c]">{name}</a></h3>
                 <p className="mt-2 text-xs text-[#6a8588]">{item.durationHours} {es ? 'horas · Guía local incluido' : 'hours · Local guide included'}</p>
+                {/* Lo que más pesa al decidir: poder cancelar y cuándo sale. */}
+                <ul className="mt-3 grid gap-1 text-xs">
+                  <li className="flex items-center gap-1.5 font-semibold text-[#2f7d63]">
+                    <ShieldCheck size={13} aria-hidden="true" />
+                    {es ? `Cancelación gratis hasta ${FREE_CANCELLATION_HOURS} h antes` : `Free cancellation up to ${FREE_CANCELLATION_HOURS} h before`}
+                  </li>
+                  <li className="flex min-h-4 items-center gap-1.5 text-[#547176]">
+                    <CalendarCheck size={13} aria-hidden="true" />
+                    {next ? (
+                      <span>{es ? 'Próxima salida: ' : 'Next departure: '}<strong className="font-semibold text-[#173f45]">{departureLabel(next, language, now ?? undefined)}</strong></span>
+                    ) : (
+                      <span className="h-3 w-24 animate-pulse rounded-full bg-[#eaf1ed]" aria-hidden="true" />
+                    )}
+                  </li>
+                </ul>
                 <div className="mt-4 flex flex-wrap items-end justify-between gap-2 border-t border-[#edf0ed] pt-3">
                   <span><span className="text-xs text-[#6a8588]">{es ? 'Desde' : 'From'}</span> <strong className="text-lg">${item.priceUsd}</strong> <span className="text-xs text-[#6a8588]">{es ? '/ persona' : '/ person'}</span></span>
                   <a href={bookHref} className="rounded-full bg-[#b8481c] px-3.5 py-1.5 text-xs font-bold text-white transition hover:bg-[#963b18] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#173f45]">{es ? 'Reservar' : 'Book Now'}</a>
@@ -326,9 +428,41 @@ export default function Page() {
 
       <ReviewsSection />
 
-      <section id="como-funciona" className="bg-[#eaf1ed] py-20"><div className="mx-auto max-w-7xl px-5 lg:px-8"><div className="grid items-center gap-12 lg:grid-cols-[.9fr_1.1fr]"><div><p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-[#b8481c]">{es ? 'Viajar es fácil' : 'Travel made easy'}</p><h2 className="max-w-md text-3xl font-semibold tracking-tight md:text-4xl">{es ? <>Lo local se vive <em className="font-serif font-normal">mejor.</em></> : <>Local is simply <em className="font-serif font-normal">better.</em></>}</h2><p className="mt-5 max-w-md leading-relaxed text-[#547176]">{es ? 'Conectamos tus ganas de explorar con quienes conocen cada rincón de El Salvador. Tú eliges el plan, nosotros cuidamos los detalles.' : 'We connect your urge to explore with the people who know every corner of El Salvador. You pick the plan, we handle the details.'}</p><button className="mt-7 flex items-center gap-2 rounded-full bg-[#173f45] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#0e3035]">{es ? 'Conoce cómo funciona' : 'See how it works'} <ArrowRight size={17} /></button></div><div className="grid gap-4 sm:grid-cols-3">{(es ? [['01','Elige','Encuentra el destino o experiencia que te mueve.'],['02','Reserva','Confirma en pocos pasos y recibe todo al instante.'],['03','Disfruta','Vive el momento con anfitriones locales.']] : [['01','Choose','Find the destination or experience that moves you.'],['02','Book','Confirm in a few steps and get everything instantly.'],['03','Enjoy','Live the moment with local hosts.']]).map(([number, title, description]) => <div key={number} className="rounded-2xl bg-white p-5"><span className="text-4xl font-light text-[#f0b649]">{number}</span><h3 className="mt-8 font-semibold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-[#6a8588]">{description}</p><Check className="mt-5 text-[#b8481c]" size={19} /></div>)}</div></div></div></section>
+      <section id="como-funciona" className="bg-[#eaf1ed] py-20"><div className="mx-auto max-w-7xl px-5 lg:px-8"><div className="grid items-center gap-12 lg:grid-cols-[.9fr_1.1fr]"><div><p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-[#b8481c]">{es ? 'Viajar es fácil' : 'Travel made easy'}</p><h2 className="max-w-md text-3xl font-semibold tracking-tight md:text-4xl">{es ? <>Lo local se vive <em className="font-serif font-normal">mejor.</em></> : <>Local is simply <em className="font-serif font-normal">better.</em></>}</h2><p className="mt-5 max-w-md leading-relaxed text-[#547176]">{es ? 'Conectamos tus ganas de explorar con quienes conocen cada rincón de El Salvador. Tú eliges el plan, nosotros cuidamos los detalles.' : 'We connect your urge to explore with the people who know every corner of El Salvador. You pick the plan, we handle the details.'}</p><a href="#experiencias" className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#173f45] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#0e3035]">{es ? 'Elegir mi experiencia' : 'Choose my experience'} <ArrowRight size={17} /></a></div><div className="grid gap-4 sm:grid-cols-3">{(es ? [['01','Elige','Encuentra el destino o experiencia que te mueve.'],['02','Reserva','Confirma en pocos pasos y recibe todo al instante.'],['03','Disfruta','Vive el momento con anfitriones locales.']] : [['01','Choose','Find the destination or experience that moves you.'],['02','Book','Confirm in a few steps and get everything instantly.'],['03','Enjoy','Live the moment with local hosts.']]).map(([number, title, description]) => <div key={number} className="rounded-2xl bg-white p-5"><span className="text-4xl font-light text-[#f0b649]">{number}</span><h3 className="mt-8 font-semibold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-[#6a8588]">{description}</p><Check className="mt-5 text-[#b8481c]" size={19} /></div>)}</div></div></div></section>
 
-      <section id="destinos" className="mx-auto max-w-7xl px-5 py-20 lg:px-8"><div className="rounded-[2rem] bg-[#173f45] p-7 text-white md:p-12"><div className="flex flex-col justify-between gap-8 md:flex-row md:items-end"><div><p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-[#f4d27c]">{es ? 'Tu próxima historia' : 'Your next story'}</p><h2 className="max-w-xl text-3xl font-semibold tracking-tight md:text-5xl">{es ? <>Hay mucho más por <em className="font-serif font-normal text-[#f4c45e]">descubrir.</em></> : <>There is much more to <em className="font-serif font-normal text-[#f4c45e]">discover.</em></>}</h2></div><a href="#experiencias" className="flex shrink-0 items-center gap-2 rounded-full bg-[#b8481c] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#963b18]">{es ? 'Explorar destinos' : 'Explore destinations'} <ArrowRight size={17} /></a></div><div className="mt-10 grid gap-3 sm:grid-cols-3"><div className="relative h-48 overflow-hidden rounded-2xl sm:col-span-2"><img src="/img/experiences/ruta-de-las-flores.jpg" alt={es ? 'Iglesia de Juayúa, en la Ruta de las Flores' : 'Juayúa church on the Ruta de las Flores'} loading="lazy" decoding="async" className="h-full w-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" /><span className="absolute bottom-4 left-4 font-semibold">Ruta de las Flores</span></div><div className="relative h-48 overflow-hidden rounded-2xl"><img src="/img/reels/thumbs/suchitoto.jpg" alt={es ? 'Calle empedrada de Suchitoto' : 'Cobblestone street in Suchitoto'} loading="lazy" decoding="async" className="h-full w-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" /><span className="absolute bottom-4 left-4 font-semibold">Suchitoto</span></div></div></div></section>
+      <section id="destinos" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+        <div className="rounded-[2rem] bg-[#173f45] p-7 text-white md:p-12">
+          <div>
+            <p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-[#f4d27c]">{es ? 'Destinos' : 'Destinations'}</p>
+            <h2 className="max-w-xl text-3xl font-semibold tracking-tight md:text-5xl">
+              {es ? <>Elige a dónde <em className="font-serif font-normal text-[#f4c45e]">ir primero.</em></> : <>Choose where to <em className="font-serif font-normal text-[#f4c45e]">go first.</em></>}
+            </h2>
+            <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/75">
+              {es ? 'Toca un destino y te mostramos todas sus experiencias.' : 'Tap a destination to see all of its experiences.'}
+            </p>
+          </div>
+          <ul className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
+            {DESTINATION_TILES.map((tile) => (
+              <li key={tile.name}>
+                <button
+                  onClick={() => exploreDestination(tile.name)}
+                  className="group relative block h-40 w-full overflow-hidden rounded-2xl text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f4b942]"
+                >
+                  <img src={tile.image} alt={tile.alt[language]} loading="lazy" decoding="async" width={320} height={240} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                  <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                  <span className="absolute inset-x-3 bottom-3">
+                    <span className="block font-semibold leading-tight">{tile.name}</span>
+                    <span className="mt-0.5 flex items-center gap-1 text-xs text-white/80">
+                      {tile.count} {es ? (tile.count === 1 ? 'experiencia' : 'experiencias') : tile.count === 1 ? 'experience' : 'experiences'}
+                      <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
+                    </span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
 
       <SiteFooter />
     </main>

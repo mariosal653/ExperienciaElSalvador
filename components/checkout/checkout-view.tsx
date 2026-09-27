@@ -2,14 +2,15 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
-import { AlertTriangle, CalendarDays, Loader2, Lock, MapPin, Minus, Plus, ShieldCheck, Ticket, Users } from 'lucide-react'
+import { AlertTriangle, CalendarDays, Check, Loader2, Lock, MapPin, Minus, Plus, ShieldCheck, Ticket, Users } from 'lucide-react'
 import { useLanguage } from '@/components/i18n/language-provider'
 import { useWhatsAppLead } from '@/components/whatsapp/whatsapp-provider'
 import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
 import { DatePicker } from './date-picker'
 import { calculatePrice, formatCents } from '@/lib/pricing'
-import { parseLocalDate, type Locale } from '@/lib/data'
+import { experienceName, parseLocalDate, type Locale } from '@/lib/data'
+import { FREE_CANCELLATION_HOURS } from '@/lib/experience-details'
 import {
   CUSTOMER_ERROR_MESSAGES,
   validateCustomer,
@@ -20,6 +21,7 @@ import {
 type ExperienceView = {
   id: string
   title: string
+  name: Record<Locale, string>
   destination: string
   image: string
   imageAlt: Record<Locale, string>
@@ -513,7 +515,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
                 className="h-20 w-20 shrink-0 rounded-xl object-cover sm:h-24 sm:w-24"
               />
               <div className="min-w-0">
-                <p className="font-semibold leading-snug">{experience.title}</p>
+                <p className="font-semibold leading-snug">{experienceName(experience, lang)}</p>
                 <p className="mt-1 flex items-center gap-1 text-xs text-[#6a8588]">
                   <MapPin size={12} /> {experience.destination}
                 </p>
@@ -656,6 +658,22 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
             {!methods.any && (
               <p className="mt-3 text-center text-xs font-medium text-[#a3341c]">{SERVER_ERRORS.paymentsDisabled[lang]}</p>
             )}
+
+            {/* Garantías justo antes de pagar: es donde surge la duda. */}
+            <ul className="mt-4 grid gap-1.5 rounded-2xl bg-[#f3f7f4] p-3.5 text-xs text-[#173f45]">
+              <li className="flex items-start gap-2">
+                <Check size={14} className="mt-px shrink-0 text-[#2f7d63]" aria-hidden="true" />
+                {t(`Cancelación gratis hasta ${FREE_CANCELLATION_HOURS} h antes`, `Free cancellation up to ${FREE_CANCELLATION_HOURS} h before`)}
+              </li>
+              <li className="flex items-start gap-2">
+                <Check size={14} className="mt-px shrink-0 text-[#2f7d63]" aria-hidden="true" />
+                {t('Confirmación y entradas con QR al instante en tu correo', 'Instant confirmation and QR tickets by email')}
+              </li>
+              <li className="flex items-start gap-2">
+                <Check size={14} className="mt-px shrink-0 text-[#2f7d63]" aria-hidden="true" />
+                {t('Ayuda por WhatsApp antes y durante tu experiencia', 'WhatsApp support before and during your experience')}
+              </li>
+            </ul>
 
             <p className="mt-3 flex items-start justify-center gap-1.5 text-center text-xs text-[#6a8588]">
               <ShieldCheck size={14} className="mt-px shrink-0 text-[#256b54]" />

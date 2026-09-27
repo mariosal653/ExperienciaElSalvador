@@ -23,13 +23,17 @@ export type Category = {
 
 export type Experience = {
   id: string
+  /**
+   * Nombre canónico en español. Es el que se guarda en la reserva, las
+   * opiniones y el panel: no cambia con el idioma de la interfaz.
+   */
   title: string
+  /** Nombre visible, traducido. Usar `experienceName()` en la interfaz. */
+  name: Record<Locale, string>
   /** Debe coincidir con el `name` de un destino. */
   destination: string
   category: CategoryId
   priceUsd: number
-  rating: number
-  reviews: number
   durationHours: number
   image: string
   imageAlt: Record<Locale, string>
@@ -127,11 +131,10 @@ export const experiences: Experience[] = [
   {
     id: 'volcan-santa-ana',
     title: 'Volcán de Santa Ana',
+    name: { ES: 'Volcán de Santa Ana', EN: 'Santa Ana Volcano Hike' },
     destination: 'Volcán de Santa Ana',
     category: 'volcanes',
     priceUsd: 45,
-    rating: 4.9,
-    reviews: 128,
     durationHours: 8,
     image: '/img/reels/thumbs/santa-ana.jpg',
     imageAlt: { ES: 'Laguna turquesa en el cráter del volcán de Santa Ana', EN: 'Turquoise lagoon inside the Santa Ana volcano crater' },
@@ -150,11 +153,10 @@ export const experiences: Experience[] = [
   {
     id: 'atardecer-el-tunco',
     title: 'Atardecer en El Tunco',
+    name: { ES: 'Atardecer en El Tunco', EN: 'Sunset at El Tunco' },
     destination: 'El Tunco',
     category: 'playas',
     priceUsd: 38,
-    rating: 4.8,
-    reviews: 94,
     durationHours: 4,
     image: '/img/reels/thumbs/el-tunco.jpg',
     imageAlt: { ES: 'La roca de El Tunco frente a la playa', EN: 'El Tunco rock off the beach' },
@@ -173,11 +175,10 @@ export const experiences: Experience[] = [
   {
     id: 'ruta-de-las-flores',
     title: 'Ruta de las Flores',
+    name: { ES: 'Ruta de las Flores', EN: 'Ruta de las Flores Day Trip' },
     destination: 'Ruta de las Flores',
     category: 'cultura',
     priceUsd: 52,
-    rating: 4.9,
-    reviews: 76,
     durationHours: 10,
     image: '/img/experiences/ruta-de-las-flores.jpg',
     imageAlt: { ES: 'Iglesia de Juayúa, en la Ruta de las Flores', EN: 'Juayúa church on the Ruta de las Flores' },
@@ -196,11 +197,10 @@ export const experiences: Experience[] = [
   {
     id: 'kayak-coatepeque',
     title: 'Kayak en el Lago de Coatepeque',
+    name: { ES: 'Kayak en el Lago de Coatepeque', EN: 'Kayaking on Lake Coatepeque' },
     destination: 'Lago de Coatepeque',
     category: 'aventura',
     priceUsd: 42,
-    rating: 4.7,
-    reviews: 61,
     durationHours: 6,
     image: '/img/reels/thumbs/coatepeque.jpg',
     imageAlt: { ES: 'Vista del lago de Coatepeque', EN: 'View over Lake Coatepeque' },
@@ -219,11 +219,10 @@ export const experiences: Experience[] = [
   {
     id: 'surf-el-zonte',
     title: 'Clases de surf en El Zonte',
+    name: { ES: 'Clases de surf en El Zonte', EN: 'Surf Lessons in El Zonte' },
     destination: 'El Zonte',
     category: 'playas',
     priceUsd: 35,
-    rating: 4.8,
-    reviews: 142,
     durationHours: 2,
     image: '/img/experiences/surf-el-zonte.jpg',
     // La foto es de banco (Pixabay) y no está tomada en El Zonte, así que
@@ -246,11 +245,10 @@ export const experiences: Experience[] = [
   {
     id: 'centro-historico-san-salvador',
     title: 'Centro histórico de San Salvador',
+    name: { ES: 'Centro histórico de San Salvador', EN: 'San Salvador Historic Center' },
     destination: 'San Salvador',
     category: 'cultura',
     priceUsd: 28,
-    rating: 4.6,
-    reviews: 53,
     durationHours: 3,
     image: '/img/experiences/centro-historico.jpg',
     imageAlt: {
@@ -272,11 +270,10 @@ export const experiences: Experience[] = [
   {
     id: 'bosque-nuboso',
     title: 'Bosque nuboso y senderos',
+    name: { ES: 'Bosque nuboso y senderos', EN: 'Cloud Forest Trails' },
     destination: 'Santa Ana',
     category: 'aventura',
     priceUsd: 40,
-    rating: 4.8,
-    reviews: 47,
     durationHours: 5,
     image: '/img/experiences/bosque-montecristo.jpg',
     imageAlt: {
@@ -298,11 +295,10 @@ export const experiences: Experience[] = [
   {
     id: 'suchitoto-colonial',
     title: 'Suchitoto colonial y lago Suchitlán',
+    name: { ES: 'Suchitoto colonial y lago Suchitlán', EN: 'Colonial Suchitoto & Lake Suchitlán' },
     destination: 'Suchitoto',
     category: 'cultura',
     priceUsd: 48,
-    rating: 4.7,
-    reviews: 88,
     durationHours: 7,
     image: '/img/reels/thumbs/suchitoto.jpg',
     imageAlt: { ES: 'Calle empedrada de Suchitoto', EN: 'Cobblestone street in Suchitoto' },
@@ -320,11 +316,10 @@ export const experiences: Experience[] = [
   {
     id: 'surf-city-ruta',
     title: 'Surf City: ruta de playas',
+    name: { ES: 'Surf City: ruta de playas', EN: 'Surf City Beach Route' },
     destination: 'Surf City',
     category: 'playas',
     priceUsd: 32,
-    rating: 4.6,
-    reviews: 71,
     durationHours: 5,
     image: '/img/experiences/surf-city-el-sunzal.jpg',
     imageAlt: { ES: 'Palmeras y ola en la playa El Sunzal, Surf City', EN: 'Palms and a breaking wave at El Sunzal beach, Surf City' },
@@ -342,11 +337,10 @@ export const experiences: Experience[] = [
   {
     id: 'volcan-izalco',
     title: 'Volcán de Izalco desde Cerro Verde',
+    name: { ES: 'Volcán de Izalco desde Cerro Verde', EN: 'Izalco Volcano from Cerro Verde' },
     destination: 'Santa Ana',
     category: 'volcanes',
     priceUsd: 50,
-    rating: 4.7,
-    reviews: 64,
     durationHours: 9,
     image: '/img/experiences/volcan-izalco.jpg',
     imageAlt: { ES: 'Volcán de Izalco visto desde el mirador de Cerro Verde', EN: 'Izalco volcano seen from the Cerro Verde viewpoint' },
@@ -364,11 +358,10 @@ export const experiences: Experience[] = [
   {
     id: 'malecon-la-libertad',
     title: 'Malecón de La Libertad y mariscos',
+    name: { ES: 'Malecón de La Libertad y mariscos', EN: 'La Libertad Waterfront & Seafood' },
     destination: 'La Libertad',
     category: 'cultura',
     priceUsd: 30,
-    rating: 4.5,
-    reviews: 39,
     durationHours: 4,
     image: '/img/experiences/malecon-la-libertad.jpg',
     imageAlt: { ES: 'Malecón y muelle del Puerto de La Libertad al atardecer', EN: 'Waterfront and pier of Puerto de La Libertad at sunset' },
@@ -384,6 +377,18 @@ export const experiences: Experience[] = [
     },
   },
 ]
+
+/** Nombre de la experiencia en el idioma de la interfaz. */
+export function experienceName(experience: Pick<Experience, 'name'>, lang: Locale): string {
+  return experience.name[lang]
+}
+
+/** Busca el nombre traducido a partir del id; útil para reservas y opiniones. */
+export function experienceNameById(id: string | null | undefined, lang: Locale): string | null {
+  if (!id) return null
+  const experience = experiences.find((item) => item.id === id)
+  return experience ? experience.name[lang] : null
+}
 
 /* ------------------------------------------------------------------ */
 /* Filtrado                                                            */

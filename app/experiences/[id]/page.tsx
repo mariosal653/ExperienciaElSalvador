@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { experiences } from '@/lib/data'
+import { getExperienceDetails } from '@/lib/experience-details'
+import { availablePaymentMethods } from '@/lib/payments/config'
 import { getSiteUrl } from '@/lib/site'
 import { ExperienceDetail } from '@/components/experience/experience-detail'
 
@@ -54,7 +56,7 @@ export default async function ExperiencePage({ params }: Params) {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TouristTrip',
-    name: experience.title,
+    name: experience.name.EN,
     description: experience.description.EN,
     image,
     touristType: experience.category,
@@ -69,9 +71,19 @@ export default async function ExperiencePage({ params }: Params) {
     },
   }
 
-  const related = experiences
-    .filter((item) => item.category === experience.category && item.id !== experience.id)
-    .slice(0, 3)
+  // Primero las de la misma categoría; si no llegan a tres, se completa con
+  // otras del mismo destino y luego con el resto.
+  const others = experiences.filter((item) => item.id !== experience.id)
+  const related = [
+    ...others.filter((item) => item.category === experience.category),
+    ...others.filter((item) => item.category !== experience.category && item.destination === experience.destination),
+    ...others.filter((item) => item.category !== experience.category && item.destination !== experience.destination),
+  ].slice(0, 3)
+
+  // Qué métodos de pago anunciar. Se decide en el build (la página es
+  // estática); el checkout vuelve a comprobarlo en cada visita.
+  const methods = availablePaymentMethods()
+  const payments = { card: methods.wompi.available, paypal: methods.paypal.available }
 
   return (
     <>
@@ -81,7 +93,7 @@ export default async function ExperiencePage({ params }: Params) {
         // catálogo nunca pueda cerrar la etiqueta <script>.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
-      <ExperienceDetail experience={experience} related={related} />
+      <ExperienceDetail experience={experience} details={getExperienceDetails(experience.id)} related={related} payments={payments} />
     </>
   )
 }

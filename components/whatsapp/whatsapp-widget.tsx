@@ -79,8 +79,9 @@ export function WhatsAppWidget() {
   // El safe-area va en la propia clase y no en un `style` inline: así sigue
   // habiendo variante md y no se pierde el responsive.
   // Capa 50 — ver la escala en app/globals.css.
+  // --sticky-offset lo fija la barra de reserva del detalle para no taparla.
   return (
-    <div className="fixed right-6 z-50 flex flex-col items-end gap-3 bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))] md:right-8 md:bottom-[calc(2rem+env(safe-area-inset-bottom,0px))]">
+    <div className="fixed right-6 z-50 flex flex-col items-end gap-3 bottom-[calc(1.5rem+var(--sticky-offset,0px)+env(safe-area-inset-bottom,0px))] transition-[bottom] duration-300 md:right-8 md:bottom-[calc(2rem+var(--sticky-offset,0px)+env(safe-area-inset-bottom,0px))]">
       {showBubble && (
         <div
           role="status"

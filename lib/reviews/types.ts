@@ -28,6 +28,8 @@ export type Review = {
   permalink: string | null
   /** Experiencia sobre la que opina, cuando se conoce. */
   experienceTitle?: string | null
+  /** Id del catálogo, para mostrar el nombre traducido. */
+  experienceId?: string | null
   /** Escrita por quien completó la reserva. */
   verified?: boolean
   /** Contenido de arranque, etiquetado como tal en la interfaz. */
@@ -76,3 +78,13 @@ export interface ReviewProvider {
 export function emptyResult(source: ReviewSource, notice: string): ProviderResult {
   return { source, configured: false, reviews: [], summary: null, notice }
 }
+
+/** Valoración de una experiencia calculada con sus opiniones publicadas. */
+export type ExperienceRating = {
+  average: number
+  count: number
+  /** Cuántas opiniones hay de 5, 4, 3, 2 y 1 estrellas (índice 0 = 1 estrella). */
+  breakdown: [number, number, number, number, number]
+}
+
+export type ReviewStats = Record<string, ExperienceRating>

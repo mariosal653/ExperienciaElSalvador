@@ -22,6 +22,11 @@ export type SeedReview = {
   experienceTitle: string
   rating: number
   comment: string
+  /**
+   * Traducción al inglés para la interfaz en inglés. Las opiniones reales
+   * se muestran en el idioma en que se escribieron.
+   */
+  commentEn: string
   createdAt: string
 }
 
@@ -35,6 +40,8 @@ export const SEED_REVIEWS: SeedReview[] = [
     rating: 5,
     comment:
       'Llegué desde Suecia sin hablar casi nada de español y el guía cambió al inglés sin que se lo pidiera. Las calles coloniales, la iglesia y el paseo en lancha por el lago hicieron un día muy completo. Reservar fue cuestión de dos minutos.',
+    commentEn:
+      'I came from Sweden speaking almost no Spanish, and the guide switched to English without me asking. The colonial streets, the church and the boat ride on the lake made for a very full day. Booking took two minutes.',
     createdAt: '2026-08-30T11:05:00.000Z',
   },
   {
@@ -46,6 +53,8 @@ export const SEED_REVIEWS: SeedReview[] = [
     rating: 4,
     comment:
       'Fuimos con dos niños de 8 y 11 años. Nos dieron chalecos para todos y el instructor tuvo muchísima paciencia con los peques. Lo único: llegamos casi al mediodía y pegaba fuerte el sol, mejor ir temprano.',
+    commentEn:
+      'We went with two kids aged 8 and 11. They gave everyone a life jacket and the instructor was incredibly patient with the little ones. One tip: we arrived close to noon and the sun was strong, so go early.',
     createdAt: '2026-08-24T14:10:00.000Z',
   },
   {
@@ -57,6 +66,8 @@ export const SEED_REVIEWS: SeedReview[] = [
     rating: 5,
     comment:
       'Subimos como pareja sin ser nada deportistas y el ritmo del grupo fue perfecto. La laguna del cráter con ese verde turquesa no se parece a nada que hayamos visto antes. Salir a las cinco de la mañana vale cada minuto de sueño perdido.',
+    commentEn:
+      "We climbed as a couple without being athletic at all, and the group's pace was perfect. The turquoise-green crater lagoon looks like nothing we had seen before. Leaving at five in the morning is worth every minute of lost sleep.",
     createdAt: '2026-08-02T18:45:00.000Z',
   },
   {
@@ -68,6 +79,8 @@ export const SEED_REVIEWS: SeedReview[] = [
     rating: 5,
     comment:
       'Fui por la feria gastronómica de Juayúa y terminé quedándome todo el día. El guía nos llevó a una cocina donde hacían pupusas de chipilín como las de mi abuela. Comimos muchísimo y aun así el precio me pareció justo.',
+    commentEn:
+      "I went for the Juayúa food fair and ended up staying all day. The guide took us to a kitchen making chipilín pupusas just like my grandmother's. We ate a lot and the price still felt fair.",
     createdAt: '2026-07-19T15:20:00.000Z',
   },
 ]

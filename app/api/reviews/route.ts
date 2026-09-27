@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { getReviews } from '@/lib/reviews'
+import { getExperienceReviews, getReviews } from '@/lib/reviews'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 
@@ -25,6 +25,12 @@ export const dynamic = 'force-dynamic'
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const requested = searchParams.get('locale') === 'ES' ? 'es' : 'en'
+
+  // ?experience=<id>: solo las opiniones de esa experiencia (página de detalle).
+  const experienceId = searchParams.get('experience')
+  if (experienceId) {
+    return NextResponse.json(await getExperienceReviews(requested, experienceId))
+  }
 
   const payload = await getReviews(requested)
 

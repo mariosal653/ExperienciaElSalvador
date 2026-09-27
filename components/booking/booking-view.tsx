@@ -22,7 +22,7 @@ import { useLanguage } from '@/components/i18n/language-provider'
 import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
 import { formatCents } from '@/lib/pricing'
-import { parseLocalDate } from '@/lib/data'
+import { experienceNameById, parseLocalDate } from '@/lib/data'
 
 type BookingData = {
   code: string
@@ -226,7 +226,7 @@ export function BookingView({
               <img src={booking.experienceImage} alt="" decoding="async" className="h-44 w-full object-cover sm:h-auto sm:w-56 sm:shrink-0" />
             )}
             <div className="min-w-0 flex-1 p-5 sm:p-6">
-              <h2 id="details-title" className="text-xl font-semibold">{booking.experienceTitle}</h2>
+              <h2 id="details-title" className="text-xl font-semibold">{experienceNameById(booking.experienceId, lang) ?? booking.experienceTitle}</h2>
               <ul className="mt-3 grid gap-2 text-sm text-[#547176]">
                 <li className="flex items-center gap-2"><MapPin size={15} className="shrink-0" /> {booking.destination}</li>
                 <li className="flex items-center gap-2 capitalize"><CalendarDays size={15} className="shrink-0" /> {dateLabel}</li>

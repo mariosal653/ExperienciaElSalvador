@@ -5,6 +5,7 @@ import { SourceIcon, SOURCE_LABEL } from './platform-icons'
 import type { Review } from '@/lib/reviews/types'
 import type { Locale } from '@/lib/data'
 import { avatarColorFor } from '@/lib/reviews/seed-data'
+import { experienceNameById } from '@/lib/data'
 
 function initials(name: string): string {
   return name
@@ -85,7 +86,7 @@ export function ReviewCard({ review, lang }: { review: Review; lang: Locale }) {
       {review.experienceTitle && (
         <p className="mt-3 flex items-start gap-1.5 text-xs font-semibold text-[#173f45]">
           <MapPin size={13} className="mt-0.5 shrink-0 text-[#b8481c]" aria-hidden="true" />
-          <span>{review.experienceTitle}</span>
+          <span>{experienceNameById(review.experienceId, lang) ?? review.experienceTitle}</span>
         </p>
       )}
 

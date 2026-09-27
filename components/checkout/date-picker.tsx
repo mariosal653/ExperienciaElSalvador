@@ -24,6 +24,16 @@ function monthGrid(year: number, month: number): (Date | null)[] {
   return cells
 }
 
+/** Primer día reservable en que sale la experiencia (o `from` si no hay). */
+function firstDepartureFrom(from: Date, until: Date, weekdays: number[]): Date {
+  const day = new Date(from)
+  for (let i = 0; i < 14 && day <= until; i++) {
+    if (weekdays.includes(day.getDay())) return day
+    day.setDate(day.getDate() + 1)
+  }
+  return from
+}
+
 /**
  * Calendario en línea del checkout. Solo deja elegir los días en que sale
  * la experiencia, desde mañana y hasta un año vista. Siempre visible (sin
@@ -54,8 +64,11 @@ export function DatePicker({
   const lastDate = parseLocalDate(last)!
   const selected = value ? parseLocalDate(value) : null
 
+  // Sin fecha elegida, abre en el mes de la PRIMERA salida disponible: si
+  // hoy es 30 y la próxima salida es el 3, abrir en este mes obliga a
+  // adivinar que hay que pasar de página.
   const [cursor, setCursor] = useState(() => {
-    const base = selected ?? firstDate
+    const base = selected ?? firstDepartureFrom(firstDate, lastDate, weekdays)
     return { year: base.getFullYear(), month: base.getMonth() }
   })
 

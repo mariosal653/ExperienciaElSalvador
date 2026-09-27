@@ -58,6 +58,7 @@ export default async function CheckoutPage({ params, searchParams }: Props) {
       experience={{
         id: experience.id,
         title: experience.title,
+        name: experience.name,
         destination: experience.destination,
         image: experience.image,
         imageAlt: experience.imageAlt,
