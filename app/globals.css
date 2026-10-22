@@ -57,7 +57,8 @@
 
 @layer base {
   * { @apply border-border outline-ring/50; }
-  html { scroll-behavior: smooth; }
+  /* Red de seguridad: ningún elemento que se escape (p. ej. un .sr-only absoluto) puede ensanchar la página en móvil. `clip` no rompe position: sticky. */
+  html { scroll-behavior: smooth; overflow-x: clip; }
   body { @apply bg-background text-foreground; margin: 0; }
   button, a { -webkit-tap-highlight-color: transparent; }
 }

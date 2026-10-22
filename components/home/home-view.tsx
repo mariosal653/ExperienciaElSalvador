@@ -325,7 +325,8 @@ export function HomeView() {
 
         {/* Filtros finos y orden: en móvil se deslizan en horizontal. */}
         <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="-mx-1 flex items-center gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]" role="group" aria-label={es ? 'Filtros' : 'Filters'}>
+          {/* `relative`: sin él, el .sr-only de "Precio máximo" se posiciona respecto a <body>, escapa del recorte y ensancha toda la página en móvil. */}
+          <div className="relative -mx-1 flex items-center gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]" role="group" aria-label={es ? 'Filtros' : 'Filters'}>
             <SlidersHorizontal size={16} className="shrink-0 text-[#6a8588]" aria-hidden="true" />
             <button aria-pressed={refine.duration === 'half'} onClick={() => setRefine((r) => ({ ...r, duration: r.duration === 'half' ? 'any' : 'half' }))} className={chip(refine.duration === 'half')}>
               {es ? 'Medio día (hasta 5 h)' : 'Half day (up to 5 h)'}
