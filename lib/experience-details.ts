@@ -89,6 +89,26 @@ const IMG = {
     src: '/img/categoria-cultura.jpg',
     alt: { ES: 'Iglesia de Santa Lucía, Suchitoto', EN: 'Santa Lucía church, Suchitoto' },
   },
+  tamaniqueMar: {
+    src: '/img/experiences/tamanique-vista-al-mar.jpg',
+    alt: { ES: 'Vista al Pacífico desde la carretera a Tamanique', EN: 'View of the Pacific from the road to Tamanique' },
+  },
+  tamaniqueIglesia: {
+    src: '/img/experiences/tamanique-iglesia.jpg',
+    alt: { ES: 'Iglesia y parque central de Tamanique', EN: 'Church and central park of Tamanique' },
+  },
+  puertaDelDiabloPenas: {
+    src: '/img/experiences/puerta-del-diablo-penas.jpg',
+    alt: { ES: 'La abertura entre las dos peñas de la Puerta del Diablo', EN: 'The gap between the two rocks of the Puerta del Diablo' },
+  },
+  panchimalcoValle: {
+    src: '/img/experiences/puerta-del-diablo-panchimalco.jpg',
+    alt: { ES: 'Valle de Panchimalco visto desde la Puerta del Diablo', EN: 'Panchimalco valley seen from the Puerta del Diablo' },
+  },
+  conchaguaPlaya: {
+    src: '/img/experiences/conchagua-playa.jpg',
+    alt: { ES: 'El volcán de Conchagua visto desde la playa', EN: 'Conchagua volcano seen from the beach' },
+  },
 }
 
 const ID_DOC: List = {
@@ -449,6 +469,126 @@ export const experienceDetails: Record<string, ExperienceDetails> = {
     },
     difficulty: 'easy',
     minAge: 0,
+    languages: ['ES', 'EN'],
+  },
+
+  'cascadas-tamanique': {
+    gallery: [IMG.tamaniqueMar, IMG.tamaniqueIglesia],
+    itinerary: [
+      { time: '8:00', text: { ES: 'Encuentro en el parque central de Tamanique y charla de seguridad', EN: 'Meet at the Tamanique central park for a safety briefing' } },
+      { time: '8:30', text: { ES: 'Descenso por el sendero entre cafetales y bosque (30–45 min)', EN: 'Walk down the trail through coffee farms and forest (30–45 min)' } },
+      { time: '9:15', text: { ES: 'Primera cascada y poza', EN: 'First waterfall and pool' } },
+      { time: '9:45', text: { ES: 'Recorrido por las cascadas: nado y saltos opcionales donde el guía lo indique', EN: 'Explore the waterfalls: swimming and optional jumps where the guide allows' } },
+      { time: '11:45', text: { ES: 'Subida de regreso al pueblo (45–60 min)', EN: 'Hike back up to the town (45–60 min)' } },
+      { time: '13:00', text: { ES: 'Fin de la experiencia en el parque central', EN: 'Experience ends at the central park' } },
+    ],
+    includes: {
+      ES: ['Guía local (obligatorio para bajar a las cascadas)', 'Aporte de acceso al sendero', 'Agua y un refrigerio', 'Botiquín de primeros auxilios'],
+      EN: ['Local guide (required to reach the waterfalls)', 'Trail access fee', 'Water and a snack', 'First-aid kit'],
+    },
+    excludes: {
+      ES: ['Transporte hasta Tamanique', 'Almuerzo', 'Propinas'],
+      EN: ['Transport to Tamanique', 'Lunch', 'Tips'],
+    },
+    bring: {
+      ES: ['Traje de baño y toalla', 'Sandalias con correa o tenis que se puedan mojar', 'Bolsa seca para el teléfono', 'Bloqueador', '1,5 L de agua', ...ID_DOC.ES],
+      EN: ['Swimsuit and towel', 'Strapped sandals or sneakers that can get wet', 'Dry bag for your phone', 'Sunscreen', '1.5 L of water', ...ID_DOC.EN],
+    },
+    notes: {
+      ES: [
+        'La bajada y la subida tienen pendientes fuertes: hace falta una condición física media.',
+        'En época de lluvias (mayo a octubre) el guía puede cambiar o suspender el recorrido si sube el caudal.',
+        'Los saltos son opcionales y solo desde los puntos que indique el guía.',
+      ],
+      EN: [
+        'The trail down and back up is steep: a moderate fitness level is needed.',
+        'In the rainy season (May to October) the guide may change or suspend the route if the water rises.',
+        'Jumps are optional and only from the spots the guide points out.',
+      ],
+    },
+    meetingPoint: {
+      name: { ES: 'Parque central de Tamanique, frente a la iglesia', EN: 'Tamanique central park, in front of the church' },
+      mapQuery: 'Parque Central Tamanique, La Libertad, El Salvador',
+    },
+    difficulty: 'moderate',
+    minAge: 10,
+    languages: ['ES', 'EN'],
+  },
+
+  'puerta-del-diablo': {
+    gallery: [IMG.puertaDelDiabloPenas, IMG.panchimalcoValle],
+    itinerary: [
+      { time: '8:00', text: { ES: 'Encuentro en el estacionamiento del Parque Natural Puerta del Diablo', EN: 'Meet at the Puerta del Diablo Natural Park parking lot' } },
+      { time: '8:15', text: { ES: 'Subida a la peña El Chulo por escalinatas y sendero', EN: 'Climb El Chulo rock by steps and trail' } },
+      { time: '9:00', text: { ES: 'Mirador en la cima: San Salvador, el lago de Ilopango, el volcán de San Vicente y el Pacífico', EN: 'Summit viewpoint: San Salvador, Lake Ilopango, San Vicente volcano and the Pacific' } },
+      { time: '9:45', text: { ES: 'La leyenda de la Puerta del Diablo y fotos en la abertura entre las peñas', EN: 'The legend of the Devil\'s Door and photos at the gap between the rocks' } },
+      { time: '10:30', text: { ES: 'Traslado a Panchimalco: iglesia colonial de la Santa Cruz de Roma y calles del pueblo', EN: 'Ride to Panchimalco: the colonial Santa Cruz de Roma church and the town streets' } },
+      { time: '12:00', text: { ES: 'Regreso al parque y fin de la experiencia', EN: 'Back at the park; experience ends' } },
+    ],
+    includes: {
+      ES: ['Guía local', 'Entrada a las peñas', 'Traslado ida y vuelta a Panchimalco', 'Agua'],
+      EN: ['Local guide', 'Entry to the rocks', 'Round-trip ride to Panchimalco', 'Water'],
+    },
+    excludes: {
+      ES: ['Transporte hasta el parque', 'Comida', 'Propinas'],
+      EN: ['Transport to the park', 'Food', 'Tips'],
+    },
+    bring: {
+      ES: ['Tenis con buen agarre', 'Gorra y bloqueador', 'Agua', ...ID_DOC.ES],
+      EN: ['Sneakers with good grip', 'Cap and sunscreen', 'Water', ...ID_DOC.EN],
+    },
+    notes: {
+      ES: ['La subida tiene tramos de roca con barandal: no se recomienda si tienes vértigo.'],
+      EN: ['The climb has rocky stretches with railings: not recommended if you are afraid of heights.'],
+    },
+    meetingPoint: {
+      name: { ES: 'Parque Natural Puerta del Diablo, estacionamiento', EN: 'Puerta del Diablo Natural Park, parking lot' },
+      mapQuery: 'Parque Natural Puerta del Diablo, Panchimalco, El Salvador',
+    },
+    difficulty: 'moderate',
+    minAge: 6,
+    languages: ['ES', 'EN'],
+  },
+
+  'volcan-conchagua': {
+    gallery: [IMG.conchaguaPlaya],
+    itinerary: [
+      { time: '4:00', text: { ES: 'Encuentro en el parque central de Conchagua', EN: 'Meet at the Conchagua central park' } },
+      { time: '4:15', text: { ES: 'Subida en 4x4 al Parque Natural Conchagua (unos 45 min)', EN: '4x4 ride up to Conchagua Natural Park (about 45 min)' } },
+      { time: '5:15', text: { ES: 'Mirador Espíritu de la Montaña: amanecer sobre el Golfo de Fonseca', EN: 'Espíritu de la Montaña viewpoint: sunrise over the Gulf of Fonseca' } },
+      { time: '6:30', text: { ES: 'Desayuno típico con café de la zona', EN: 'Traditional breakfast with local coffee' } },
+      { time: '7:30', text: { ES: 'Caminata por los senderos y miradores del parque', EN: 'Walk along the park trails and viewpoints' } },
+      { time: '9:30', text: { ES: 'Descenso en 4x4 y visita a la iglesia colonial de Conchagua', EN: '4x4 ride down and visit to the colonial church of Conchagua' } },
+      { time: '11:00', text: { ES: 'Fin de la experiencia en el parque central', EN: 'Experience ends at the central park' } },
+    ],
+    includes: {
+      ES: ['Guía local', 'Transporte en 4x4 de subida y bajada', 'Entrada al mirador', 'Desayuno típico y café'],
+      EN: ['Local guide', '4x4 transport up and down', 'Viewpoint entry', 'Traditional breakfast and coffee'],
+    },
+    excludes: {
+      ES: ['Transporte hasta Conchagua', 'Hospedaje la noche anterior', 'Propinas'],
+      EN: ['Transport to Conchagua', 'Lodging the night before', 'Tips'],
+    },
+    bring: {
+      ES: ['Chaqueta: al amanecer hace frío en la cima', 'Linterna o frontal', 'Tenis cómodos', 'Cámara', ...ID_DOC.ES],
+      EN: ['A jacket: it is cold at the top at dawn', 'Flashlight or headlamp', 'Comfortable sneakers', 'Camera', ...ID_DOC.EN],
+    },
+    notes: {
+      ES: [
+        'Sale a las 4:00 a. m.: recomendamos dormir la noche anterior en La Unión o en Conchagua.',
+        'Con el cielo nublado el amanecer puede no verse; el recorrido se hace igual.',
+      ],
+      EN: [
+        'It starts at 4:00 a.m.: we recommend spending the night before in La Unión or Conchagua.',
+        'On cloudy days the sunrise may not be visible; the tour runs anyway.',
+      ],
+    },
+    meetingPoint: {
+      name: { ES: 'Parque central de Conchagua, La Unión', EN: 'Conchagua central park, La Unión' },
+      mapQuery: 'Parque Central Conchagua, La Unión, El Salvador',
+    },
+    difficulty: 'easy',
+    minAge: 6,
     languages: ['ES', 'EN'],
   },
 }

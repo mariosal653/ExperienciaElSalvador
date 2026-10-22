@@ -154,6 +154,62 @@ export const credits = {
     license: 'CC BY-SA 3.0',
     source: `${COMMONS}Bosque_interior_Parque_Nacional_Montecristo_01.JPG`,
   },
+  tamaniqueCascada: {
+    file: '/img/experiences/cascadas-tamanique.jpg',
+    title: 'Tamanique Waterfall',
+    author: 'Sambusak74',
+    license: 'CC BY 4.0',
+    source: `${COMMONS}Tamanique_Waterfall.jpg`,
+  },
+  tamaniqueMar: {
+    file: '/img/experiences/tamanique-vista-al-mar.jpg',
+    title: 'Vista al mar carretera a Tamanique',
+    author: 'Daniel chavez castro',
+    license: 'CC BY 3.0',
+    source: `${COMMONS}Vista_al_mar_carretera_a_Tamanique_-_panoramio.jpg`,
+  },
+  tamaniqueIglesia: {
+    file: '/img/experiences/tamanique-iglesia.jpg',
+    title: 'Templo Tamanique',
+    author: 'Daniel chavez castro',
+    license: 'CC BY 3.0',
+    source: `${COMMONS}Templo_tamanique_-_panoramio.jpg`,
+  },
+  puertaDelDiablo: {
+    file: '/img/experiences/puerta-del-diablo.jpg',
+    title: 'Mirador desde la cima de la Puerta del Diablo',
+    author: 'Pabloqp20',
+    license: 'CC BY-SA 4.0',
+    source: `${COMMONS}Mirador_desde_la_cima_de_la_puerta_del_diablo.jpg`,
+  },
+  puertaDelDiabloPenas: {
+    file: '/img/experiences/puerta-del-diablo-penas.jpg',
+    title: 'Puerta del Diablo, El Salvador',
+    author: 'Jerrye & Roy Klotz, MD',
+    license: 'CC BY-SA 3.0',
+    source: `${COMMONS}PUERTA_DEL_DIABLO,_EL_SALVADOR.jpg`,
+  },
+  panchimalcoValle: {
+    file: '/img/experiences/puerta-del-diablo-panchimalco.jpg',
+    title: 'Puerta del Diablo',
+    author: 'Metztli',
+    license: 'CC BY-SA 3.0',
+    source: `${COMMONS}Puerta_del_Diablo.JPG`,
+  },
+  conchaguaGolfo: {
+    file: '/img/experiences/volcan-conchagua.jpg',
+    title: 'Conchagua, Golfo de Fonseca',
+    author: 'Raúl Arias',
+    license: 'CC BY 2.0',
+    source: `${COMMONS}Conchagua,_Golfo_de_Fonseca.jpg`,
+  },
+  conchaguaPlaya: {
+    file: '/img/experiences/conchagua-playa.jpg',
+    title: 'Volcán Conchagua',
+    author: 'Marcelo Alberto Miranda',
+    license: 'CC BY-SA 4.0',
+    source: `${COMMONS}Volcan_Conchagua.jpg`,
+  },
   // ÚNICA imagen de banco del sitio. Las demás son fotografías reales de
   // los lugares, de Wikimedia Commons. Esta ilustra una clase de surf al
   // atardecer, pero NO está tomada en El Zonte: por eso su texto

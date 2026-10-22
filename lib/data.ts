@@ -88,6 +88,9 @@ export const destinations: Destination[] = [
   { id: 'volcan-de-santa-ana', name: 'Volcán de Santa Ana', region: { ES: 'Santa Ana', EN: 'Santa Ana' } },
   { id: 'la-libertad', name: 'La Libertad', region: { ES: 'La Libertad', EN: 'La Libertad' } },
   { id: 'surf-city', name: 'Surf City', region: { ES: 'Costa de La Libertad', EN: 'La Libertad coast' } },
+  { id: 'tamanique', name: 'Tamanique', region: { ES: 'La Libertad', EN: 'La Libertad' } },
+  { id: 'puerta-del-diablo', name: 'Puerta del Diablo', region: { ES: 'Panchimalco, San Salvador', EN: 'Panchimalco, San Salvador' } },
+  { id: 'volcan-de-conchagua', name: 'Volcán de Conchagua', region: { ES: 'La Unión', EN: 'La Unión' } },
 ]
 
 /* ------------------------------------------------------------------ */
@@ -374,6 +377,81 @@ export const experiences: Experience[] = [
     highlights: {
       ES: ['Muelle de pescadores', 'Mariscos frescos', 'Paseo tranquilo'],
       EN: ['Fishing pier', 'Fresh seafood', 'Easy stroll'],
+    },
+  },
+  {
+    id: 'cascadas-tamanique',
+    title: 'Cascadas de Tamanique',
+    name: { ES: 'Cascadas de Tamanique', EN: 'Tamanique Waterfalls Hike' },
+    destination: 'Tamanique',
+    category: 'aventura',
+    priceUsd: 35,
+    durationHours: 5,
+    image: '/img/experiences/cascadas-tamanique.jpg',
+    imageAlt: {
+      ES: 'Cascada de Tamanique cayendo sobre una poza entre paredes de roca',
+      EN: 'Tamanique waterfall dropping into a pool between rock walls',
+    },
+    tag: { ES: 'Nuevo', EN: 'New' },
+    maxPeople: 10,
+    weekdays: [0, 3, 5, 6],
+    description: {
+      ES: 'Baja desde el pueblo de Tamanique, en la cordillera del Bálsamo, por un sendero de unos 2 km hasta las cascadas escondidas en un cañón de roca. Nada en sus pozas de agua fresca y, si te animas, salta desde las rocas con el guía. A 35 minutos de El Tunco.',
+      EN: 'Hike down from the town of Tamanique, in the Bálsamo mountain range, along a trail of about 2 km to waterfalls hidden in a rock canyon. Swim in their cool pools and, if you dare, jump from the rocks with your guide. 35 minutes from El Tunco.',
+    },
+    highlights: {
+      ES: ['Cascadas y pozas para nadar', 'Saltos opcionales con guía', 'Vista al mar desde la cordillera'],
+      EN: ['Waterfalls and swimming pools', 'Optional jumps with a guide', 'Ocean views from the ridge'],
+    },
+  },
+  {
+    id: 'puerta-del-diablo',
+    title: 'Parque Natural Puerta del Diablo',
+    name: { ES: 'Parque Natural Puerta del Diablo', EN: 'Puerta del Diablo Natural Park' },
+    destination: 'Puerta del Diablo',
+    category: 'aventura',
+    priceUsd: 30,
+    durationHours: 4,
+    image: '/img/experiences/puerta-del-diablo.jpg',
+    imageAlt: {
+      ES: 'Peña de la Puerta del Diablo entre montañas y neblina',
+      EN: 'Puerta del Diablo rock among mountains and mist',
+    },
+    tag: { ES: 'Miradores', EN: 'Viewpoints' },
+    maxPeople: 14,
+    weekdays: [0, 3, 6],
+    description: {
+      ES: 'Sube a las peñas de la Puerta del Diablo, dos enormes rocas partidas que dan nombre a una leyenda, en Panchimalco, a unos 40 minutos de San Salvador. Desde la cima se ven la capital, el lago de Ilopango, el volcán de San Vicente y el océano Pacífico. Cierra con una parada en el pueblo de Panchimalco.',
+      EN: "Climb the rocks of the Puerta del Diablo (\"Devil's Door\"), two huge split boulders at the heart of a local legend, in Panchimalco, about 40 minutes from San Salvador. From the top you can see the capital, Lake Ilopango, the San Vicente volcano and the Pacific Ocean. It ends with a stop in the town of Panchimalco.",
+    },
+    highlights: {
+      ES: ['Vistas al lago de Ilopango y al Pacífico', 'Subida corta a las peñas', 'Parada en Panchimalco'],
+      EN: ['Views of Lake Ilopango and the Pacific', 'Short climb to the rocks', 'Stop in Panchimalco'],
+    },
+  },
+  {
+    id: 'volcan-conchagua',
+    title: 'Amanecer en el volcán de Conchagua',
+    name: { ES: 'Amanecer en el volcán de Conchagua', EN: 'Sunrise on Conchagua Volcano' },
+    destination: 'Volcán de Conchagua',
+    category: 'volcanes',
+    priceUsd: 55,
+    durationHours: 7,
+    image: '/img/experiences/volcan-conchagua.jpg',
+    imageAlt: {
+      ES: 'Golfo de Fonseca y sus islas vistos desde el volcán de Conchagua',
+      EN: 'The Gulf of Fonseca and its islands seen from Conchagua volcano',
+    },
+    tag: { ES: 'Amanecer', EN: 'Sunrise' },
+    maxPeople: 12,
+    weekdays: [0, 6],
+    description: {
+      ES: 'Sube en 4x4 al mirador Espíritu de la Montaña, a más de 1 200 metros sobre el Golfo de Fonseca, y mira salir el sol sobre las montañas de Honduras y Nicaragua. Abajo, las islas Meanguera, Conchagüita y Zacatillo. Desayuno en la montaña y caminata por el Parque Natural Conchagua.',
+      EN: 'Ride a 4x4 up to the Espíritu de la Montaña viewpoint, more than 1,200 meters above the Gulf of Fonseca, and watch the sun rise over the mountains of Honduras and Nicaragua. Below lie the islands of Meanguera, Conchagüita and Zacatillo. Breakfast on the mountain and a walk through Conchagua Natural Park.',
+    },
+    highlights: {
+      ES: ['Amanecer sobre el Golfo de Fonseca', 'Tres países a la vista', 'Subida en 4x4'],
+      EN: ['Sunrise over the Gulf of Fonseca', 'Three countries in view', '4x4 ride to the top'],
     },
   },
 ]

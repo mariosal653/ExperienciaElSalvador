@@ -20,15 +20,40 @@
     800,
     960
   ],
+  "/img/experiences/cascadas-tamanique.jpg": [
+    400,
+    800,
+    960
+  ],
   "/img/experiences/centro-historico.jpg": [
     400,
     800,
     960
   ],
+  "/img/experiences/conchagua-playa.jpg": [
+    400,
+    800,
+    880
+  ],
   "/img/experiences/malecon-la-libertad.jpg": [
     400,
     800,
     960
+  ],
+  "/img/experiences/puerta-del-diablo-panchimalco.jpg": [
+    400,
+    800,
+    960
+  ],
+  "/img/experiences/puerta-del-diablo-penas.jpg": [
+    400,
+    800,
+    960
+  ],
+  "/img/experiences/puerta-del-diablo.jpg": [
+    400,
+    800,
+    1024
   ],
   "/img/experiences/ruta-de-las-flores.jpg": [
     400,
@@ -44,6 +69,22 @@
     400,
     800,
     960
+  ],
+  "/img/experiences/tamanique-iglesia.jpg": [
+    400,
+    800,
+    960
+  ],
+  "/img/experiences/tamanique-vista-al-mar.jpg": [
+    400,
+    800,
+    960
+  ],
+  "/img/experiences/volcan-conchagua.jpg": [
+    400,
+    800,
+    1280,
+    1920
   ],
   "/img/experiences/volcan-izalco.jpg": [
     400,

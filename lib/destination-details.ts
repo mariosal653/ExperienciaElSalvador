@@ -49,6 +49,18 @@ const INTRO: Record<string, Text> = {
     ES: 'El tramo de costa de La Libertad con playas como El Tunco y El Sunzal, y algunas de las olas más conocidas del país.',
     EN: 'The stretch of La Libertad coast with beaches such as El Tunco and El Sunzal, and some of the best-known waves in the country.',
   },
+  tamanique: {
+    ES: 'Pueblo de la cordillera del Bálsamo, en La Libertad, a 35 minutos de El Tunco. De aquí sale el sendero a sus cascadas, con vistas al Pacífico en el camino.',
+    EN: 'A town in the Bálsamo mountain range, in La Libertad, 35 minutes from El Tunco. The trail to its waterfalls starts here, with Pacific views along the way.',
+  },
+  'puerta-del-diablo': {
+    ES: 'Parque natural en Panchimalco, a unos 40 minutos de San Salvador, con dos enormes peñas y miradores sobre la capital, el lago de Ilopango y el océano Pacífico.',
+    EN: 'A natural park in Panchimalco, about 40 minutes from San Salvador, with two huge rocks and viewpoints over the capital, Lake Ilopango and the Pacific Ocean.',
+  },
+  'volcan-de-conchagua': {
+    ES: 'Volcán del oriente del país, en La Unión, que se asoma al Golfo de Fonseca y a sus islas, con Honduras y Nicaragua al otro lado del agua.',
+    EN: 'A volcano in the east of the country, in La Unión, overlooking the Gulf of Fonseca and its islands, with Honduras and Nicaragua across the water.',
+  },
 }
 
 export type DestinationPage = {
