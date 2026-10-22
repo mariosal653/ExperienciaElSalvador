@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play, Volume2, VolumeX, X, MapPin } from 'lucide-react'
+import { Picture } from '@/components/ui/picture'
 import { useLanguage } from '@/components/i18n/language-provider'
 import { reels, type Reel } from '@/lib/reels'
 
@@ -186,7 +187,7 @@ export function ReelViewer({
               ))}
             </video>
           ) : (
-            <img
+            <Picture
               key={reel.id}
               src={reel.poster}
               alt=""

@@ -24,6 +24,7 @@ import {
   X,
   Zap,
 } from 'lucide-react'
+import { Picture } from '@/components/ui/picture'
 import { useLanguage } from '@/components/i18n/language-provider'
 import { useWhatsAppLead } from '@/components/whatsapp/whatsapp-provider'
 import { SiteHeader } from '@/components/site/site-header'
@@ -34,6 +35,7 @@ import { useReviewStats } from '@/components/reviews/use-review-stats'
 import { useFavorites } from '@/components/favorites/use-favorites'
 import { destinationIdByName } from '@/lib/destination-details'
 import { experienceName, type Experience, type Locale } from '@/lib/data'
+import { trackViewItem } from '@/lib/analytics'
 import { departureLabel, formatDeparture, nextDepartures } from '@/lib/departures'
 import {
   DIFFICULTY_LABEL,
@@ -89,6 +91,11 @@ export function ExperienceDetail({
   useEffect(() => {
     setLead({ lang, experience: experience.title, destination: experience.destination, date: null, people: null })
   }, [lang, experience.title, experience.destination, setLead])
+
+  // Analítica: una vista por experiencia (no se repite al cambiar de idioma).
+  useEffect(() => {
+    trackViewItem({ id: experience.id, name: experience.title, priceUsd: experience.priceUsd, destination: experience.destination })
+  }, [experience.id, experience.title, experience.priceUsd, experience.destination])
 
   // Fechas calculadas solo en el navegador (ver la nota en app/page.tsx).
   const [now, setNow] = useState<Date | null>(null)
@@ -442,7 +449,7 @@ export function ExperienceDetail({
                   className="group overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_rgba(26,65,69,.08)]"
                 >
                   <div className="h-44 overflow-hidden">
-                    <img src={item.image} alt={item.imageAlt[lang]} loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                    <Picture src={item.image} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" alt={item.imageAlt[lang]} loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                   </div>
                   <div className="p-4">
                     <div className="flex items-center justify-between gap-2 text-xs text-[#6a8588]">
@@ -526,9 +533,10 @@ function Gallery({
           touchStart.current = null
         }}
       >
-        <img
+        <Picture
           key={images[active].src}
           src={images[active].src}
+          sizes="(min-width: 1024px) 60vw, 100vw"
           alt={images[active].alt[lang]}
           fetchPriority={active === 0 ? 'high' : 'auto'}
           decoding="async"
@@ -572,7 +580,7 @@ function Gallery({
                 aria-current={index === active}
                 className={`block h-16 w-20 overflow-hidden rounded-xl transition sm:h-20 sm:w-28 ${index === active ? 'ring-2 ring-[#b8481c] ring-offset-2' : 'opacity-70 hover:opacity-100'}`}
               >
-                <img src={image.src} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                <Picture src={image.src} sizes="112px" alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
               </button>
             </li>
           ))}

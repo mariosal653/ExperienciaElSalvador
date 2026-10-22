@@ -6,6 +6,7 @@ import { X } from 'lucide-react'
 import { useWhatsAppLead } from './whatsapp-provider'
 import { useLanguage } from '@/components/i18n/language-provider'
 import { buildWhatsAppUrl, whatsappConfig } from '@/lib/whatsapp'
+import { trackWhatsApp } from '@/lib/analytics'
 
 /** Glifo de WhatsApp. Se dibuja aquí porque lucide no incluye marcas. */
 function WhatsAppGlyph({ className }: { className?: string }) {
@@ -106,6 +107,7 @@ export function WhatsAppWidget() {
 
       <a
         href={href}
+        onClick={() => trackWhatsApp(lead.experience ? 'experience' : 'general')}
         target="_blank"
         rel="noopener noreferrer"
         aria-label={es ? 'Contactar por WhatsApp' : 'Contact us on WhatsApp'}

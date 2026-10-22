@@ -1,0 +1,133 @@
+{
+  "/img/categoria-aventura.jpg": [
+    400,
+    500
+  ],
+  "/img/categoria-cultura.jpg": [
+    400,
+    500
+  ],
+  "/img/categoria-playas.jpg": [
+    400,
+    500
+  ],
+  "/img/categoria-volcanes.jpg": [
+    400,
+    500
+  ],
+  "/img/experiences/bosque-montecristo.jpg": [
+    400,
+    800,
+    960
+  ],
+  "/img/experiences/centro-historico.jpg": [
+    400,
+    800,
+    960
+  ],
+  "/img/experiences/malecon-la-libertad.jpg": [
+    400,
+    800,
+    960
+  ],
+  "/img/experiences/ruta-de-las-flores.jpg": [
+    400,
+    800,
+    960
+  ],
+  "/img/experiences/surf-city-el-sunzal.jpg": [
+    400,
+    800,
+    960
+  ],
+  "/img/experiences/surf-el-zonte.jpg": [
+    400,
+    800,
+    960
+  ],
+  "/img/experiences/volcan-izalco.jpg": [
+    400,
+    800,
+    960
+  ],
+  "/img/hero/cerro-verde-izalco-1920.jpg": [
+    400,
+    800,
+    1280,
+    1920
+  ],
+  "/img/hero/cerro-verde-izalco-960.jpg": [
+    400,
+    800,
+    960
+  ],
+  "/img/reels/coatepeque.jpg": [
+    400,
+    800,
+    1280
+  ],
+  "/img/reels/el-tunco.jpg": [
+    400,
+    800,
+    1280
+  ],
+  "/img/reels/ruta-de-las-flores.jpg": [
+    400,
+    800,
+    1280
+  ],
+  "/img/reels/san-miguel.jpg": [
+    400,
+    800,
+    960
+  ],
+  "/img/reels/santa-ana.jpg": [
+    400,
+    800,
+    1280
+  ],
+  "/img/reels/suchitoto.jpg": [
+    400,
+    800,
+    1280
+  ],
+  "/img/reels/surf.jpg": [
+    400,
+    800,
+    1280
+  ],
+  "/img/reels/thumbs/coatepeque.jpg": [
+    400,
+    800,
+    960
+  ],
+  "/img/reels/thumbs/el-tunco.jpg": [
+    400,
+    800,
+    960
+  ],
+  "/img/reels/thumbs/ruta-de-las-flores.jpg": [
+    400,
+    500
+  ],
+  "/img/reels/thumbs/san-miguel.jpg": [
+    400,
+    800,
+    960
+  ],
+  "/img/reels/thumbs/santa-ana.jpg": [
+    400,
+    800,
+    960
+  ],
+  "/img/reels/thumbs/suchitoto.jpg": [
+    400,
+    800,
+    1280
+  ],
+  "/img/reels/thumbs/surf.jpg": [
+    400,
+    800,
+    960
+  ]
+}

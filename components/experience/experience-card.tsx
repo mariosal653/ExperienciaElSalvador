@@ -1,6 +1,7 @@
 'use client'
 
 import { CalendarCheck, Heart, MapPin, ShieldCheck } from 'lucide-react'
+import { Picture } from '@/components/ui/picture'
 import { RatingBadge } from '@/components/reviews/rating-badge'
 import { experienceName, type Experience, type Locale } from '@/lib/data'
 import { departureLabel, nextDepartures } from '@/lib/departures'
@@ -40,7 +41,7 @@ export function ExperienceCard({
   return (
     <article className="group overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_rgba(26,65,69,.08)]">
       <div className="relative h-56 overflow-hidden">
-        <a href={detailHref} tabIndex={-1} aria-hidden="true" className="block h-full"><img src={item.image} alt={item.imageAlt[lang]} loading="lazy" decoding="async" width={600} height={448} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /></a>
+        <a href={detailHref} tabIndex={-1} aria-hidden="true" className="block h-full"><Picture src={item.image} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" alt={item.imageAlt[lang]} loading="lazy" decoding="async" width={600} height={448} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /></a>
         {item.tag && <span className="absolute left-3 top-3 rounded-full bg-[#f4d27c] px-3 py-1 text-[11px] font-bold text-[#173f45]">{item.tag[lang]}</span>}
         <button
           onClick={() => onToggleSave(item.id)}

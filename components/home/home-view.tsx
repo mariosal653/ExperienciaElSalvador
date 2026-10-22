@@ -17,6 +17,7 @@ import {
   Waves,
   X,
 } from 'lucide-react'
+import { Picture } from '@/components/ui/picture'
 import { SearchPanel } from '@/components/search/search-panel'
 import { useWhatsAppLead } from '@/components/whatsapp/whatsapp-provider'
 import { useLanguage } from '@/components/i18n/language-provider'
@@ -225,7 +226,7 @@ export function HomeView() {
           Izalco está a la derecha de la foto: en móvil, donde el recorte
           vertical es fuerte, se desplaza el encuadre para que no quede fuera.
         */}
-        <img
+        <Picture
           src="/img/hero/cerro-verde-izalco-1920.jpg"
           srcSet="/img/hero/cerro-verde-izalco-960.jpg 960w, /img/hero/cerro-verde-izalco-1920.jpg 1920w"
           sizes="100vw"
@@ -287,7 +288,7 @@ export function HomeView() {
               aria-pressed={isActive}
               className={`group relative h-24 min-w-40 shrink-0 overflow-hidden rounded-2xl text-left shadow-lg transition hover:-translate-y-1 ${isActive ? 'ring-2 ring-[#f4b942] ring-offset-2' : ''}`}
             >
-              <img src={category.image} alt="" width={320} height={192} decoding="async" className="absolute inset-0 h-full w-full object-cover transition group-hover:scale-105" />
+              <Picture src={category.image} sizes="160px" alt="" width={320} height={192} decoding="async" className="absolute inset-0 h-full w-full object-cover transition group-hover:scale-105" />
               <span className="absolute inset-0 bg-[#103f44]/55" />
               <span className="relative flex h-full flex-col justify-between p-4 text-white"><Icon size={20} /><span className="font-semibold">{category.label[language]}</span></span>
             </button>
@@ -459,7 +460,7 @@ export function HomeView() {
                   href={`/destinos/${tile.destination.id}`}
                   className="group relative block h-40 w-full overflow-hidden rounded-2xl text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f4b942]"
                 >
-                  <img src={tile.image.src} alt={tile.image.alt[language]} loading="lazy" decoding="async" width={320} height={240} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                  <Picture src={tile.image.src} sizes="(min-width: 1024px) 25vw, 50vw" alt={tile.image.alt[language]} loading="lazy" decoding="async" width={320} height={240} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                   <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
                   <span className="absolute inset-x-3 bottom-3">
                     <span className="block font-semibold leading-tight">{tile.destination.name}</span>

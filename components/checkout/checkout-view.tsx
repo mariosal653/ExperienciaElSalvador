@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { AlertTriangle, CalendarDays, Check, Loader2, Lock, MapPin, Minus, Plus, ShieldCheck, Ticket, Users } from 'lucide-react'
+import { Picture } from '@/components/ui/picture'
 import { useLanguage } from '@/components/i18n/language-provider'
 import { useWhatsAppLead } from '@/components/whatsapp/whatsapp-provider'
 import { SiteHeader } from '@/components/site/site-header'
@@ -10,6 +11,7 @@ import { SiteFooter } from '@/components/site/site-footer'
 import { DatePicker } from './date-picker'
 import { calculatePrice, formatCents } from '@/lib/pricing'
 import { experienceName, parseLocalDate, type Locale } from '@/lib/data'
+import { track, trackBeginCheckout } from '@/lib/analytics'
 import { FREE_CANCELLATION_HOURS } from '@/lib/experience-details'
 import { canPayLater, formatDeadline, payLaterDeadline } from '@/lib/pay-later'
 import {
@@ -146,6 +148,15 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
     setLead({ lang, experience: experience.title, destination: experience.destination, date, people })
   }, [lang, experience.title, experience.destination, date, people, setLead])
 
+  // Analítica: inicio del pago, una vez por visita a esta página.
+  useEffect(() => {
+    trackBeginCheckout(
+      { id: experience.id, name: experience.title, priceUsd: experience.priceUsd, destination: experience.destination, people },
+      false,
+    )
+    // Solo al entrar: los cambios de personas o fecha no son otro inicio.
+  }, [experience.id])
+
   // Una compra distinta necesita una llave distinta. Cambiar lo que se
   // compra genera otra; un doble clic sin cambios reutiliza la misma.
   useEffect(() => {
@@ -230,6 +241,12 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
     }
 
     setSubmitting(true)
+    track('add_payment_info', {
+      currency: 'USD',
+      value: experience.priceUsd * people,
+      payment_type: payLater ? 'pay_later' : method,
+      items: [{ item_id: experience.id, item_name: experience.title, price: experience.priceUsd, quantity: people }],
+    })
     try {
       const response = await fetch('/api/checkout', {
         method: 'POST',
@@ -522,8 +539,9 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
             </h2>
 
             <div className="mt-4 flex gap-3">
-              <img
+              <Picture
                 src={experience.image}
+                sizes="96px"
                 alt={experience.imageAlt[lang]}
                 width={96}
                 height={96}

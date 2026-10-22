@@ -15,6 +15,7 @@
         "bootstrap": "node scripts/setup.mjs",
         "admin:setup": "node --env-file-if-exists=.env scripts/admin.mjs",
         "wompi:check": "node --env-file-if-exists=.env scripts/wompi-check.mjs",
+        "images": "node scripts/optimize-images.mjs",
         "predev": "node scripts/setup.mjs --quiet"
     },
     "dependencies": {

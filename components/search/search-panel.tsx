@@ -6,6 +6,7 @@ import { DestinationField } from './destination-field'
 import { DateField } from './date-field'
 import { TravelersField } from './travelers-field'
 import { emptyCriteria, type Locale, type SearchCriteria } from '@/lib/data'
+import { trackSearch } from '@/lib/analytics'
 
 type Props = {
   /** Criterios aplicados actualmente, para reflejarlos al limpiar. */
@@ -26,6 +27,7 @@ export function SearchPanel({ applied, onSearch, lang }: Props) {
 
   function submit(event: FormEvent) {
     event.preventDefault()
+    trackSearch(draft)
     onSearch(draft)
   }
 

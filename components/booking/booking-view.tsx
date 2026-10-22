@@ -24,6 +24,7 @@ import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
 import { formatCents } from '@/lib/pricing'
 import { experienceNameById, parseLocalDate } from '@/lib/data'
+import { trackPurchase } from '@/lib/analytics'
 import { formatDeadline } from '@/lib/pay-later'
 
 type BookingData = {
@@ -149,6 +150,12 @@ export function BookingView({
     }
     setReleasing(false)
   }
+
+  // Analítica: la compra se cuenta cuando la reserva queda confirmada.
+  // trackPurchase evita contarla dos veces si se vuelve a abrir la página.
+  useEffect(() => {
+    if (confirmed) trackPurchase(booking)
+  }, [confirmed, booking])
 
   // Mientras el pago se procesa (webhook en camino), refresca la página.
   useEffect(() => {

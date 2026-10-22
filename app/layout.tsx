@@ -1,4 +1,5 @@
 import { Analytics } from '@vercel/analytics/next'
+import { GoogleAnalytics } from '@/components/analytics/google-analytics'
 import type { Metadata, Viewport } from 'next'
 import { LanguageProvider } from '@/components/i18n/language-provider'
 import { SessionBoundary } from '@/components/auth/session-boundary'
@@ -74,6 +75,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           /_vercel/insights y fallaría en cada visita.
         */}
         {process.env.NODE_ENV === 'production' && process.env.VERCEL === '1' && <Analytics />}
+        {/* GA4: solo se carga si NEXT_PUBLIC_GA_ID está definida (Netlify). */}
+        <GoogleAnalytics />
       </body>
     </html>
   )

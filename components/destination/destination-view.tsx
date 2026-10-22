@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, ChevronRight, MapPin } from 'lucide-react'
+import { Picture } from '@/components/ui/picture'
 import { useLanguage } from '@/components/i18n/language-provider'
 import { useWhatsAppLead } from '@/components/whatsapp/whatsapp-provider'
 import { SiteHeader } from '@/components/site/site-header'
@@ -42,7 +43,7 @@ export function DestinationView({ destinationId }: { destinationId: string }) {
       <SiteHeader />
 
       <section className="relative flex min-h-[340px] items-end overflow-hidden bg-[#174b51] md:min-h-[420px]">
-        <img
+        <Picture
           src={page.image.src}
           alt={page.image.alt[lang]}
           fetchPriority="high"
@@ -100,7 +101,7 @@ export function DestinationView({ destinationId }: { destinationId: string }) {
                   href={`/destinos/${other.destination.id}`}
                   className="group relative block h-32 w-44 overflow-hidden rounded-2xl text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b8481c]"
                 >
-                  <img src={other.image.src} alt={other.image.alt[lang]} loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                  <Picture src={other.image.src} sizes="176px" alt={other.image.alt[lang]} loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                   <span className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent" />
                   <span className="absolute inset-x-3 bottom-3 text-sm font-semibold leading-tight">{other.destination.name}</span>
                 </Link>

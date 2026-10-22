@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Play, Clapperboard } from 'lucide-react'
+import { Picture } from '@/components/ui/picture'
 import { useLanguage } from '@/components/i18n/language-provider'
 import { reels } from '@/lib/reels'
 import { ReelViewer } from './reel-viewer'
@@ -56,8 +57,9 @@ export function ReelsSection() {
               className="group relative block aspect-[9/16] w-full overflow-hidden rounded-2xl bg-[#173f45] text-left shadow-[0_8px_30px_rgba(26,65,69,.12)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b8481c]"
               aria-label={`${es ? 'Ver reel' : 'Watch reel'}: ${reel.title[lang]}, ${reel.location}`}
             >
-              <img
+              <Picture
                 src={reel.thumbnail}
+                sizes="(min-width: 1024px) 14vw, (min-width: 640px) 176px, 38vw"
                 alt=""
                 loading="lazy"
                 decoding="async"
