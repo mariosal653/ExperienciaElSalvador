@@ -3,36 +3,25 @@
 Netlify reconoce Next.js y aplica su adaptador oficial automáticamente.
 `netlify.toml` fija el comando de build, Node 22 y la versión de pnpm.
 
-## 1. La base de datos: PostgreSQL (obligatorio)
+## 1. La base de datos: PostgreSQL en Neon
 
-**SQLite no funciona en Netlify.** Las funciones corren en un sistema de
-archivos efímero y de solo lectura: `dev.db` no existe allí y, aunque
-existiera, nada de lo escrito se conservaría. Es la causa del error de base
-de datos en el sitio desplegado.
+Hecho el 2026-10-21. Proyecto Neon `experiences-el-salvador` (AWS US East 2,
+Ohio, la región de las funciones de Netlify), base `experiences`, Postgres 17,
+plan gratuito.
 
-1. Crea una base PostgreSQL gestionada (Neon, Supabase, Netlify DB…).
-   Usa la cadena **con pooler** si el proveedor la ofrece: las funciones
-   abren muchas conexiones cortas.
-2. En `prisma/schema.prisma`, cambia:
-   ```prisma
-   datasource db {
-     provider = "postgresql"
-     url      = env("DATABASE_URL")
-   }
-   ```
-3. Las migraciones actuales son de SQLite. Genera la línea base de Postgres
-   (en local, apuntando a una base Postgres de desarrollo):
-   ```bash
-   mv prisma/migrations prisma/migrations_sqlite
-   DATABASE_URL="postgresql://…" pnpm prisma migrate dev --name init
-   ```
-   Confirma la carpeta nueva `prisma/migrations` en git.
-4. En Netlify, cambia el comando de build para aplicar migraciones en cada
-   deploy:
-   ```toml
-   [build]
-     command = "pnpm prisma migrate deploy && pnpm run build"
-   ```
+- `DATABASE_URL`: cadena **con pooler** (host `-pooler`). La usa la app.
+- `DIRECT_URL`: cadena **sin pooler**. La usan las migraciones.
+
+Ambas están en Netlify como secretas y en `.env.production.local` (ignorado
+por git) para operar la base de producción desde la PC.
+
+`netlify.toml` ejecuta `prisma migrate deploy` antes de cada build: un
+cambio de esquema se publica con `pnpm prisma migrate dev --name <cambio>`
+contra la rama de desarrollo y un push.
+
+Las migraciones de SQLite se reemplazaron por una sola línea base de Postgres
+(`20261021000000_init_postgres`); las antiguas siguen en el historial de git.
+Los datos de prueba de SQLite no se migraron.
 
 `binaryTargets` en el esquema ya incluye `rhel-openssl-3.0.x`, el sistema de
 las funciones de Netlify.
@@ -41,7 +30,8 @@ las funciones de Netlify.
 
 | Variable | Obligatoria | Nota |
 | --- | --- | --- |
-| `DATABASE_URL` | Sí | Postgres |
+| `DATABASE_URL` | Sí | Neon, cadena con pooler (secreta) |
+| `DIRECT_URL` | Sí | Neon, cadena sin pooler (secreta) |
 | `AUTH_SECRET` | Sí | `openssl rand -base64 32` |
 | `AUTH_TRUST_HOST` | Sí | `true` |
 | `SITE_URL` | Recomendada | Dominio final; si falta se usa `URL` de Netlify |

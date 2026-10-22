@@ -4,11 +4,11 @@ import { createHmac } from 'node:crypto'
 
 /**
  * Pruebas del flujo de pago: firmas de Wompi, configuración, validación y,
- * contra una base SQLite real, idempotencia de la aprobación y emisión de
+ * contra una base Postgres real (TEST_DATABASE_URL), idempotencia de la aprobación y emisión de
  * entradas.
  */
 
-const TEST_DB = 'file:./test.db'
+const TEST_DB = process.env.TEST_DATABASE_URL!
 process.env.DATABASE_URL = TEST_DB
 
 // Se importan DESPUÉS de fijar DATABASE_URL: el cliente Prisma la lee al crearse.
@@ -26,7 +26,7 @@ type Modules = {
 let m: Modules
 
 beforeAll(async () => {
-  execSync('npx prisma migrate deploy', { env: { ...process.env, DATABASE_URL: TEST_DB }, stdio: 'ignore' })
+  execSync('npx prisma migrate deploy', { env: { ...process.env, DATABASE_URL: TEST_DB, DIRECT_URL: TEST_DB }, stdio: 'ignore' })
   m = {
     prisma: (await import('../lib/db')).prisma,
     checkout: await import('../lib/checkout'),

@@ -6,11 +6,12 @@ import bcrypt from 'bcryptjs'
 import { calculatePrice } from '../lib/pricing'
 
 /**
- * Pruebas del descuento de bienvenida contra una base SQLite real.
+ * Pruebas del descuento de bienvenida contra una base Postgres real.
  *
- * Se usa un archivo aparte para no tocar dev.db.
+ * BORRAN DATOS: solo corren con TEST_DATABASE_URL, una base (o rama de Neon)
+ * exclusiva para pruebas. Sin ella, vitest.config.ts las excluye.
  */
-const TEST_DB = 'file:./test.db'
+const TEST_DB = process.env.TEST_DATABASE_URL!
 process.env.DATABASE_URL = TEST_DB
 
 const prisma = new PrismaClient({ datasources: { db: { url: TEST_DB } } })
@@ -72,7 +73,7 @@ async function createBooking(userId: string, discountPct = 0) {
 
 beforeAll(() => {
   execSync('npx prisma migrate deploy', {
-    env: { ...process.env, DATABASE_URL: TEST_DB },
+    env: { ...process.env, DATABASE_URL: TEST_DB, DIRECT_URL: TEST_DB },
     stdio: 'ignore',
   })
 })

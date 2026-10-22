@@ -2,7 +2,7 @@
 /**
  * Prepara el entorno de desarrollo.
  *
- * Existe porque .env y la base SQLite estan (correctamente) en .gitignore:
+ * Existe porque .env esta (correctamente) en .gitignore:
  * sin este paso, quien clone el repositorio se encuentra la aplicacion sin
  * base de datos, y tanto el registro como las opiniones fallan.
  *
@@ -12,7 +12,7 @@
  *
  *   1. Crea .env desde .env.example si no existe.
  *   2. Genera un AUTH_SECRET real si falta.
- *   3. Asegura DATABASE_URL.
+ *   3. Comprueba que DATABASE_URL apunte a Postgres (no la inventa).
  *   4. Aplica migraciones (migrate deploy no hace nada si ya estan).
  *   5. Carga las opiniones de arranque.
  */
@@ -61,23 +61,28 @@ if (!/^AUTH_SECRET=.+/m.test(env)) {
   always('  AUTH_SECRET generado')
 }
 
-// --- 3. DATABASE_URL --------------------------------------------------
-// Cuenta solo una linea sin comentar y con valor.
-if (!/^DATABASE_URL=\s*\S+/m.test(env)) {
-  env += '\nDATABASE_URL="file:./dev.db"\n'
-  envChanged = true
-  always('  DATABASE_URL anadido (SQLite local)')
-}
-
 if (envChanged) {
   writeFileSync(ENV_FILE, env)
   didSomething = true
 }
 
-// Los comandos de Prisma necesitan la variable en ESTE proceso: el .env
+// --- 3. DATABASE_URL --------------------------------------------------
+// La base es Postgres (Neon): ya no hay base local que crear. Hace falta la
+// cadena de una rama de DESARROLLO, nunca la de produccion.
+// Los comandos de Prisma necesitan las variables en ESTE proceso: el .env
 // todavia no esta cargado aqui.
-const dbUrl = /^DATABASE_URL=\s*"?([^"\r\n]+)"?/m.exec(env)?.[1]
-const childEnv = { ...process.env, DATABASE_URL: dbUrl ?? process.env.DATABASE_URL }
+const readVar = (name) => new RegExp(`^${name}=\\s*"?([^"\\r\\n]+)"?`, 'm').exec(env)?.[1]
+const dbUrl = readVar('DATABASE_URL') ?? process.env.DATABASE_URL
+if (!dbUrl || !/^postgres(ql)?:\/\//.test(dbUrl)) {
+  console.error('\n  DATABASE_URL en .env no es una base Postgres.')
+  console.error('  Pon la cadena de la rama "development" de Neon (ver .env.example).\n')
+  process.exit(1)
+}
+const childEnv = {
+  ...process.env,
+  DATABASE_URL: dbUrl,
+  DIRECT_URL: readVar('DIRECT_URL') ?? process.env.DIRECT_URL ?? dbUrl,
+}
 
 // --- 4. Migraciones ---------------------------------------------------
 try {

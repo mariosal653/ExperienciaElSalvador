@@ -1,17 +1,15 @@
 // Experiences El Salvador — esquema de datos
 //
-// PROVEEDOR: SQLite. El proyecto no tenía base de datos ni ORM, y no hay
-// un servidor PostgreSQL disponible en este entorno. SQLite permite tener
-// migraciones reales, transacciones y bloqueo de escritura sin
-// infraestructura externa.
+// PROVEEDOR: PostgreSQL en Neon (desde 2026-10-21; antes SQLite, que no
+// funciona en Netlify porque las funciones tienen un sistema de archivos
+// efímero y de solo lectura).
 //
-// PARA PRODUCCIÓN hay que pasar a PostgreSQL: cambiar `provider` a
-// "postgresql", apuntar DATABASE_URL a la instancia y regenerar la
-// migración. SQLite NO sirve en Netlify ni en Vercel: las funciones corren
-// en un sistema de archivos efímero y de solo lectura, así que la base ni
-// existe ni guardaría nada. Pasos completos en docs/DEPLOY_NETLIFY.md. Los
-// tipos usados (String, Int, DateTime, Decimal evitado a propósito) son
-// compatibles con ambos motores.
+//   DATABASE_URL  cadena CON pooler (host "-pooler"): la usa la aplicación,
+//                 que en Netlify abre muchas conexiones cortas.
+//   DIRECT_URL    cadena SIN pooler: la usan las migraciones de Prisma,
+//                 que necesitan una sesión propia.
+//
+// Pasos y variables en docs/DEPLOY_NETLIFY.md.
 
 generator client {
   provider = "prisma-client-js"
@@ -22,8 +20,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ---------------------------------------------------------------------

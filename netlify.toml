@@ -1,11 +1,13 @@
 # Netlify detecta Next.js y aplica su adaptador oficial (OpenNext) solo:
 # no hace falta instalar ningún plugin. Este archivo fija lo mínimo.
 #
-# ANTES DEL PRIMER DEPLOY: la base de datos debe ser PostgreSQL.
-# SQLite no funciona en Netlify. Ver docs/DEPLOY_NETLIFY.md.
+# La base es PostgreSQL en Neon (DATABASE_URL y DIRECT_URL en las variables
+# de Netlify). Cada build aplica las migraciones pendientes antes de
+# compilar; si una falla, el deploy se detiene y el sitio anterior sigue en
+# línea. Ver docs/DEPLOY_NETLIFY.md.
 
 [build]
-  command = "pnpm run build"
+  command = "pnpm prisma migrate deploy && pnpm run build"
   publish = ".next"
 
 [build.environment]
