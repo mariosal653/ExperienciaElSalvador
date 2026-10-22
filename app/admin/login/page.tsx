@@ -24,7 +24,7 @@ export default async function AdminLoginPage() {
   if (await getAdmin()) redirect('/admin')
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#eaf1ed] px-5 py-14">
+    <main className="flex min-h-screen items-center justify-center bg-surface-mint px-5 py-14">
       <Suspense>
         <AdminLoginForm />
       </Suspense>

@@ -166,26 +166,26 @@ export function HomeView() {
 
   const chip = (active: boolean) =>
     `shrink-0 rounded-full border px-3.5 py-2 text-xs font-bold transition ${
-      active ? 'border-[#173f45] bg-[#173f45] text-white' : 'border-[#dce7e1] bg-white text-[#173f45] hover:bg-[#eaf1ed]'
+      active ? 'border-brand bg-brand text-white' : 'border-line bg-white text-brand hover:bg-surface-mint'
     }`
 
   const es = language === 'ES'
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] text-[#173f45]">
+    <main className="min-h-screen bg-cream text-brand">
       <WelcomeModal />
       {/* Capa 40 — ver la escala documentada en app/globals.css */}
       <header className="absolute inset-x-0 top-0 z-40 border-b border-white/20 text-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
           <a href="#inicio" className="flex items-center gap-2.5" aria-label="Experiences El Salvador · Inicio">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-[#f4b942] text-[#173f45]"><Compass size={21} strokeWidth={2.5} /></span>
-            <span className="text-lg font-bold tracking-tight">Experiences <span className="text-[#f4b942]">El Salvador</span></span>
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-gold text-brand"><Compass size={21} strokeWidth={2.5} /></span>
+            <span className="text-lg font-bold tracking-tight">Experiences <span className="text-gold">El Salvador</span></span>
           </a>
           <nav className="hidden items-center gap-8 text-sm font-medium md:flex" aria-label={es ? 'Navegación principal' : 'Main navigation'}>
-            <a href="#experiencias" className="transition hover:text-[#f4b942]">{es ? 'Explorar' : 'Explore'}</a>
-            <a href="#destinos" className="transition hover:text-[#f4b942]">{es ? 'Destinos' : 'Destinations'}</a>
-            <a href="#opiniones" className="transition hover:text-[#f4b942]">{es ? 'Opiniones' : 'Reviews'}</a>
-            <a href="#como-funciona" className="transition hover:text-[#f4b942]">{es ? 'Cómo funciona' : 'How it works'}</a>
+            <a href="#experiencias" className="transition hover:text-gold">{es ? 'Explorar' : 'Explore'}</a>
+            <a href="#destinos" className="transition hover:text-gold">{es ? 'Destinos' : 'Destinations'}</a>
+            <a href="#opiniones" className="transition hover:text-gold">{es ? 'Opiniones' : 'Reviews'}</a>
+            <a href="#como-funciona" className="transition hover:text-gold">{es ? 'Cómo funciona' : 'How it works'}</a>
           </nav>
           <div className="hidden items-center gap-4 md:flex">
             <LanguageSwitch lang={language} onChange={setLang} />
@@ -194,7 +194,7 @@ export function HomeView() {
           <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? (es ? 'Cerrar menú' : 'Close menu') : (es ? 'Abrir menú' : 'Open menu')}>{menuOpen ? <X /> : <Menu />}</button>
         </div>
         {menuOpen && (
-          <div className="border-t border-white/20 bg-[#173f45] px-5 pb-5 pt-3 md:hidden">
+          <div className="border-t border-white/20 bg-brand px-5 pb-5 pt-3 md:hidden">
             <nav className="flex flex-col gap-4 text-sm">
               <a href="#experiencias" onClick={() => setMenuOpen(false)}>{es ? 'Explorar' : 'Explore'}</a>
               <a href="#destinos" onClick={() => setMenuOpen(false)}>{es ? 'Destinos' : 'Destinations'}</a>
@@ -218,7 +218,7 @@ export function HomeView() {
         calendario al salirse del héroe. La imagen y los degradados están en
         `absolute inset-0`, así que no se desbordan por sí solos.
       */}
-      <section id="inicio" className="relative flex min-h-[620px] items-center bg-[#174b51] pt-24">
+      <section id="inicio" className="relative flex min-h-[620px] items-center bg-brand-hero pt-24">
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,43,48,.86)_0%,rgba(10,43,48,.55)_45%,rgba(10,43,48,.15)_100%)]" />
         {/*
           Imagen del LCP: prioridad alta y tamaños por ancho de pantalla.
@@ -245,8 +245,8 @@ export function HomeView() {
         */}
         <div className="relative z-30 mx-auto w-full max-w-7xl px-5 pb-28 pt-16 lg:px-8">
           <div className="max-w-2xl text-white">
-            <p className="mb-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-[.22em] text-[#f4d27c]"><span className="h-px w-8 bg-[#f4d27c]" />{es ? 'Viaja con propósito' : 'Travel with purpose'}</p>
-            <h1 className="text-5xl font-semibold leading-[.98] tracking-[-.04em] md:text-7xl">El Salvador, <em className="font-serif font-normal text-[#f4c45e]">{es ? 'a tu manera.' : 'your way.'}</em></h1>
+            <p className="mb-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-[.22em] text-gold-soft"><span className="h-px w-8 bg-gold-soft" />{es ? 'Viaja con propósito' : 'Travel with purpose'}</p>
+            <h1 className="text-5xl font-semibold leading-[.98] tracking-[-.04em] md:text-7xl">El Salvador, <em className="font-serif font-normal text-gold-deep">{es ? 'a tu manera.' : 'your way.'}</em></h1>
             <p className="mt-6 max-w-lg text-base leading-relaxed text-white/85 md:text-lg">{es ? 'Descubre lugares que se sienten como un secreto. Experiencias locales, recuerdos que se quedan.' : 'Discover places that feel like a secret. Local experiences, memories that stay.'}</p>
           </div>
 
@@ -260,7 +260,7 @@ export function HomeView() {
                   ? results.length === 1 ? 'experiencia encontrada' : 'experiencias encontradas'
                   : results.length === 1 ? 'experience found' : 'experiences found'}
               </span>
-              <a href="#experiencias" className="font-bold text-[#f4c45e] underline underline-offset-4">
+              <a href="#experiencias" className="font-bold text-gold-deep underline underline-offset-4">
                 {es ? 'Ver resultados' : 'See results'}
               </a>
             </p>
@@ -286,7 +286,7 @@ export function HomeView() {
               key={category.id}
               onClick={() => setActiveCategory(isActive ? null : category.id)}
               aria-pressed={isActive}
-              className={`group relative h-24 min-w-40 shrink-0 overflow-hidden rounded-2xl text-left shadow-lg transition hover:-translate-y-1 ${isActive ? 'ring-2 ring-[#f4b942] ring-offset-2' : ''}`}
+              className={`group relative h-24 min-w-40 shrink-0 overflow-hidden rounded-2xl text-left shadow-lg transition hover:-translate-y-1 ${isActive ? 'ring-2 ring-gold ring-offset-2' : ''}`}
             >
               <Picture src={category.image} sizes="160px" alt="" width={320} height={192} decoding="async" className="absolute inset-0 h-full w-full object-cover transition group-hover:scale-105" />
               <span className="absolute inset-0 bg-[#103f44]/55" />
@@ -302,20 +302,20 @@ export function HomeView() {
       <section id="experiencias" className="mx-auto max-w-7xl px-5 pb-20 pt-16 lg:px-8">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
-            <p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-[#b8481c]">{es ? 'Para empezar' : 'To get started'}</p>
+            <p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-accent">{es ? 'Para empezar' : 'To get started'}</p>
             <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
               {es ? <>Experiencias que <em className="font-serif font-normal">dejan huella</em></> : <>Experiences that <em className="font-serif font-normal">leave a mark</em></>}
             </h2>
           </div>
           <div className="flex shrink-0 items-center gap-3">
-            <p className="hidden text-sm text-[#6a8588] sm:block" aria-live="polite">
+            <p className="hidden text-sm text-muted sm:block" aria-live="polite">
               {results.length} {es ? (results.length === 1 ? 'experiencia' : 'experiencias') : results.length === 1 ? 'experience' : 'experiences'}
             </p>
             {favorites.length > 0 && (
               <button
                 onClick={() => setOnlySaved((value) => !value)}
                 aria-pressed={onlySaved}
-                className={`flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-bold transition ${onlySaved ? 'border-[#b8481c] bg-[#b8481c] text-white' : 'border-[#dce7e1] text-[#173f45] hover:bg-[#eaf1ed]'}`}
+                className={`flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-bold transition ${onlySaved ? 'border-accent bg-accent text-white' : 'border-line text-brand hover:bg-surface-mint'}`}
               >
                 <Heart size={14} fill={onlySaved ? '#fff' : 'none'} />
                 {es ? 'Guardadas' : 'Saved'} ({favorites.length})
@@ -328,7 +328,7 @@ export function HomeView() {
         <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           {/* `relative`: sin él, el .sr-only de "Precio máximo" se posiciona respecto a <body>, escapa del recorte y ensancha toda la página en móvil. */}
           <div className="relative -mx-1 flex items-center gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]" role="group" aria-label={es ? 'Filtros' : 'Filters'}>
-            <SlidersHorizontal size={16} className="shrink-0 text-[#6a8588]" aria-hidden="true" />
+            <SlidersHorizontal size={16} className="shrink-0 text-muted" aria-hidden="true" />
             <button aria-pressed={refine.duration === 'half'} onClick={() => setRefine((r) => ({ ...r, duration: r.duration === 'half' ? 'any' : 'half' }))} className={chip(refine.duration === 'half')}>
               {es ? 'Medio día (hasta 5 h)' : 'Half day (up to 5 h)'}
             </button>
@@ -355,13 +355,13 @@ export function HomeView() {
               </select>
             </label>
           </div>
-          <label className="flex shrink-0 items-center gap-2 text-xs font-semibold text-[#547176]">
+          <label className="flex shrink-0 items-center gap-2 text-xs font-semibold text-muted">
             <ArrowUpDown size={15} aria-hidden="true" />
             <span className="sr-only sm:not-sr-only">{es ? 'Ordenar:' : 'Sort:'}</span>
             <select
               value={sort}
               onChange={(event) => setSort(event.target.value as SortKey)}
-              className="cursor-pointer rounded-full border border-[#dce7e1] bg-white px-3.5 py-2 text-xs font-bold text-[#173f45]"
+              className="cursor-pointer rounded-full border border-line bg-white px-3.5 py-2 text-xs font-bold text-brand"
             >
               {(Object.keys(SORT_LABEL) as SortKey[]).map((key) => (
                 <option key={key} value={key}>{SORT_LABEL[key][language]}</option>
@@ -373,30 +373,30 @@ export function HomeView() {
         {isFiltered && (
           <div className="mb-6 flex flex-wrap items-center gap-2">
             {applied?.destination && (
-              <span className="flex items-center gap-1.5 rounded-full bg-[#eaf1ed] px-3 py-1.5 text-xs font-semibold text-[#173f45]"><MapPin size={13} />{applied.destination}</span>
+              <span className="flex items-center gap-1.5 rounded-full bg-surface-mint px-3 py-1.5 text-xs font-semibold text-brand"><MapPin size={13} />{applied.destination}</span>
             )}
             {applied?.date && (
-              <span className="rounded-full bg-[#eaf1ed] px-3 py-1.5 text-xs font-semibold text-[#173f45]">{formatDate(applied.date, language)}</span>
+              <span className="rounded-full bg-surface-mint px-3 py-1.5 text-xs font-semibold text-brand">{formatDate(applied.date, language)}</span>
             )}
             {applied && applied.people !== emptyCriteria.people && (
-              <span className="rounded-full bg-[#eaf1ed] px-3 py-1.5 text-xs font-semibold text-[#173f45]">
+              <span className="rounded-full bg-surface-mint px-3 py-1.5 text-xs font-semibold text-brand">
                 {applied.people} {es ? (applied.people === 1 ? 'viajero' : 'viajeros') : applied.people === 1 ? 'traveler' : 'travelers'}
               </span>
             )}
             {activeCategory && (
-              <span className="rounded-full bg-[#f4d27c] px-3 py-1.5 text-xs font-bold text-[#173f45]">
+              <span className="rounded-full bg-gold-soft px-3 py-1.5 text-xs font-bold text-brand">
                 {categories.find((category) => category.id === activeCategory)?.label[language]}
               </span>
             )}
             {onlySaved && (
-              <span className="flex items-center gap-1.5 rounded-full bg-[#fbe3d7] px-3 py-1.5 text-xs font-bold text-[#963b18]">
+              <span className="flex items-center gap-1.5 rounded-full bg-[#fbe3d7] px-3 py-1.5 text-xs font-bold text-accent-dark">
                 <Heart size={12} fill="currentColor" />
                 {es ? 'Solo guardadas' : 'Saved only'}
               </span>
             )}
             <button
               onClick={resetAll}
-              className="flex items-center gap-1.5 rounded-full border border-[#dce7e1] px-3 py-1.5 text-xs font-bold text-[#173f45] transition hover:bg-[#eaf1ed]"
+              className="flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs font-bold text-brand transition hover:bg-surface-mint"
             >
               <RotateCcw size={13} />
               {es ? 'Limpiar filtros' : 'Clear filters'}
@@ -421,15 +421,15 @@ export function HomeView() {
 
         {results.length === 0 && (
           <div className="rounded-2xl bg-white p-10 text-center shadow-[0_8px_30px_rgba(26,65,69,.08)]">
-            <p className="text-lg font-semibold text-[#173f45]">
+            <p className="text-lg font-semibold text-brand">
               {es ? 'No encontramos experiencias con estos criterios.' : 'No experiences match these filters.'}
             </p>
-            <p className="mx-auto mt-2 max-w-md text-sm text-[#6a8588]">
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted">
               {es ? 'Prueba cambiando el destino o las fechas.' : 'Try changing the destination or the dates.'}
             </p>
             <button
               onClick={resetAll}
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#b8481c] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#963b18]"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-bold text-white transition hover:bg-accent-dark"
             >
               <RotateCcw size={16} />
               {es ? 'Limpiar filtros' : 'Clear filters'}
@@ -440,14 +440,14 @@ export function HomeView() {
 
       <ReviewsSection />
 
-      <section id="como-funciona" className="bg-[#eaf1ed] py-20"><div className="mx-auto max-w-7xl px-5 lg:px-8"><div className="grid items-center gap-12 lg:grid-cols-[.9fr_1.1fr]"><div><p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-[#b8481c]">{es ? 'Viajar es fácil' : 'Travel made easy'}</p><h2 className="max-w-md text-3xl font-semibold tracking-tight md:text-4xl">{es ? <>Lo local se vive <em className="font-serif font-normal">mejor.</em></> : <>Local is simply <em className="font-serif font-normal">better.</em></>}</h2><p className="mt-5 max-w-md leading-relaxed text-[#547176]">{es ? 'Conectamos tus ganas de explorar con quienes conocen cada rincón de El Salvador. Tú eliges el plan, nosotros cuidamos los detalles.' : 'We connect your urge to explore with the people who know every corner of El Salvador. You pick the plan, we handle the details.'}</p><a href="#experiencias" className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#173f45] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#0e3035]">{es ? 'Elegir mi experiencia' : 'Choose my experience'} <ArrowRight size={17} /></a></div><div className="grid gap-4 sm:grid-cols-3">{(es ? [['01','Elige','Encuentra el destino o experiencia que te mueve.'],['02','Reserva','Confirma en pocos pasos y recibe todo al instante.'],['03','Disfruta','Vive el momento con anfitriones locales.']] : [['01','Choose','Find the destination or experience that moves you.'],['02','Book','Confirm in a few steps and get everything instantly.'],['03','Enjoy','Live the moment with local hosts.']]).map(([number, title, description]) => <div key={number} className="rounded-2xl bg-white p-5"><span className="text-4xl font-light text-[#f0b649]">{number}</span><h3 className="mt-8 font-semibold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-[#6a8588]">{description}</p><Check className="mt-5 text-[#b8481c]" size={19} /></div>)}</div></div></div></section>
+      <section id="como-funciona" className="bg-surface-mint py-20"><div className="mx-auto max-w-7xl px-5 lg:px-8"><div className="grid items-center gap-12 lg:grid-cols-[.9fr_1.1fr]"><div><p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-accent">{es ? 'Viajar es fácil' : 'Travel made easy'}</p><h2 className="max-w-md text-3xl font-semibold tracking-tight md:text-4xl">{es ? <>Lo local se vive <em className="font-serif font-normal">mejor.</em></> : <>Local is simply <em className="font-serif font-normal">better.</em></>}</h2><p className="mt-5 max-w-md leading-relaxed text-muted">{es ? 'Conectamos tus ganas de explorar con quienes conocen cada rincón de El Salvador. Tú eliges el plan, nosotros cuidamos los detalles.' : 'We connect your urge to explore with the people who know every corner of El Salvador. You pick the plan, we handle the details.'}</p><a href="#experiencias" className="mt-7 inline-flex items-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">{es ? 'Elegir mi experiencia' : 'Choose my experience'} <ArrowRight size={17} /></a></div><div className="grid gap-4 sm:grid-cols-3">{(es ? [['01','Elige','Encuentra el destino o experiencia que te mueve.'],['02','Reserva','Confirma en pocos pasos y recibe todo al instante.'],['03','Disfruta','Vive el momento con anfitriones locales.']] : [['01','Choose','Find the destination or experience that moves you.'],['02','Book','Confirm in a few steps and get everything instantly.'],['03','Enjoy','Live the moment with local hosts.']]).map(([number, title, description]) => <div key={number} className="rounded-2xl bg-white p-5"><span className="text-4xl font-light text-[#f0b649]">{number}</span><h3 className="mt-8 font-semibold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-muted">{description}</p><Check className="mt-5 text-accent" size={19} /></div>)}</div></div></div></section>
 
       <section id="destinos" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-        <div className="rounded-[2rem] bg-[#173f45] p-7 text-white md:p-12">
+        <div className="rounded-[2rem] bg-brand p-7 text-white md:p-12">
           <div>
-            <p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-[#f4d27c]">{es ? 'Destinos' : 'Destinations'}</p>
+            <p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-gold-soft">{es ? 'Destinos' : 'Destinations'}</p>
             <h2 className="max-w-xl text-3xl font-semibold tracking-tight md:text-5xl">
-              {es ? <>Elige a dónde <em className="font-serif font-normal text-[#f4c45e]">ir primero.</em></> : <>Choose where to <em className="font-serif font-normal text-[#f4c45e]">go first.</em></>}
+              {es ? <>Elige a dónde <em className="font-serif font-normal text-gold-deep">ir primero.</em></> : <>Choose where to <em className="font-serif font-normal text-gold-deep">go first.</em></>}
             </h2>
             <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/75">
               {es ? 'Cada destino tiene su página con todas sus experiencias.' : 'Each destination has its own page with all of its experiences.'}
@@ -458,7 +458,7 @@ export function HomeView() {
               <li key={tile.destination.id}>
                 <Link
                   href={`/destinos/${tile.destination.id}`}
-                  className="group relative block h-40 w-full overflow-hidden rounded-2xl text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f4b942]"
+                  className="group relative block h-40 w-full overflow-hidden rounded-2xl text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
                 >
                   <Picture src={tile.image.src} sizes="(min-width: 1024px) 25vw, 50vw" alt={tile.image.alt[language]} loading="lazy" decoding="async" width={320} height={240} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                   <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />

@@ -161,16 +161,16 @@ export function ExperienceDetail({
   }, [showBar])
 
   return (
-    <div className="min-h-screen bg-[#fbfaf7] text-[#173f45]">
+    <div className="min-h-screen bg-cream text-brand">
       <SiteHeader />
 
       <main className="mx-auto max-w-7xl px-5 pb-16 pt-6 lg:px-8 lg:pt-8">
-        <nav aria-label={es ? 'Ruta de navegación' : 'Breadcrumb'} className="mb-5 flex flex-wrap items-center gap-1 text-xs text-[#6a8588]">
-          <Link href="/" className="hover:text-[#173f45] hover:underline">{es ? 'Inicio' : 'Home'}</Link>
+        <nav aria-label={es ? 'Ruta de navegación' : 'Breadcrumb'} className="mb-5 flex flex-wrap items-center gap-1 text-xs text-muted">
+          <Link href="/" className="hover:text-brand hover:underline">{es ? 'Inicio' : 'Home'}</Link>
           <ChevronRight size={12} />
-          <Link href="/#experiencias" className="hover:text-[#173f45] hover:underline">{es ? 'Experiencias' : 'Experiences'}</Link>
+          <Link href="/#experiencias" className="hover:text-brand hover:underline">{es ? 'Experiencias' : 'Experiences'}</Link>
           <ChevronRight size={12} />
-          <span aria-current="page" className="font-semibold text-[#173f45]">{name}</span>
+          <span aria-current="page" className="font-semibold text-brand">{name}</span>
         </nav>
 
         <div className="grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:gap-12">
@@ -179,18 +179,18 @@ export function ExperienceDetail({
           <div className="flex flex-col">
             <div className="flex items-start justify-between gap-4">
               {destinationId ? (
-                <Link href={`/destinos/${destinationId}`} className="flex items-center gap-1.5 text-sm font-semibold text-[#6a8588] hover:text-[#b8481c] hover:underline">
+                <Link href={`/destinos/${destinationId}`} className="flex items-center gap-1.5 text-sm font-semibold text-muted hover:text-accent hover:underline">
                   <MapPin size={15} /> {experience.destination}
                 </Link>
               ) : (
-                <p className="flex items-center gap-1.5 text-sm font-semibold text-[#6a8588]">
+                <p className="flex items-center gap-1.5 text-sm font-semibold text-muted">
                   <MapPin size={15} /> {experience.destination}
                 </p>
               )}
               <button
                 onClick={() => toggleFavorite(experience.id)}
                 aria-pressed={saved}
-                className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition ${saved ? 'border-[#b8481c] bg-[#fdf3ee] text-[#b8481c]' : 'border-[#dce7e1] bg-white text-[#173f45] hover:bg-[#eaf1ed]'}`}
+                className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition ${saved ? 'border-accent bg-[#fdf3ee] text-accent' : 'border-line bg-white text-brand hover:bg-surface-mint'}`}
               >
                 <Heart size={14} fill={saved ? '#b8481c' : 'none'} />
                 {saved ? (es ? 'Guardada' : 'Saved') : es ? 'Guardar' : 'Save'}
@@ -201,18 +201,18 @@ export function ExperienceDetail({
               <RatingBadge rating={rating} loading={stats === undefined} lang={lang} size="md" />
             </a>
 
-            <p className="mt-5 leading-relaxed text-[#547176]">{experience.description[lang]}</p>
+            <p className="mt-5 leading-relaxed text-muted">{experience.description[lang]}</p>
 
             <ul className="mt-5 flex flex-wrap gap-2 text-xs font-semibold">
-              <li className="flex items-center gap-1.5 rounded-full bg-[#e3f1ea] px-3 py-1.5 text-[#256b54]">
+              <li className="flex items-center gap-1.5 rounded-full bg-[#e3f1ea] px-3 py-1.5 text-success-dark">
                 <ShieldCheck size={14} aria-hidden="true" />
                 {es ? `Cancelación gratis hasta ${FREE_CANCELLATION_HOURS} h antes` : `Free cancellation up to ${FREE_CANCELLATION_HOURS} h before`}
               </li>
-              <li className="flex items-center gap-1.5 rounded-full bg-[#eaf1ed] px-3 py-1.5 text-[#173f45]">
+              <li className="flex items-center gap-1.5 rounded-full bg-surface-mint px-3 py-1.5 text-brand">
                 <Zap size={14} aria-hidden="true" />
                 {es ? 'Confirmación inmediata' : 'Instant confirmation'}
               </li>
-              <li className="flex items-center gap-1.5 rounded-full bg-[#eaf1ed] px-3 py-1.5 text-[#173f45]">
+              <li className="flex items-center gap-1.5 rounded-full bg-surface-mint px-3 py-1.5 text-brand">
                 <QrCode size={14} aria-hidden="true" />
                 {es ? 'Entrada digital con QR' : 'Digital QR ticket'}
               </li>
@@ -220,12 +220,12 @@ export function ExperienceDetail({
 
             <div ref={bookingCardRef} id="reservar" className="mt-6 scroll-mt-24 rounded-2xl bg-white p-5 shadow-[0_8px_30px_rgba(26,65,69,.08)]">
               <p>
-                <span className="text-xs text-[#6a8588]">{es ? 'Desde' : 'From'}</span>{' '}
+                <span className="text-xs text-muted">{es ? 'Desde' : 'From'}</span>{' '}
                 <strong className="text-3xl">${experience.priceUsd}</strong>{' '}
-                <span className="text-sm text-[#6a8588]">{es ? '/ persona · USD, precio final' : '/ person · USD, final price'}</span>
+                <span className="text-sm text-muted">{es ? '/ persona · USD, precio final' : '/ person · USD, final price'}</span>
               </p>
 
-              <p className="mt-4 text-xs font-bold uppercase tracking-wider text-[#759096]">
+              <p className="mt-4 text-xs font-bold uppercase tracking-wider text-faint">
                 {es ? 'Próximas salidas' : 'Next departures'}
               </p>
               <ul className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
@@ -234,15 +234,15 @@ export function ExperienceDetail({
                     {iso ? (
                       <Link
                         href={`${bookHref}?date=${iso}`}
-                        className="flex h-full flex-col rounded-xl border border-[#dce7e1] px-3 py-2 text-sm transition hover:border-[#b8481c] hover:bg-[#fdf3ee] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#173f45]"
+                        className="flex h-full flex-col rounded-xl border border-line px-3 py-2 text-sm transition hover:border-accent hover:bg-[#fdf3ee] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
                       >
                         <span className="font-semibold capitalize">{formatDeparture(iso, lang)}</span>
                         {index === 0 && now && departureLabel(iso, lang, now) !== formatDeparture(iso, lang) && (
-                          <span className="text-[11px] font-semibold text-[#b8481c]">{departureLabel(iso, lang, now)}</span>
+                          <span className="text-[11px] font-semibold text-accent">{departureLabel(iso, lang, now)}</span>
                         )}
                       </Link>
                     ) : (
-                      <span className="block h-10 animate-pulse rounded-xl bg-[#eaf1ed]" aria-hidden="true" />
+                      <span className="block h-10 animate-pulse rounded-xl bg-surface-mint" aria-hidden="true" />
                     )}
                   </li>
                 ))}
@@ -250,12 +250,12 @@ export function ExperienceDetail({
 
               <Link
                 href={bookHref}
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-[#b8481c] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[#963b18] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#173f45]"
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-bold text-white transition hover:bg-accent-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
               >
                 {es ? 'Ver todas las fechas y reservar' : 'See all dates and book'} <ArrowRight size={16} />
               </Link>
-              <p className="mt-3 flex items-start gap-1.5 text-xs text-[#6a8588]">
-                <ShieldCheck size={14} className="mt-px shrink-0 text-[#256b54]" />
+              <p className="mt-3 flex items-start gap-1.5 text-xs text-muted">
+                <ShieldCheck size={14} className="mt-px shrink-0 text-success-dark" />
                 {es
                   ? `Sin crear cuenta · Pago seguro${paymentText ? ` con ${paymentText}` : ''} · Ayuda por WhatsApp`
                   : `No account needed · Secure payment${paymentText ? ` by ${paymentText}` : ''} · WhatsApp support`}
@@ -266,10 +266,10 @@ export function ExperienceDetail({
 
         <dl className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {facts.map(({ icon: Icon, label, value }) => (
-            <div key={label} className="flex items-start gap-3 rounded-2xl border border-[#dce7e1] bg-white p-3.5">
-              <Icon size={18} className="mt-0.5 shrink-0 text-[#b8481c]" />
+            <div key={label} className="flex items-start gap-3 rounded-2xl border border-line bg-white p-3.5">
+              <Icon size={18} className="mt-0.5 shrink-0 text-accent" />
               <div className="min-w-0">
-                <dt className="text-[11px] font-bold uppercase tracking-wider text-[#759096]">{label}</dt>
+                <dt className="text-[11px] font-bold uppercase tracking-wider text-faint">{label}</dt>
                 <dd className="mt-0.5 text-sm font-semibold">{value}</dd>
               </div>
             </div>
@@ -286,17 +286,17 @@ export function ExperienceDetail({
                     const last = index === details.itinerary.length - 1
                     return (
                       <li key={step.time} className="relative flex gap-4 pb-5 last:pb-0">
-                        {!last && <span className="absolute left-[7px] top-5 h-full w-px bg-[#dce7e1]" aria-hidden="true" />}
-                        <span className={`relative mt-1 h-[15px] w-[15px] shrink-0 rounded-full border-[3px] bg-white ${index === 0 || last ? 'border-[#b8481c]' : 'border-[#dce7e1]'}`} aria-hidden="true" />
+                        {!last && <span className="absolute left-[7px] top-5 h-full w-px bg-line" aria-hidden="true" />}
+                        <span className={`relative mt-1 h-[15px] w-[15px] shrink-0 rounded-full border-[3px] bg-white ${index === 0 || last ? 'border-accent' : 'border-line'}`} aria-hidden="true" />
                         <div>
-                          <p className="text-xs font-bold text-[#b8481c]">{step.time}</p>
-                          <p className="mt-0.5 text-sm text-[#173f45]">{step.text[lang]}</p>
+                          <p className="text-xs font-bold text-accent">{step.time}</p>
+                          <p className="mt-0.5 text-sm text-brand">{step.text[lang]}</p>
                         </div>
                       </li>
                     )
                   })}
                 </ol>
-                <p className="mt-4 text-xs text-[#6a8588]">
+                <p className="mt-4 text-xs text-muted">
                   {es ? 'Horarios aproximados: el guía puede ajustarlos según el clima y el ritmo del grupo.' : 'Approximate times: your guide may adjust them for weather and group pace.'}
                 </p>
               </section>
@@ -306,8 +306,8 @@ export function ExperienceDetail({
               <h2 id="highlights-title" className="text-xl font-semibold">{es ? 'Lo mejor' : 'Highlights'}</h2>
               <ul className="mt-4 grid gap-2.5">
                 {experience.highlights[lang].map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-sm text-[#547176]">
-                    <Check size={17} className="mt-0.5 shrink-0 text-[#b8481c]" /> {item}
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-muted">
+                    <Check size={17} className="mt-0.5 shrink-0 text-accent" /> {item}
                   </li>
                 ))}
               </ul>
@@ -319,8 +319,8 @@ export function ExperienceDetail({
                   <h2 id="includes-title" className="text-xl font-semibold">{es ? 'Incluye' : 'Included'}</h2>
                   <ul className="mt-4 grid gap-2.5">
                     {details.includes[lang].map((item) => (
-                      <li key={item} className="flex items-start gap-2.5 text-sm text-[#547176]">
-                        <Check size={17} className="mt-0.5 shrink-0 text-[#2f7d63]" /> {item}
+                      <li key={item} className="flex items-start gap-2.5 text-sm text-muted">
+                        <Check size={17} className="mt-0.5 shrink-0 text-success" /> {item}
                       </li>
                     ))}
                   </ul>
@@ -329,8 +329,8 @@ export function ExperienceDetail({
                   <h2 className="text-xl font-semibold">{es ? 'No incluye' : 'Not included'}</h2>
                   <ul className="mt-4 grid gap-2.5">
                     {details.excludes[lang].map((item) => (
-                      <li key={item} className="flex items-start gap-2.5 text-sm text-[#547176]">
-                        <X size={17} className="mt-0.5 shrink-0 text-[#a3341c]" /> {item}
+                      <li key={item} className="flex items-start gap-2.5 text-sm text-muted">
+                        <X size={17} className="mt-0.5 shrink-0 text-accent-deep" /> {item}
                       </li>
                     ))}
                   </ul>
@@ -341,12 +341,12 @@ export function ExperienceDetail({
             {details && (
               <section aria-labelledby="bring-title">
                 <h2 id="bring-title" className="flex items-center gap-2 text-xl font-semibold">
-                  <Backpack size={20} className="text-[#b8481c]" /> {es ? 'Qué llevar' : 'What to bring'}
+                  <Backpack size={20} className="text-accent" /> {es ? 'Qué llevar' : 'What to bring'}
                 </h2>
                 <ul className="mt-4 grid gap-2.5 sm:grid-cols-2">
                   {details.bring[lang].map((item) => (
-                    <li key={item} className="flex items-start gap-2.5 text-sm text-[#547176]">
-                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#b8481c]" aria-hidden="true" /> {item}
+                    <li key={item} className="flex items-start gap-2.5 text-sm text-muted">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" /> {item}
                     </li>
                   ))}
                 </ul>
@@ -368,9 +368,9 @@ export function ExperienceDetail({
               <section aria-labelledby="meeting-title">
                 <h2 id="meeting-title" className="text-xl font-semibold">{es ? 'Punto de encuentro' : 'Meeting point'}</h2>
                 <p className="mt-3 flex items-start gap-2 text-sm font-semibold">
-                  <MapPin size={17} className="mt-0.5 shrink-0 text-[#b8481c]" /> {details.meetingPoint.name[lang]}
+                  <MapPin size={17} className="mt-0.5 shrink-0 text-accent" /> {details.meetingPoint.name[lang]}
                 </p>
-                <div className="mt-4 overflow-hidden rounded-2xl border border-[#dce7e1] bg-[#eaf1ed]">
+                <div className="mt-4 overflow-hidden rounded-2xl border border-line bg-surface-mint">
                   <iframe
                     title={`${es ? 'Mapa' : 'Map'}: ${details.meetingPoint.name[lang]}`}
                     src={mapEmbedUrl(details.meetingPoint.mapQuery, lang)}
@@ -383,37 +383,37 @@ export function ExperienceDetail({
                   href={mapLinkUrl(details.meetingPoint.mapQuery)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-[#b8481c] underline-offset-4 hover:underline"
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-accent underline-offset-4 hover:underline"
                 >
                   {es ? 'Abrir en Google Maps' : 'Open in Google Maps'} <ExternalLink size={14} />
                 </a>
-                <p className="mt-2 text-xs text-[#6a8588]">
+                <p className="mt-2 text-xs text-muted">
                   {es ? '¿Dudas sobre cómo llegar? Escríbenos por WhatsApp y te ayudamos.' : 'Not sure how to get there? Message us on WhatsApp and we will help.'}
                 </p>
               </section>
             )}
 
-            <section aria-labelledby="cancellation-title" className="rounded-2xl bg-[#eaf1ed] p-5">
+            <section aria-labelledby="cancellation-title" className="rounded-2xl bg-surface-mint p-5">
               <h2 id="cancellation-title" className="flex items-center gap-2 text-lg font-semibold">
-                <ShieldCheck size={20} className="text-[#256b54]" /> {es ? 'Política de cancelación' : 'Cancellation policy'}
+                <ShieldCheck size={20} className="text-success-dark" /> {es ? 'Política de cancelación' : 'Cancellation policy'}
               </h2>
               <ul className="mt-4 grid gap-2.5 text-sm">
                 <li className="flex items-start gap-2.5">
-                  <Check size={16} className="mt-0.5 shrink-0 text-[#2f7d63]" />
+                  <Check size={16} className="mt-0.5 shrink-0 text-success" />
                   <span><strong>{es ? `Más de ${FREE_CANCELLATION_HOURS} h antes:` : `More than ${FREE_CANCELLATION_HOURS} h before:`}</strong> {es ? 'reembolso completo.' : 'full refund.'}</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <CalendarCheck size={16} className="mt-0.5 shrink-0 text-[#8a5d0c]" />
+                  <CalendarCheck size={16} className="mt-0.5 shrink-0 text-gold-ink" />
                   <span><strong>{es ? 'Entre 48 y 24 h antes:' : 'Between 48 and 24 h before:'}</strong> {es ? 'reembolso del 50 %.' : '50% refund.'}</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <X size={16} className="mt-0.5 shrink-0 text-[#a3341c]" />
+                  <X size={16} className="mt-0.5 shrink-0 text-accent-deep" />
                   <span><strong>{es ? 'Menos de 24 h o no presentarse:' : 'Less than 24 h or no-show:'}</strong> {es ? 'sin reembolso.' : 'no refund.'}</span>
                 </li>
               </ul>
-              <p className="mt-3 text-xs text-[#547176]">
+              <p className="mt-3 text-xs text-muted">
                 {es ? 'Si cancelamos por clima o seguridad, eliges otra fecha o el reembolso completo.' : 'If we cancel for weather or safety, you choose another date or a full refund.'}{' '}
-                <Link href="/legal/cancellation" className="font-bold text-[#b8481c] underline-offset-4 hover:underline">
+                <Link href="/legal/cancellation" className="font-bold text-accent underline-offset-4 hover:underline">
                   {es ? 'Ver política completa' : 'Full policy'}
                 </Link>
               </p>
@@ -421,13 +421,13 @@ export function ExperienceDetail({
 
             <section aria-labelledby="how-title">
               <h2 id="how-title" className="text-xl font-semibold">{es ? 'Cómo funciona' : 'How it works'}</h2>
-              <ol className="mt-4 grid gap-2.5 text-sm text-[#547176]">
+              <ol className="mt-4 grid gap-2.5 text-sm text-muted">
                 {(es
                   ? ['Elige fecha y número de viajeros.', 'Deja tus datos de contacto: no hace falta cuenta.', `Paga en la página segura${paymentText ? ` (${paymentText})` : ''}.`, 'Recibe tu confirmación y una entrada con QR por viajero.']
                   : ['Pick a date and the number of travelers.', 'Leave your contact details — no account needed.', `Pay on the secure page${paymentText ? ` (${paymentText})` : ''}.`, 'Get your confirmation and one QR ticket per traveler.']
                 ).map((step, index) => (
                   <li key={step} className="flex items-start gap-3">
-                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#eaf1ed] text-xs font-bold text-[#173f45]">{index + 1}</span>
+                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-surface-mint text-xs font-bold text-brand">{index + 1}</span>
                     <span className="pt-0.5">{step}</span>
                   </li>
                 ))}
@@ -452,12 +452,12 @@ export function ExperienceDetail({
                     <Picture src={item.image} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" alt={item.imageAlt[lang]} loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                   </div>
                   <div className="p-4">
-                    <div className="flex items-center justify-between gap-2 text-xs text-[#6a8588]">
+                    <div className="flex items-center justify-between gap-2 text-xs text-muted">
                       <span className="flex items-center gap-1"><MapPin size={13} />{item.destination}</span>
                       <RatingBadge rating={stats?.[item.id]} loading={stats === undefined} lang={lang} />
                     </div>
                     <p className="mt-1 font-semibold">{experienceName(item, lang)}</p>
-                    <p className="mt-2 text-sm"><strong>${item.priceUsd}</strong> <span className="text-xs text-[#6a8588]">{es ? '/ persona' : '/ person'}</span></p>
+                    <p className="mt-2 text-sm"><strong>${item.priceUsd}</strong> <span className="text-xs text-muted">{es ? '/ persona' : '/ person'}</span></p>
                   </div>
                 </Link>
               ))}
@@ -468,24 +468,24 @@ export function ExperienceDetail({
 
       {/* Barra fija de reserva (móvil y tableta). */}
       <div
-        className={`fixed inset-x-0 bottom-0 z-40 border-t border-[#dce7e1] bg-white/95 px-5 pb-[calc(.75rem+env(safe-area-inset-bottom,0px))] pt-3 shadow-[0_-8px_30px_rgba(26,65,69,.12)] backdrop-blur transition-transform duration-300 lg:hidden ${showBar ? 'translate-y-0' : 'pointer-events-none translate-y-full'}`}
+        className={`fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 px-5 pb-[calc(.75rem+env(safe-area-inset-bottom,0px))] pt-3 shadow-[0_-8px_30px_rgba(26,65,69,.12)] backdrop-blur transition-transform duration-300 lg:hidden ${showBar ? 'translate-y-0' : 'pointer-events-none translate-y-full'}`}
         aria-hidden={!showBar}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
           <div className="min-w-0">
             <p className="text-sm">
-              <span className="text-xs text-[#6a8588]">{es ? 'Desde' : 'From'}</span>{' '}
+              <span className="text-xs text-muted">{es ? 'Desde' : 'From'}</span>{' '}
               <strong className="text-lg">${experience.priceUsd}</strong>{' '}
-              <span className="text-xs text-[#6a8588]">{es ? '/ persona' : '/ person'}</span>
+              <span className="text-xs text-muted">{es ? '/ persona' : '/ person'}</span>
             </p>
-            <p className="truncate text-[11px] font-semibold text-[#256b54]">
+            <p className="truncate text-[11px] font-semibold text-success-dark">
               {es ? `Cancelación gratis hasta ${FREE_CANCELLATION_HOURS} h antes` : `Free cancellation up to ${FREE_CANCELLATION_HOURS} h before`}
             </p>
           </div>
           <Link
             href={bookHref}
             tabIndex={showBar ? 0 : -1}
-            className="shrink-0 rounded-full bg-[#b8481c] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#963b18]"
+            className="shrink-0 rounded-full bg-accent px-5 py-3 text-sm font-bold text-white transition hover:bg-accent-dark"
           >
             {es ? 'Ver fechas' : 'Check dates'}
           </Link>
@@ -522,7 +522,7 @@ function Gallery({
   return (
     <div>
       <div
-        className="relative overflow-hidden rounded-3xl bg-[#eaf1ed]"
+        className="relative overflow-hidden rounded-3xl bg-surface-mint"
         onTouchStart={(event) => {
           touchStart.current = event.touches[0].clientX
         }}
@@ -545,21 +545,21 @@ function Gallery({
           className="aspect-[4/3] h-full w-full object-cover"
         />
         {tag && (
-          <span className="absolute left-4 top-4 rounded-full bg-[#f4d27c] px-3 py-1 text-xs font-bold text-[#173f45]">{tag}</span>
+          <span className="absolute left-4 top-4 rounded-full bg-gold-soft px-3 py-1 text-xs font-bold text-brand">{tag}</span>
         )}
         {many && (
           <>
             <button
               onClick={() => go(-1)}
               aria-label={es ? 'Foto anterior' : 'Previous photo'}
-              className="absolute left-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-[#173f45] shadow transition hover:bg-white"
+              className="absolute left-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-brand shadow transition hover:bg-white"
             >
               <ChevronLeft size={20} />
             </button>
             <button
               onClick={() => go(1)}
               aria-label={es ? 'Foto siguiente' : 'Next photo'}
-              className="absolute right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-[#173f45] shadow transition hover:bg-white"
+              className="absolute right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-brand shadow transition hover:bg-white"
             >
               <ChevronRight size={20} />
             </button>
@@ -578,7 +578,7 @@ function Gallery({
                 onClick={() => setActive(index)}
                 aria-label={`${es ? 'Ver foto' : 'View photo'} ${index + 1}: ${image.alt[lang]}`}
                 aria-current={index === active}
-                className={`block h-16 w-20 overflow-hidden rounded-xl transition sm:h-20 sm:w-28 ${index === active ? 'ring-2 ring-[#b8481c] ring-offset-2' : 'opacity-70 hover:opacity-100'}`}
+                className={`block h-16 w-20 overflow-hidden rounded-xl transition sm:h-20 sm:w-28 ${index === active ? 'ring-2 ring-accent ring-offset-2' : 'opacity-70 hover:opacity-100'}`}
               >
                 <Picture src={image.src} sizes="112px" alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
               </button>

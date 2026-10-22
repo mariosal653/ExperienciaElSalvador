@@ -52,14 +52,14 @@ export default async function PaymentReturnPage({ searchParams }: { searchParams
 
   if (!payment) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#fbfaf7] px-5 text-center text-[#173f45]">
+      <main className="grid min-h-screen place-items-center bg-cream px-5 text-center text-brand">
         <div className="max-w-md">
           <h1 className="text-2xl font-semibold">We could not find this payment</h1>
-          <p className="mt-2 text-sm text-[#6a8588]">
+          <p className="mt-2 text-sm text-muted">
             If you completed a payment, you will receive the confirmation by email. No encontramos este pago: si
             pagaste, recibirás la confirmación por correo.
           </p>
-          <Link href="/" className="mt-6 inline-block rounded-full bg-[#b8481c] px-5 py-3 text-sm font-bold text-white">
+          <Link href="/" className="mt-6 inline-block rounded-full bg-accent px-5 py-3 text-sm font-bold text-white">
             Back to Experiences
           </Link>
         </div>

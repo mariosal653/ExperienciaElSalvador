@@ -20,7 +20,7 @@ export function RemoveFavoriteButton({ experienceId, name }: { experienceId: str
       }}
       disabled={busy}
       aria-label={`Quitar ${name} de guardadas`}
-      className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-[#b8481c] shadow transition hover:scale-105 disabled:opacity-60"
+      className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-accent shadow transition hover:scale-105 disabled:opacity-60"
     >
       {busy ? <Loader2 size={16} className="animate-spin" /> : <Heart size={17} fill="#b8481c" />}
     </button>

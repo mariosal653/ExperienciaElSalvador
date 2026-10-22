@@ -177,10 +177,10 @@ export const credits = {
   },
   puertaDelDiablo: {
     file: '/img/experiences/puerta-del-diablo.jpg',
-    title: 'Mirador desde la cima de la Puerta del Diablo',
-    author: 'Pabloqp20',
-    license: 'CC BY-SA 4.0',
-    source: `${COMMONS}Mirador_desde_la_cima_de_la_puerta_del_diablo.jpg`,
+    title: 'Mirador «La Puerta del Diablo», San Salvador',
+    author: 'feinteriano',
+    license: 'CC BY-SA 3.0',
+    source: `${COMMONS}Mirador_%22La_Puerta_del_Diablo%22_San_Salvador._-_panoramio_(1).jpg`,
   },
   puertaDelDiabloPenas: {
     file: '/img/experiences/puerta-del-diablo-penas.jpg',

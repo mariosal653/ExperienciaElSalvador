@@ -54,11 +54,11 @@ export function ReviewsSection() {
   const hasReviews = reviews.length > 0
 
   return (
-    <section id="opiniones" className="bg-[#eaf1ed] py-20">
+    <section id="opiniones" className="bg-surface-mint py-20">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="mb-8 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
-            <p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-[#b8481c]">
+            <p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-accent">
               {es ? 'Lo que dicen' : 'What people say'}
             </p>
             <h2 className="max-w-lg text-3xl font-semibold tracking-tight md:text-4xl">
@@ -77,7 +77,7 @@ export function ReviewsSection() {
           {summary && summary.averageRating !== null && (
             <div className="flex items-center gap-4 rounded-2xl bg-white px-5 py-4 shadow-[0_8px_30px_rgba(26,65,69,.08)]">
               <div>
-                <p className="text-3xl font-semibold leading-none text-[#173f45]">
+                <p className="text-3xl font-semibold leading-none text-brand">
                   {summary.averageRating.toFixed(1)}
                 </p>
                 <div className="mt-1.5 flex items-center gap-0.5" aria-hidden="true">
@@ -85,15 +85,15 @@ export function ReviewsSection() {
                     <Star
                       key={star}
                       size={14}
-                      className={star <= Math.round(summary.averageRating ?? 0) ? 'text-[#f4b942]' : 'text-[#dce7e1]'}
+                      className={star <= Math.round(summary.averageRating ?? 0) ? 'text-gold' : 'text-line'}
                       fill={star <= Math.round(summary.averageRating ?? 0) ? '#f4b942' : 'none'}
                     />
                   ))}
                 </div>
               </div>
-              <div className="border-l border-[#dce7e1] pl-4">
+              <div className="border-l border-line pl-4">
                 <GoogleIcon className="h-5 w-5" />
-                <p className="mt-1.5 text-xs text-[#6a8588]">
+                <p className="mt-1.5 text-xs text-muted">
                   {summary.totalCount !== null
                     ? `${summary.totalCount} ${es ? 'opiniones' : 'reviews'}`
                     : es ? 'en Google' : 'on Google'}
@@ -138,7 +138,7 @@ export function ReviewsSection() {
                     type="button"
                     onClick={() => scrollBy(-1)}
                     aria-label={es ? 'Opiniones anteriores' : 'Previous reviews'}
-                    className="grid h-10 w-10 place-items-center rounded-full border border-[#dce7e1] bg-white text-[#173f45] transition hover:bg-[#f4f7f5]"
+                    className="grid h-10 w-10 place-items-center rounded-full border border-line bg-white text-brand transition hover:bg-surface-soft"
                   >
                     <ChevronLeft size={18} />
                   </button>
@@ -146,7 +146,7 @@ export function ReviewsSection() {
                     type="button"
                     onClick={() => scrollBy(1)}
                     aria-label={es ? 'Más opiniones' : 'More reviews'}
-                    className="grid h-10 w-10 place-items-center rounded-full border border-[#dce7e1] bg-white text-[#173f45] transition hover:bg-[#f4f7f5]"
+                    className="grid h-10 w-10 place-items-center rounded-full border border-line bg-white text-brand transition hover:bg-surface-soft"
                   >
                     <ChevronRight size={18} />
                   </button>
@@ -160,7 +160,7 @@ export function ReviewsSection() {
                   href={summary.profileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-[#173f45] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#0e3035]"
+                  className="inline-flex items-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-dark"
                 >
                   <GoogleIcon className="h-4 w-4" />
                   {es ? 'Ver todas las opiniones en Google' : 'View all reviews on Google'}
@@ -186,20 +186,20 @@ function NotConnected({ es, payload }: { es: boolean; payload: ReviewsPayload | 
   const google = payload?.providers.find((provider) => provider.source === 'google')
 
   return (
-    <div className="rounded-2xl border border-dashed border-[#b7c5c1] bg-white/70 p-8 text-center md:p-12">
+    <div className="rounded-2xl border border-dashed border-line-strong bg-white/70 p-8 text-center md:p-12">
       <div className="mx-auto flex w-fit items-center gap-3 rounded-full bg-white px-4 py-2 shadow-sm">
         <GoogleIcon className="h-5 w-5" />
-        <span className="h-4 w-px bg-[#dce7e1]" />
+        <span className="h-4 w-px bg-line" />
         <FacebookIcon className="h-5 w-5 opacity-35" />
-        <span className="h-4 w-px bg-[#dce7e1]" />
-        <TikTokIcon className="h-5 w-5 text-[#173f45] opacity-35" />
+        <span className="h-4 w-px bg-line" />
+        <TikTokIcon className="h-5 w-5 text-brand opacity-35" />
       </div>
 
-      <p className="mt-5 text-lg font-semibold text-[#173f45]">
+      <p className="mt-5 text-lg font-semibold text-brand">
         {es ? 'Las opiniones aún no están conectadas' : 'Reviews are not connected yet'}
       </p>
 
-      <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-[#6a8588]">
+      <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-muted">
         {es
           ? 'Esta sección mostrará opiniones reales de Google en cuanto se agreguen las credenciales. No se muestran reseñas de ejemplo a propósito: en una página que vende confianza, una opinión inventada vale menos que un espacio vacío.'
           : 'This section will show real Google reviews as soon as the credentials are added. No sample reviews are shown on purpose: on a page that sells trust, a made-up review is worth less than an empty space.'}

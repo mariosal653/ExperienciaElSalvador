@@ -81,25 +81,25 @@ export function WelcomeModal() {
           type="button"
           onClick={dismiss}
           aria-label={es ? 'Cerrar' : 'Close'}
-          className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-[#173f45] transition hover:bg-[#eaf1ed] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#173f45]"
+          className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-brand transition hover:bg-surface-mint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
         >
           <X size={18} />
         </button>
 
-        <div className="bg-[#173f45] px-7 py-8 text-center text-white">
-          <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#f4b942] text-[#173f45]">
+        <div className="bg-brand px-7 py-8 text-center text-white">
+          <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-gold text-brand">
             <Ticket size={26} />
           </span>
-          <p className="mt-4 text-5xl font-semibold tracking-tight text-[#f4c45e]">
+          <p className="mt-4 text-5xl font-semibold tracking-tight text-gold-deep">
             {benefit.percentage}% OFF
           </p>
         </div>
 
         <div className="px-7 py-7 text-center">
-          <h2 id="welcome-title" className="text-xl font-semibold text-[#173f45]">
+          <h2 id="welcome-title" className="text-xl font-semibold text-brand">
             {es ? '¡Bienvenido! 🎉' : 'Welcome! 🎉'}
           </h2>
-          <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-[#6a8588]">
+          <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-muted">
             {es
               ? `Tienes un ${benefit.percentage}% de descuento en tu primera experiencia. Queda guardado en tu cuenta.`
               : `You have ${benefit.percentage}% off your first experience. It stays saved in your account.`}
@@ -109,7 +109,7 @@ export function WelcomeModal() {
             <a
               href="/#experiencias"
               onClick={dismiss}
-              className="flex items-center justify-center gap-2 rounded-full bg-[#b8481c] px-5 py-3.5 text-sm font-bold text-white transition hover:bg-[#963b18]"
+              className="flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-3.5 text-sm font-bold text-white transition hover:bg-accent-dark"
             >
               {es ? 'Explorar experiencias' : 'Explore experiences'}
               <ArrowRight size={16} />
@@ -117,7 +117,7 @@ export function WelcomeModal() {
             <button
               type="button"
               onClick={dismiss}
-              className="rounded-full px-5 py-2.5 text-sm font-semibold text-[#6a8588] transition hover:text-[#173f45]"
+              className="rounded-full px-5 py-2.5 text-sm font-semibold text-muted transition hover:text-brand"
             >
               {es ? 'Ahora no' : 'Not now'}
             </button>

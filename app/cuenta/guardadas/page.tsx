@@ -24,8 +24,8 @@ export default async function SavedPage() {
 
   return (
     <AccountShell user={user} active="guardadas">
-      <h1 className="text-2xl font-semibold tracking-tight text-[#173f45] md:text-3xl">Guardadas</h1>
-      <p className="mt-1.5 text-sm text-[#6a8588]">
+      <h1 className="text-2xl font-semibold tracking-tight text-brand md:text-3xl">Guardadas</h1>
+      <p className="mt-1.5 text-sm text-muted">
         {saved.length > 0
           ? `${saved.length} ${saved.length === 1 ? 'experiencia guardada' : 'experiencias guardadas'}. Las ves igual en cualquier dispositivo.`
           : 'Toca el ♥ de una experiencia para guardarla aquí.'}
@@ -40,10 +40,10 @@ export default async function SavedPage() {
                   <img src={item.image} alt={item.imageAlt.ES} loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                 </div>
                 <div className="p-4">
-                  <p className="flex items-center gap-1 text-xs text-[#6a8588]"><MapPin size={13} />{item.destination}</p>
-                  <p className="mt-1 font-semibold text-[#173f45]">{item.name.ES}</p>
-                  <p className="mt-2 text-sm text-[#173f45]">
-                    <strong>${item.priceUsd}</strong> <span className="text-xs text-[#6a8588]">/ persona · {item.durationHours} h</span>
+                  <p className="flex items-center gap-1 text-xs text-muted"><MapPin size={13} />{item.destination}</p>
+                  <p className="mt-1 font-semibold text-brand">{item.name.ES}</p>
+                  <p className="mt-2 text-sm text-brand">
+                    <strong>${item.priceUsd}</strong> <span className="text-xs text-muted">/ persona · {item.durationHours} h</span>
                   </p>
                 </div>
               </Link>
@@ -52,11 +52,11 @@ export default async function SavedPage() {
           ))}
         </div>
       ) : (
-        <div className="mt-8 rounded-2xl border border-dashed border-[#b7c5c1] bg-white p-8 text-center md:p-12">
-          <p className="text-lg font-semibold text-[#173f45]">Aún no guardas experiencias</p>
+        <div className="mt-8 rounded-2xl border border-dashed border-line-strong bg-white p-8 text-center md:p-12">
+          <p className="text-lg font-semibold text-brand">Aún no guardas experiencias</p>
           <Link
             href="/#experiencias"
-            className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#b8481c] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#963b18]"
+            className="mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-bold text-white transition hover:bg-accent-dark"
           >
             Explorar experiencias <ArrowRight size={16} />
           </Link>

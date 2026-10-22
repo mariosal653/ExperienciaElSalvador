@@ -53,12 +53,12 @@ export function BarComparison({
   return (
     <figure className="min-w-0 rounded-2xl bg-white p-4 shadow-[0_8px_30px_rgba(26,65,69,.06)] sm:p-5">
       <figcaption>
-        <h3 className="text-sm font-bold text-[#173f45]">{title}</h3>
-        {description && <p className="mt-1 text-xs text-[#6a8588]">{description}</p>}
+        <h3 className="text-sm font-bold text-brand">{title}</h3>
+        {description && <p className="mt-1 text-xs text-muted">{description}</p>}
       </figcaption>
 
       {!hayDatos ? (
-        <p className="mt-6 rounded-xl bg-[#f4f7f5] px-4 py-6 text-center text-sm text-[#6a8588]">{emptyLabel}</p>
+        <p className="mt-6 rounded-xl bg-surface-soft px-4 py-6 text-center text-sm text-muted">{emptyLabel}</p>
       ) : (
         <ul className="mt-4 grid gap-3">
           {rows.map((row) => {
@@ -68,14 +68,14 @@ export function BarComparison({
             return (
               <li key={row.id}>
                 <div className="flex items-baseline justify-between gap-3">
-                  <span className="min-w-0 truncate text-xs font-medium text-[#173f45]" title={row.label}>
+                  <span className="min-w-0 truncate text-xs font-medium text-brand" title={row.label}>
                     {row.label}
                   </span>
-                  <span className="shrink-0 text-xs font-bold tabular-nums text-[#173f45]">{row.display}</span>
+                  <span className="shrink-0 text-xs font-bold tabular-nums text-brand">{row.display}</span>
                 </div>
                 <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-[#eef2f0]">
                   <div
-                    className="h-full rounded-full bg-[#b8481c]"
+                    className="h-full rounded-full bg-accent"
                     style={{ width: `${pct}%` }}
                     role="img"
                     aria-label={`${row.label}: ${row.display}`}

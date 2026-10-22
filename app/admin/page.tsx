@@ -77,8 +77,8 @@ export default async function AdminDashboardPage({
     <AdminShell admin={admin}>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[#173f45] md:text-3xl">Resumen general</h1>
-          <p className="mt-1.5 text-sm text-[#6a8588]">
+          <h1 className="text-2xl font-semibold tracking-tight text-brand md:text-3xl">Resumen general</h1>
+          <p className="mt-1.5 text-sm text-muted">
             Todo lo que aparece aquí son reservas reales de la base de datos. Los ingresos cuentan solo las que
             tienen el cobro aprobado.
           </p>
@@ -92,7 +92,7 @@ export default async function AdminDashboardPage({
 
       {/* Avisos honestos sobre lo que se está contando --------------- */}
       {kpis.ingresosPruebaCents > 0 && (
-        <p className="mt-5 flex items-start gap-2 rounded-xl border border-[#e2c483] bg-[#fdf2dc] px-4 py-3 text-sm font-medium text-[#8a5d0c]">
+        <p className="mt-5 flex items-start gap-2 rounded-xl border border-gold-line bg-gold-pale px-4 py-3 text-sm font-medium text-gold-ink">
           <AlertTriangle size={16} className="mt-0.5 shrink-0" />
           <span>
             {formatCents(kpis.ingresosPruebaCents)} de los ingresos vienen de pagos de prueba (pasarela simulada o
@@ -110,7 +110,7 @@ export default async function AdminDashboardPage({
       )}
 
       {data.vacio && (
-        <p className="mt-6 rounded-2xl bg-white px-5 py-10 text-center text-sm text-[#6a8588] shadow-[0_8px_30px_rgba(26,65,69,.06)]">
+        <p className="mt-6 rounded-2xl bg-white px-5 py-10 text-center text-sm text-muted shadow-[0_8px_30px_rgba(26,65,69,.06)]">
           No hay reservas registradas que cumplan estos filtros.
         </p>
       )}
@@ -174,7 +174,7 @@ export default async function AdminDashboardPage({
             accent="terracota"
           />
         </div>
-        <p className="mt-2 text-xs text-[#6a8588]">
+        <p className="mt-2 text-xs text-muted">
           Hay {kpis.salidasProximas} {kpis.salidasProximas === 1 ? 'salida próxima' : 'salidas próximas'} (de hoy en
           adelante).
         </p>
@@ -211,7 +211,7 @@ export default async function AdminDashboardPage({
 
       {/* E. Comparativa ---------------------------------------------- */}
       <section aria-labelledby="comparativa" className="mt-9">
-        <h2 id="comparativa" className="mb-3 text-sm font-bold uppercase tracking-[.12em] text-[#759096]">
+        <h2 id="comparativa" className="mb-3 text-sm font-bold uppercase tracking-[.12em] text-faint">
           Comparativa entre experiencias
         </h2>
         <div className="grid gap-3 lg:grid-cols-3">
@@ -232,7 +232,7 @@ export default async function AdminDashboardPage({
                 reserva.
               </caption>
               <thead>
-                <tr className="border-b border-[#edf0ed] text-xs uppercase tracking-[.1em] text-[#759096]">
+                <tr className="border-b border-line-soft text-xs uppercase tracking-[.1em] text-faint">
                   <th scope="col" className="px-4 py-3 font-bold">Experiencia</th>
                   <th scope="col" className="px-4 py-3 text-right font-bold">Salidas</th>
                   <th scope="col" className="px-4 py-3 text-right font-bold">Ocupación</th>
@@ -243,21 +243,21 @@ export default async function AdminDashboardPage({
               <tbody>
                 {data.comparativa.map((item) => (
                   <tr key={item.experienceId} className="border-b border-[#f3f6f4] last:border-0">
-                    <th scope="row" className="max-w-[18rem] truncate px-4 py-3 font-semibold text-[#173f45]">
+                    <th scope="row" className="max-w-[18rem] truncate px-4 py-3 font-semibold text-brand">
                       {item.titulo}
                     </th>
-                    <td className="px-4 py-3 text-right tabular-nums text-[#547176]">{item.salidas}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-[#547176]">
+                    <td className="px-4 py-3 text-right tabular-nums text-muted">{item.salidas}</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-muted">
                       {item.ocupacion === null ? (
-                        <span className="text-[#9ab0ad]" title="No se conoce el cupo de todas sus salidas">—</span>
+                        <span className="text-faint" title="No se conoce el cupo de todas sus salidas">—</span>
                       ) : (
                         `${(item.ocupacion * 100).toFixed(0)} %`
                       )}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-[#547176]">
+                    <td className="px-4 py-3 text-right tabular-nums text-muted">
                       {item.promedioPersonasPorSalida === null ? '—' : item.promedioPersonasPorSalida.toFixed(1)}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-[#547176]">
+                    <td className="px-4 py-3 text-right tabular-nums text-muted">
                       {item.ingresoMedioPorReservaCents === null
                         ? '—'
                         : formatCents(item.ingresoMedioPorReservaCents)}
@@ -270,7 +270,7 @@ export default async function AdminDashboardPage({
         )}
       </section>
 
-      <p className="mt-8 text-xs leading-relaxed text-[#6a8588]">
+      <p className="mt-8 text-xs leading-relaxed text-muted">
         Una «salida» es una experiencia en una fecha concreta; varias reservas de distintos clientes pueden caer en
         la misma salida. El catálogo no guarda la hora de inicio, por eso las tablas muestran la duración en su
         lugar. El estado de una salida se deduce de sus reservas y de la fecha: cancelada si no queda ninguna

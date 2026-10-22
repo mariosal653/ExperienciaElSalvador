@@ -40,18 +40,18 @@ export default async function ReservaDetallePage({ params }: Params) {
 
   return (
     <AdminShell admin={admin}>
-      <Link href="/admin" className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#b8481c] hover:underline">
+      <Link href="/admin" className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline">
         <ArrowLeft size={15} /> Volver al panel
       </Link>
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-2xl font-semibold tracking-tight text-[#173f45] md:text-3xl">{reserva.experienceTitle}</h1>
-          <p className="mt-1 font-mono text-sm text-[#6a8588]">{reserva.code}</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-brand md:text-3xl">{reserva.experienceTitle}</h1>
+          <p className="mt-1 font-mono text-sm text-muted">{reserva.code}</p>
         </div>
         <div className="flex items-center gap-2">
           {reserva.isTest && (
-            <span className="rounded-full border border-[#e2c483] bg-[#fdf2dc] px-3 py-1 text-xs font-bold text-[#8a5d0c]">
+            <span className="rounded-full border border-gold-line bg-gold-pale px-3 py-1 text-xs font-bold text-gold-ink">
               RESERVA DE PRUEBA
             </span>
           )}
@@ -108,19 +108,19 @@ export default async function ReservaDetallePage({ params }: Params) {
 
       {/* Pagos ---------------------------------------------------- */}
       <section aria-labelledby="pagos" className="mt-8">
-        <h2 id="pagos" className="mb-3 text-sm font-bold uppercase tracking-[.12em] text-[#759096]">
+        <h2 id="pagos" className="mb-3 text-sm font-bold uppercase tracking-[.12em] text-faint">
           Intentos de pago ({pagos.length})
         </h2>
 
         {pagos.length === 0 ? (
-          <p className="rounded-2xl bg-white px-5 py-8 text-center text-sm text-[#6a8588] shadow-[0_8px_30px_rgba(26,65,69,.06)]">
+          <p className="rounded-2xl bg-white px-5 py-8 text-center text-sm text-muted shadow-[0_8px_30px_rgba(26,65,69,.06)]">
             Esta reserva no llegó a generar ningún intento de pago.
           </p>
         ) : (
           <div className="overflow-x-auto rounded-2xl bg-white shadow-[0_8px_30px_rgba(26,65,69,.06)]">
             <table className="w-full min-w-[46rem] text-left text-sm">
               <thead>
-                <tr className="border-b border-[#edf0ed] text-xs uppercase tracking-[.1em] text-[#759096]">
+                <tr className="border-b border-line-soft text-xs uppercase tracking-[.1em] text-faint">
                   <th scope="col" className="px-4 py-3 font-bold">Método</th>
                   <th scope="col" className="px-4 py-3 font-bold">Entorno</th>
                   <th scope="col" className="px-4 py-3 font-bold">Estado</th>
@@ -133,24 +133,24 @@ export default async function ReservaDetallePage({ params }: Params) {
               <tbody>
                 {pagos.map((pago) => (
                   <tr key={pago.id} className="border-b border-[#f3f6f4] last:border-0">
-                    <th scope="row" className="px-4 py-3 font-semibold text-[#173f45]">
+                    <th scope="row" className="px-4 py-3 font-semibold text-brand">
                       {PAYMENT_PROVIDER_LABEL[pago.provider] ?? pago.provider}
                     </th>
-                    <td className="px-4 py-3 text-[#547176]">{pago.environment}</td>
-                    <td className="px-4 py-3 font-semibold text-[#547176]">
+                    <td className="px-4 py-3 text-muted">{pago.environment}</td>
+                    <td className="px-4 py-3 font-semibold text-muted">
                       {PAYMENT_STATUS_LABEL[pago.status as PaymentStatusFilter] ?? pago.status}
                       {pago.failureReason && (
-                        <span className="block text-xs font-normal text-[#a3341c]">{pago.failureReason}</span>
+                        <span className="block text-xs font-normal text-accent-deep">{pago.failureReason}</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-[#547176]">
+                    <td className="px-4 py-3 text-right tabular-nums text-muted">
                       {formatCents(pago.amountCents, pago.currency)}
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs text-[#6a8588]">{pago.reference}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-[#6a8588]">
+                    <td className="px-4 py-3 font-mono text-xs text-muted">{pago.reference}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-muted">
                       {pago.providerTransactionId ?? '—'}
                     </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-xs text-[#6a8588]">{fechaHora(pago.createdAt)}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-xs text-muted">{fechaHora(pago.createdAt)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -173,7 +173,7 @@ function Bloque({
 }) {
   return (
     <section className="rounded-2xl bg-white p-5 shadow-[0_8px_30px_rgba(26,65,69,.06)]">
-      <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-[.12em] text-[#759096]">
+      <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-[.12em] text-faint">
         <Icon size={15} /> {titulo}
       </h2>
       <dl className="mt-4 grid gap-3">{children}</dl>
@@ -196,13 +196,13 @@ function Campo({
 }) {
   return (
     <div className="flex items-baseline justify-between gap-4 border-b border-[#f3f6f4] pb-2.5 last:border-0 last:pb-0">
-      <dt className="shrink-0 text-xs text-[#6a8588]">{label}</dt>
+      <dt className="shrink-0 text-xs text-muted">{label}</dt>
       <dd
         className={`min-w-0 break-words text-right ${capitalize ? 'capitalize ' : ''}${
-          destacado ? 'text-lg font-semibold text-[#173f45]' : 'text-sm font-medium text-[#173f45]'
+          destacado ? 'text-lg font-semibold text-brand' : 'text-sm font-medium text-brand'
         }`}
       >
-        {value ?? <span className="text-[#9ab0ad]">{nota ?? '—'}</span>}
+        {value ?? <span className="text-faint">{nota ?? '—'}</span>}
       </dd>
     </div>
   )

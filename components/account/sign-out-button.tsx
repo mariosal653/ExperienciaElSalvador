@@ -15,7 +15,7 @@ export function SignOutButton({ redirectTo = '/' }: { redirectTo?: string } = {}
     <button
       type="button"
       onClick={() => signOut({ redirectTo })}
-      className="flex items-center gap-2 rounded-full border border-white/50 px-4 py-2 text-sm font-semibold transition hover:bg-white hover:text-[#173f45] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f4b942]"
+      className="flex items-center gap-2 rounded-full border border-white/50 px-4 py-2 text-sm font-semibold transition hover:bg-white hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
     >
       <LogOut size={15} />
       Cerrar sesión

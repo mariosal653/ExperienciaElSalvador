@@ -414,8 +414,8 @@ export const experiences: Experience[] = [
     durationHours: 4,
     image: '/img/experiences/puerta-del-diablo.jpg',
     imageAlt: {
-      ES: 'Peña de la Puerta del Diablo entre montañas y neblina',
-      EN: 'Puerta del Diablo rock among mountains and mist',
+      ES: 'Peñas de la Puerta del Diablo sobre la cordillera verde de Panchimalco',
+      EN: 'The Puerta del Diablo rocks above the green ridge of Panchimalco',
     },
     tag: { ES: 'Miradores', EN: 'Viewpoints' },
     maxPeople: 14,

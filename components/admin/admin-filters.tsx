@@ -31,12 +31,12 @@ export function AdminFilters({ filters, catalogo, destinos, hoy }: {
   const anioActual = hoy.slice(0, 4)
 
   const field =
-    'mt-1 w-full rounded-xl border border-[#dce7e1] bg-white px-3 py-2.5 text-sm text-[#173f45] outline-none transition focus:border-[#173f45] focus:ring-2 focus:ring-[#173f45]/15'
-  const label = 'text-xs font-bold uppercase tracking-[.1em] text-[#759096]'
+    'mt-1 w-full rounded-xl border border-line bg-white px-3 py-2.5 text-sm text-brand outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/15'
+  const label = 'text-xs font-bold uppercase tracking-[.1em] text-faint'
 
   return (
     <section aria-labelledby="filtros" className="rounded-2xl bg-white p-4 shadow-[0_8px_30px_rgba(26,65,69,.06)] sm:p-5">
-      <h2 id="filtros" className="flex items-center gap-2 text-sm font-bold uppercase tracking-[.12em] text-[#759096]">
+      <h2 id="filtros" className="flex items-center gap-2 text-sm font-bold uppercase tracking-[.12em] text-faint">
         <Filter size={15} /> Filtros
       </h2>
 
@@ -91,16 +91,16 @@ export function AdminFilters({ filters, catalogo, destinos, hoy }: {
         </div>
 
         <div className="flex items-end sm:col-span-2 lg:col-span-1">
-          <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-[#dce7e1] px-3 py-2.5 text-sm">
+          <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-line px-3 py-2.5 text-sm">
             <input
               type="checkbox"
               name="solo"
               value="reales"
               defaultChecked={filters.onlyReal}
-              className="mt-0.5 h-4 w-4 shrink-0 accent-[#b8481c]"
+              className="mt-0.5 h-4 w-4 shrink-0 accent-accent"
             />
-            <span className="text-[#547176]">
-              <span className="block font-semibold text-[#173f45]">Solo cobros reales</span>
+            <span className="text-muted">
+              <span className="block font-semibold text-brand">Solo cobros reales</span>
               Deja fuera las reservas pagadas con la pasarela simulada o en sandbox.
             </span>
           </label>
@@ -109,14 +109,14 @@ export function AdminFilters({ filters, catalogo, destinos, hoy }: {
         <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-1">
           <button
             type="submit"
-            className="flex-1 rounded-full bg-[#173f45] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#0e3035] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b8481c]"
+            className="flex-1 rounded-full bg-brand px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             Aplicar
           </button>
           {hasFilters(filters) && (
             <Link
               href="/admin"
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[#dce7e1] text-[#547176] transition hover:bg-[#eaf1ed]"
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line text-muted transition hover:bg-surface-mint"
               aria-label="Quitar todos los filtros"
               title="Quitar todos los filtros"
             >
@@ -126,8 +126,8 @@ export function AdminFilters({ filters, catalogo, destinos, hoy }: {
         </div>
       </form>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-[#edf0ed] pt-4">
-        <span className="text-xs text-[#6a8588]">Atajos:</span>
+      <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line-soft pt-4">
+        <span className="text-xs text-muted">Atajos:</span>
         <Atajo href={`/admin?mes=${mesActual}`} label="Este mes" />
         <Atajo href={`/admin?anio=${anioActual}`} label={`Año ${anioActual}`} />
         <Atajo href={`/admin?from=${hoy}`} label="De hoy en adelante" />
@@ -141,7 +141,7 @@ function Atajo({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="rounded-full border border-[#dce7e1] px-3 py-1.5 text-xs font-semibold text-[#173f45] transition hover:bg-[#eaf1ed]"
+      className="rounded-full border border-line px-3 py-1.5 text-xs font-semibold text-brand transition hover:bg-surface-mint"
     >
       {label}
     </Link>

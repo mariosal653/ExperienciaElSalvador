@@ -98,7 +98,7 @@ export function LegalPage({ slug }: { slug: LegalSlug }) {
   const es = lang === 'ES'
 
   return (
-    <div className="min-h-screen bg-[#fbfaf7] text-[#173f45]">
+    <div className="min-h-screen bg-cream text-brand">
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-5 pb-16 pt-10 lg:px-8">
         <nav className="mb-6 flex flex-wrap gap-2 text-sm" aria-label={es ? 'Documentos legales' : 'Legal documents'}>
@@ -108,7 +108,7 @@ export function LegalPage({ slug }: { slug: LegalSlug }) {
               href={`/legal/${item}`}
               aria-current={item === slug ? 'page' : undefined}
               className={`rounded-full px-4 py-2 font-semibold transition ${
-                item === slug ? 'bg-[#173f45] text-white' : 'border border-[#dce7e1] bg-white hover:bg-[#eaf1ed]'
+                item === slug ? 'bg-brand text-white' : 'border border-line bg-white hover:bg-surface-mint'
               }`}
             >
               {DOCS[item][lang].title}
@@ -116,12 +116,12 @@ export function LegalPage({ slug }: { slug: LegalSlug }) {
           ))}
         </nav>
         <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">{doc.title}</h1>
-        <p className="mt-2 text-sm text-[#6a8588]">{doc.updated}</p>
+        <p className="mt-2 text-sm text-muted">{doc.updated}</p>
         {doc.sections.map((section) => (
           <section key={section.heading} className="mt-8">
             <h2 className="text-lg font-semibold">{section.heading}</h2>
             {section.body.map((paragraph) => (
-              <p key={paragraph} className="mt-2 leading-relaxed text-[#547176]">{paragraph}</p>
+              <p key={paragraph} className="mt-2 leading-relaxed text-muted">{paragraph}</p>
             ))}
           </section>
         ))}

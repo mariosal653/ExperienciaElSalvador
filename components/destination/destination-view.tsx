@@ -39,10 +39,10 @@ export function DestinationView({ destinationId }: { destinationId: string }) {
   const count = page.experiences.length
 
   return (
-    <div className="min-h-screen bg-[#fbfaf7] text-[#173f45]">
+    <div className="min-h-screen bg-cream text-brand">
       <SiteHeader />
 
-      <section className="relative flex min-h-[340px] items-end overflow-hidden bg-[#174b51] md:min-h-[420px]">
+      <section className="relative flex min-h-[340px] items-end overflow-hidden bg-brand-hero md:min-h-[420px]">
         <Picture
           src={page.image.src}
           alt={page.image.alt[lang]}
@@ -59,7 +59,7 @@ export function DestinationView({ destinationId }: { destinationId: string }) {
             <ChevronRight size={12} />
             <span aria-current="page" className="font-semibold text-white">{page.destination.name}</span>
           </nav>
-          <p className="flex items-center gap-1.5 text-sm font-semibold text-[#f4d27c]">
+          <p className="flex items-center gap-1.5 text-sm font-semibold text-gold-soft">
             <MapPin size={15} /> {page.destination.region[lang]}, El Salvador
           </p>
           <h1 className="mt-2 text-4xl font-semibold tracking-tight md:text-6xl">{page.destination.name}</h1>
@@ -90,7 +90,7 @@ export function DestinationView({ destinationId }: { destinationId: string }) {
         <section className="mt-16" aria-labelledby="other-destinations">
           <div className="flex items-end justify-between gap-4">
             <h2 id="other-destinations" className="text-xl font-semibold">{es ? 'Otros destinos' : 'Other destinations'}</h2>
-            <Link href="/#experiencias" className="flex items-center gap-1.5 text-sm font-bold text-[#b8481c]">
+            <Link href="/#experiencias" className="flex items-center gap-1.5 text-sm font-bold text-accent">
               {es ? 'Todas las experiencias' : 'All experiences'} <ArrowRight size={16} />
             </Link>
           </div>
@@ -99,7 +99,7 @@ export function DestinationView({ destinationId }: { destinationId: string }) {
               <li key={other.destination.id} className="shrink-0">
                 <Link
                   href={`/destinos/${other.destination.id}`}
-                  className="group relative block h-32 w-44 overflow-hidden rounded-2xl text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b8481c]"
+                  className="group relative block h-32 w-44 overflow-hidden rounded-2xl text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                 >
                   <Picture src={other.image.src} sizes="176px" alt={other.image.alt[lang]} loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                   <span className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent" />

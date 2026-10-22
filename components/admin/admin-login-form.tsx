@@ -69,25 +69,25 @@ export function AdminLoginForm() {
   }
 
   const field =
-    'mt-1.5 w-full rounded-xl border border-[#dce7e1] bg-white px-3.5 py-3 text-base text-[#173f45] outline-none transition placeholder:text-[#9ab0ad] focus:border-[#173f45] focus:ring-2 focus:ring-[#173f45]/15 sm:text-sm'
+    'mt-1.5 w-full rounded-xl border border-line bg-white px-3.5 py-3 text-base text-brand outline-none transition placeholder:text-faint focus:border-brand focus:ring-2 focus:ring-brand/15 sm:text-sm'
 
   return (
     <div className="w-full max-w-md rounded-2xl bg-white p-7 shadow-[0_18px_50px_rgba(26,65,69,.14)] md:p-9">
       <div className="mb-7 flex items-center gap-2.5">
-        <span className="grid h-9 w-9 place-items-center rounded-full bg-[#173f45] text-[#f4b942]">
+        <span className="grid h-9 w-9 place-items-center rounded-full bg-brand text-gold">
           <ShieldCheck size={20} strokeWidth={2.5} />
         </span>
-        <span className="text-lg font-bold tracking-tight text-[#173f45]">
-          Experiences <span className="text-[#b8481c]">El Salvador</span>
+        <span className="text-lg font-bold tracking-tight text-brand">
+          Experiences <span className="text-accent">El Salvador</span>
         </span>
       </div>
 
-      <h1 className="text-2xl font-semibold tracking-tight text-[#173f45]">Panel de administración</h1>
-      <p className="mt-1.5 text-sm text-[#6a8588]">Acceso restringido al equipo.</p>
+      <h1 className="text-2xl font-semibold tracking-tight text-brand">Panel de administración</h1>
+      <p className="mt-1.5 text-sm text-muted">Acceso restringido al equipo.</p>
 
       <form onSubmit={onSubmit} className="mt-7 grid gap-4" noValidate>
         <div>
-          <label htmlFor="admin-email" className="text-sm font-semibold text-[#173f45]">
+          <label htmlFor="admin-email" className="text-sm font-semibold text-brand">
             Correo
           </label>
           <input
@@ -103,7 +103,7 @@ export function AdminLoginForm() {
         </div>
 
         <div>
-          <label htmlFor="admin-password" className="text-sm font-semibold text-[#173f45]">
+          <label htmlFor="admin-password" className="text-sm font-semibold text-brand">
             Contraseña
           </label>
           <div className="relative">
@@ -119,7 +119,7 @@ export function AdminLoginForm() {
               type="button"
               onClick={() => setVisible((value) => !value)}
               aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-              className="absolute right-3 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-lg text-[#6a8588] transition hover:bg-[#f2f6f3]"
+              className="absolute right-3 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-lg text-muted transition hover:bg-[#f2f6f3]"
             >
               {visible ? <EyeOff size={17} /> : <Eye size={17} />}
             </button>
@@ -127,7 +127,7 @@ export function AdminLoginForm() {
         </div>
 
         {error && (
-          <p role="alert" className="rounded-xl bg-[#fae6e0] px-4 py-3 text-sm font-medium text-[#a3341c]">
+          <p role="alert" className="rounded-xl bg-accent-soft px-4 py-3 text-sm font-medium text-accent-deep">
             {error}
           </p>
         )}
@@ -135,7 +135,7 @@ export function AdminLoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-1 flex w-full items-center justify-center gap-2 rounded-full bg-[#173f45] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[#0e3035] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b8481c] disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-1 flex w-full items-center justify-center gap-2 rounded-full bg-brand px-6 py-3.5 text-sm font-bold text-white transition hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? <Loader2 size={16} className="animate-spin" /> : <Lock size={15} />}
           {loading ? 'Entrando…' : 'Entrar'}

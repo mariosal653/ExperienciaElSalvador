@@ -282,7 +282,7 @@ export function ReelViewer({
             {reel.experienceId && (
               <a
                 href={`/experiences/${reel.experienceId}`}
-                className="flex items-center justify-center gap-2 rounded-full bg-[#b8481c] px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-[#963b18]"
+                className="flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-accent-dark"
               >
                 {es ? 'Ver experiencia' : 'View Experience'} <ArrowRight size={16} />
               </a>

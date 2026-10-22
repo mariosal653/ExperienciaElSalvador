@@ -58,7 +58,7 @@ export function SearchPanel({ applied, onSearch, lang }: Props) {
 
       <button
         type="submit"
-        className="flex items-center justify-center gap-2 rounded-xl bg-[#b8481c] px-7 py-3.5 text-sm font-bold text-white transition hover:bg-[#963b18] md:rounded-full"
+        className="flex items-center justify-center gap-2 rounded-xl bg-accent px-7 py-3.5 text-sm font-bold text-white transition hover:bg-accent-dark md:rounded-full"
       >
         <Search size={18} aria-hidden="true" />
         {lang === 'ES' ? 'Buscar' : 'Search'}

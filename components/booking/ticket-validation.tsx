@@ -54,10 +54,10 @@ export function TicketValidation({
   }, [])
 
   const STATUS = {
-    ACTIVE: { label: t('ACTIVA', 'ACTIVE'), hint: t('Entrada válida. Aún no se ha usado.', 'Valid ticket. Not used yet.'), icon: BadgeCheck, className: 'bg-[#e3f0e9] text-[#256b54] border-[#a4cdbc]' },
+    ACTIVE: { label: t('ACTIVA', 'ACTIVE'), hint: t('Entrada válida. Aún no se ha usado.', 'Valid ticket. Not used yet.'), icon: BadgeCheck, className: 'bg-success-soft text-success-dark border-success-line' },
     USED: { label: t('USADA', 'USED'), hint: t('Esta entrada ya se utilizó.', 'This ticket has already been used.'), icon: TicketCheck, className: 'bg-[#eef1f0] text-[#50686b] border-[#cfd9d6]' },
-    CANCELLED: { label: t('CANCELADA', 'CANCELLED'), hint: t('Esta entrada fue cancelada.', 'This ticket was cancelled.'), icon: Ban, className: 'bg-[#fae6e0] text-[#a3341c] border-[#e3b3a4]' },
-    INVALID: { label: t('NO VÁLIDA', 'INVALID'), hint: t('No reconocemos esta entrada.', 'We do not recognise this ticket.'), icon: CircleSlash, className: 'bg-[#fae6e0] text-[#a3341c] border-[#e3b3a4]' },
+    CANCELLED: { label: t('CANCELADA', 'CANCELLED'), hint: t('Esta entrada fue cancelada.', 'This ticket was cancelled.'), icon: Ban, className: 'bg-accent-soft text-accent-deep border-accent-line' },
+    INVALID: { label: t('NO VÁLIDA', 'INVALID'), hint: t('No reconocemos esta entrada.', 'We do not recognise this ticket.'), icon: CircleSlash, className: 'bg-accent-soft text-accent-deep border-accent-line' },
   }[status]
   const Icon = STATUS.icon
 
@@ -109,16 +109,16 @@ export function TicketValidation({
   }
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] px-4 py-6 text-[#173f45]">
+    <main className="min-h-screen bg-cream px-4 py-6 text-brand">
       <div className="mx-auto max-w-md">
         <div className="mb-5 flex items-center justify-between gap-3">
           <span className="flex items-center gap-2 font-bold">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-[#f4b942] text-[#173f45]">
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-gold text-brand">
               <Compass size={18} strokeWidth={2.5} />
             </span>
-            Experiences <span className="text-[#b8481c]">El Salvador</span>
+            Experiences <span className="text-accent">El Salvador</span>
           </span>
-          <div className="rounded-full bg-[#173f45] p-0.5">
+          <div className="rounded-full bg-brand p-0.5">
             <LanguageSwitch lang={lang} onChange={setLang} />
           </div>
         </div>
@@ -133,31 +133,31 @@ export function TicketValidation({
           {ticket && (
             <dl className="grid gap-3 p-6 text-sm">
               <div>
-                <dt className="text-[11px] font-bold uppercase tracking-wider text-[#759096]">{t('Experiencia', 'Experience')}</dt>
+                <dt className="text-[11px] font-bold uppercase tracking-wider text-faint">{t('Experiencia', 'Experience')}</dt>
                 <dd className="mt-0.5 text-base font-semibold">{ticket.experienceTitle}</dd>
               </div>
               <div>
-                <dt className="text-[11px] font-bold uppercase tracking-wider text-[#759096]">{t('Fecha', 'Date')}</dt>
+                <dt className="text-[11px] font-bold uppercase tracking-wider text-faint">{t('Fecha', 'Date')}</dt>
                 <dd className="mt-0.5 capitalize">{dateLabel}</dd>
               </div>
               <div className="flex flex-wrap justify-between gap-3">
                 <div>
-                  <dt className="text-[11px] font-bold uppercase tracking-wider text-[#759096]">{t('ID de entrada', 'Ticket ID')}</dt>
+                  <dt className="text-[11px] font-bold uppercase tracking-wider text-faint">{t('ID de entrada', 'Ticket ID')}</dt>
                   <dd className="mt-0.5 break-all font-mono">{ticket.code}</dd>
                 </div>
                 <div className="text-right">
-                  <dt className="text-[11px] font-bold uppercase tracking-wider text-[#759096]">{t('Viajero', 'Traveler')}</dt>
+                  <dt className="text-[11px] font-bold uppercase tracking-wider text-faint">{t('Viajero', 'Traveler')}</dt>
                   <dd className="mt-0.5">{ticket.number} / {ticket.people}</dd>
                 </div>
               </div>
               {ticket.usedAt && (
                 <div>
-                  <dt className="text-[11px] font-bold uppercase tracking-wider text-[#759096]">{t('Usada el', 'Used on')}</dt>
+                  <dt className="text-[11px] font-bold uppercase tracking-wider text-faint">{t('Usada el', 'Used on')}</dt>
                   <dd className="mt-0.5">{new Date(ticket.usedAt).toLocaleString(es ? 'es-SV' : 'en-US', { timeZone: 'America/El_Salvador' })}</dd>
                 </div>
               )}
               {ticket.isTest && (
-                <p className="flex items-center gap-2 rounded-xl bg-[#fdf2dc] px-3 py-2 text-xs font-semibold text-[#8a5d0c]">
+                <p className="flex items-center gap-2 rounded-xl bg-gold-pale px-3 py-2 text-xs font-semibold text-gold-ink">
                   <AlertTriangle size={14} /> {t('Entrada de una reserva de prueba.', 'Ticket from a test booking.')}
                 </p>
               )}
@@ -167,9 +167,9 @@ export function TicketValidation({
 
         {/* Personal */}
         {staffEnabled && status === 'ACTIVE' && (
-          <section className="mt-5 rounded-3xl border border-[#dce7e1] bg-white p-5">
+          <section className="mt-5 rounded-3xl border border-line bg-white p-5">
             {!staffOpen ? (
-              <button type="button" onClick={() => setStaffOpen(true)} className="flex w-full items-center justify-center gap-2 text-sm font-bold text-[#173f45]">
+              <button type="button" onClick={() => setStaffOpen(true)} className="flex w-full items-center justify-center gap-2 text-sm font-bold text-brand">
                 <KeyRound size={16} /> {t('Soy del personal: validar entrada', 'Staff: validate ticket')}
               </button>
             ) : (
@@ -187,12 +187,12 @@ export function TicketValidation({
                   autoComplete="off"
                   value={key}
                   onChange={(event) => setKey(event.target.value)}
-                  className="w-full rounded-xl border border-[#dce7e1] px-3.5 py-3 text-base outline-none focus:border-[#173f45]"
+                  className="w-full rounded-xl border border-line px-3.5 py-3 text-base outline-none focus:border-brand"
                 />
                 <button
                   type="submit"
                   disabled={loading || !key}
-                  className="flex items-center justify-center gap-2 rounded-full bg-[#173f45] px-5 py-3 text-sm font-bold text-white disabled:opacity-50"
+                  className="flex items-center justify-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-bold text-white disabled:opacity-50"
                 >
                   {loading && <Loader2 size={15} className="animate-spin" />} {t('Marcar como usada', 'Mark as used')}
                 </button>
@@ -201,7 +201,7 @@ export function TicketValidation({
                     type="button"
                     onClick={() => redeem(true)}
                     disabled={loading}
-                    className="rounded-full border border-[#e2c483] bg-[#fdf2dc] px-5 py-3 text-sm font-bold text-[#8a5d0c]"
+                    className="rounded-full border border-gold-line bg-gold-pale px-5 py-3 text-sm font-bold text-gold-ink"
                   >
                     {t('Validar igualmente', 'Validate anyway')}
                   </button>
@@ -215,7 +215,7 @@ export function TicketValidation({
           <p
             role="alert"
             className={`mt-4 rounded-xl px-4 py-3 text-sm font-medium ${
-              message.tone === 'ok' ? 'bg-[#e3f0e9] text-[#256b54]' : message.tone === 'warn' ? 'bg-[#fdf2dc] text-[#8a5d0c]' : 'bg-[#fae6e0] text-[#a3341c]'
+              message.tone === 'ok' ? 'bg-success-soft text-success-dark' : message.tone === 'warn' ? 'bg-gold-pale text-gold-ink' : 'bg-accent-soft text-accent-deep'
             }`}
           >
             {message.text}

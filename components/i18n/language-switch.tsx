@@ -21,7 +21,7 @@ export function LanguageSwitch({ lang, onChange }: { lang: Locale; onChange: (la
           onClick={() => onChange(option)}
           aria-pressed={lang === option}
           className={`rounded-full px-3 py-1 text-xs font-bold transition ${
-            lang === option ? 'bg-white text-[#173f45]' : 'text-white/80 hover:text-white'
+            lang === option ? 'bg-white text-brand' : 'text-white/80 hover:text-white'
           }`}
         >
           {option}

@@ -16,15 +16,15 @@ export function SiteFooter() {
   ]
 
   return (
-    <footer className="no-print border-t border-[#dce7e1] px-5 py-8 text-sm text-[#6a8588]">
+    <footer className="no-print border-t border-line px-5 py-8 text-sm text-muted">
       <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 md:flex-row md:items-center">
-        <span className="font-bold text-[#173f45]">
-          Experiences <span className="text-[#b8481c]">El Salvador</span>
+        <span className="font-bold text-brand">
+          Experiences <span className="text-accent">El Salvador</span>
         </span>
         <span>{es ? 'Hecho con cariño desde El Salvador · © 2026' : 'Made with care in El Salvador · © 2026'}</span>
         <nav aria-label={es ? 'Enlaces legales' : 'Legal links'} className="flex flex-wrap gap-x-4 gap-y-2">
           {links.map((link) => (
-            <Link key={link.href} href={link.href} className="transition hover:text-[#173f45] hover:underline">
+            <Link key={link.href} href={link.href} className="transition hover:text-brand hover:underline">
               {link.label}
             </Link>
           ))}

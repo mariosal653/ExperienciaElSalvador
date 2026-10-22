@@ -89,10 +89,10 @@ export function DateField({ value, onChange, lang }: Props) {
       >
         <CalendarDays className="shrink-0 text-[#ee7f47]" size={19} aria-hidden="true" />
         <span>
-          <span className="block text-[11px] font-bold uppercase tracking-wider text-[#759096]">
+          <span className="block text-[11px] font-bold uppercase tracking-wider text-faint">
             {lang === 'ES' ? 'Cuándo' : 'When'}
           </span>
-          <span className="text-sm font-semibold text-[#173f45]">{summary}</span>
+          <span className="text-sm font-semibold text-brand">{summary}</span>
         </span>
       </button>
 
@@ -107,12 +107,12 @@ export function DateField({ value, onChange, lang }: Props) {
               onClick={() => move(-1)}
               disabled={atCurrentMonth}
               aria-label={lang === 'ES' ? 'Mes anterior' : 'Previous month'}
-              className="grid h-8 w-8 place-items-center rounded-full text-[#173f45] transition hover:bg-[#eaf1ed] disabled:cursor-not-allowed disabled:opacity-30"
+              className="grid h-8 w-8 place-items-center rounded-full text-brand transition hover:bg-surface-mint disabled:cursor-not-allowed disabled:opacity-30"
             >
               <ChevronLeft size={17} />
             </button>
 
-            <span aria-live="polite" className="text-sm font-semibold capitalize text-[#173f45]">
+            <span aria-live="polite" className="text-sm font-semibold capitalize text-brand">
               {MONTHS[lang][cursor.month]} {cursor.year}
             </span>
 
@@ -120,7 +120,7 @@ export function DateField({ value, onChange, lang }: Props) {
               type="button"
               onClick={() => move(1)}
               aria-label={lang === 'ES' ? 'Mes siguiente' : 'Next month'}
-              className="grid h-8 w-8 place-items-center rounded-full text-[#173f45] transition hover:bg-[#eaf1ed]"
+              className="grid h-8 w-8 place-items-center rounded-full text-brand transition hover:bg-surface-mint"
             >
               <ChevronRight size={17} />
             </button>
@@ -131,7 +131,7 @@ export function DateField({ value, onChange, lang }: Props) {
               <span
                 key={`${day}-${index}`}
                 aria-hidden="true"
-                className="grid h-8 place-items-center text-[11px] font-bold uppercase text-[#759096]"
+                className="grid h-8 place-items-center text-[11px] font-bold uppercase text-faint"
               >
                 {day}
               </span>
@@ -157,12 +157,12 @@ export function DateField({ value, onChange, lang }: Props) {
                   aria-current={isToday ? 'date' : undefined}
                   className={`grid h-9 place-items-center rounded-full text-sm transition ${
                     isSelected
-                      ? 'bg-[#173f45] font-bold text-white'
+                      ? 'bg-brand font-bold text-white'
                       : isPast
                         ? 'cursor-not-allowed text-[#c3d1cd]'
                         : isToday
-                          ? 'font-bold text-[#b8481c] hover:bg-[#eaf1ed]'
-                          : 'text-[#173f45] hover:bg-[#eaf1ed]'
+                          ? 'font-bold text-accent hover:bg-surface-mint'
+                          : 'text-brand hover:bg-surface-mint'
                   }`}
                 >
                   {date.getDate()}
@@ -177,7 +177,7 @@ export function DateField({ value, onChange, lang }: Props) {
               onChange(null)
               close()
             }}
-            className="mt-3 w-full rounded-full border border-[#dce7e1] py-2 text-xs font-bold text-[#173f45] transition hover:bg-[#eaf1ed]"
+            className="mt-3 w-full rounded-full border border-line py-2 text-xs font-bold text-brand transition hover:bg-surface-mint"
           >
             {lang === 'ES' ? 'Cualquier fecha' : 'Any date'}
           </button>

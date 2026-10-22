@@ -23,21 +23,21 @@ export function KpiCard({
   accent?: 'teal' | 'terracota' | 'ambar'
 }) {
   const accents = {
-    teal: 'bg-[#eaf1ed] text-[#173f45]',
-    terracota: 'bg-[#fae6e0] text-[#b8481c]',
-    ambar: 'bg-[#fdf2dc] text-[#8a5d0c]',
+    teal: 'bg-surface-mint text-brand',
+    terracota: 'bg-accent-soft text-accent',
+    ambar: 'bg-gold-pale text-gold-ink',
   }
 
   return (
     <div className="rounded-2xl bg-white p-4 shadow-[0_8px_30px_rgba(26,65,69,.06)] sm:p-5">
       <div className="flex items-start justify-between gap-3">
-        <p className="text-xs font-bold uppercase tracking-[.12em] text-[#759096]">{label}</p>
+        <p className="text-xs font-bold uppercase tracking-[.12em] text-faint">{label}</p>
         <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${accents[accent]}`}>
           <Icon size={16} />
         </span>
       </div>
-      <p className="mt-3 text-3xl font-semibold tracking-tight text-[#173f45]">{value}</p>
-      {hint && <p className="mt-1.5 text-xs leading-relaxed text-[#6a8588]">{hint}</p>}
+      <p className="mt-3 text-3xl font-semibold tracking-tight text-brand">{value}</p>
+      {hint && <p className="mt-1.5 text-xs leading-relaxed text-muted">{hint}</p>}
     </div>
   )
 }

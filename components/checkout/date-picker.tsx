@@ -88,7 +88,7 @@ export function DatePicker({
 
   return (
     <div
-      className={`rounded-2xl border bg-white p-3 sm:p-4 ${invalid ? 'border-[#c0492b]' : 'border-[#dce7e1]'}`}
+      className={`rounded-2xl border bg-white p-3 sm:p-4 ${invalid ? 'border-[#c0492b]' : 'border-line'}`}
       aria-describedby={describedBy}
     >
       <div className="mb-2 flex items-center justify-between">
@@ -97,11 +97,11 @@ export function DatePicker({
           onClick={() => move(-1)}
           disabled={atStart}
           aria-label={es ? 'Mes anterior' : 'Previous month'}
-          className="grid h-9 w-9 place-items-center rounded-full text-[#173f45] transition hover:bg-[#eaf1ed] disabled:opacity-30"
+          className="grid h-9 w-9 place-items-center rounded-full text-brand transition hover:bg-surface-mint disabled:opacity-30"
         >
           <ChevronLeft size={18} />
         </button>
-        <p className="text-sm font-semibold capitalize text-[#173f45]" aria-live="polite">
+        <p className="text-sm font-semibold capitalize text-brand" aria-live="polite">
           {MONTHS[lang][cursor.month]} {cursor.year}
         </p>
         <button
@@ -109,7 +109,7 @@ export function DatePicker({
           onClick={() => move(1)}
           disabled={atEnd}
           aria-label={es ? 'Mes siguiente' : 'Next month'}
-          className="grid h-9 w-9 place-items-center rounded-full text-[#173f45] transition hover:bg-[#eaf1ed] disabled:opacity-30"
+          className="grid h-9 w-9 place-items-center rounded-full text-brand transition hover:bg-surface-mint disabled:opacity-30"
         >
           <ChevronRight size={18} />
         </button>
@@ -117,7 +117,7 @@ export function DatePicker({
 
       <div className="grid grid-cols-7 gap-1 text-center" role="group" aria-label={es ? 'Fechas disponibles' : 'Available dates'}>
         {WEEKDAYS[lang].map((day, index) => (
-          <span key={`${day}-${index}`} className="py-1 text-[11px] font-bold text-[#759096]" aria-hidden="true">
+          <span key={`${day}-${index}`} className="py-1 text-[11px] font-bold text-faint" aria-hidden="true">
             {day}
           </span>
         ))}
@@ -137,10 +137,10 @@ export function DatePicker({
               aria-label={date.toLocaleDateString(es ? 'es-SV' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
               className={`aspect-square min-h-9 rounded-full text-sm font-semibold transition ${
                 isSelected
-                  ? 'bg-[#173f45] text-white'
+                  ? 'bg-brand text-white'
                   : enabled
-                    ? 'bg-[#eaf1ed] text-[#173f45] hover:bg-[#d7e7df]'
-                    : 'text-[#b7c5c1] line-through decoration-transparent'
+                    ? 'bg-surface-mint text-brand hover:bg-[#d7e7df]'
+                    : 'text-line-strong line-through decoration-transparent'
               }`}
             >
               {date.getDate()}
@@ -149,8 +149,8 @@ export function DatePicker({
         })}
       </div>
 
-      <p className="mt-2 flex items-center gap-2 text-[11px] text-[#6a8588]">
-        <span className="inline-block h-3 w-3 rounded-full bg-[#eaf1ed]" aria-hidden="true" />
+      <p className="mt-2 flex items-center gap-2 text-[11px] text-muted">
+        <span className="inline-block h-3 w-3 rounded-full bg-surface-mint" aria-hidden="true" />
         {es ? 'Días con salida' : 'Departure days'}
       </p>
     </div>

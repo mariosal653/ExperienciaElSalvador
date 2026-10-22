@@ -22,11 +22,11 @@ export function ExportButtons({ filters, total }: { filters: AdminFilters; total
   }
 
   const base =
-    'inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b8481c]'
+    'inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 
   if (total === 0) {
     return (
-      <p className="text-xs text-[#9ab0ad]">No hay nada que exportar con estos filtros.</p>
+      <p className="text-xs text-faint">No hay nada que exportar con estos filtros.</p>
     )
   }
 
@@ -35,7 +35,7 @@ export function ExportButtons({ filters, total }: { filters: AdminFilters; total
       <a
         href={href('xlsx')}
         download
-        className={`${base} border-[#a4cdbc] bg-white text-[#256b54] hover:bg-[#e3f0e9]`}
+        className={`${base} border-success-line bg-white text-success-dark hover:bg-success-soft`}
       >
         <FileSpreadsheet size={16} />
         Excel
@@ -43,12 +43,12 @@ export function ExportButtons({ filters, total }: { filters: AdminFilters; total
       <a
         href={href('pdf')}
         download
-        className={`${base} border-[#e3b5a7] bg-white text-[#b8481c] hover:bg-[#fae6e0]`}
+        className={`${base} border-[#e3b5a7] bg-white text-accent hover:bg-accent-soft`}
       >
         <FileText size={16} />
         PDF
       </a>
-      <span className="text-xs text-[#6a8588]">
+      <span className="text-xs text-muted">
         {total} {total === 1 ? 'reserva' : 'reservas'} con los filtros actuales
       </span>
     </div>

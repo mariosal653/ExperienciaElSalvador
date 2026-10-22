@@ -22,11 +22,11 @@ type BookingView = {
 }
 
 const STATUS_STYLE: Record<string, { label: string; className: string }> = {
-  PENDING_PAYMENT: { label: 'Pago pendiente', className: 'bg-[#fdf2dc] text-[#8a5d0c] border-[#e2c483]' },
+  PENDING_PAYMENT: { label: 'Pago pendiente', className: 'bg-gold-pale text-gold-ink border-gold-line' },
   PAID: { label: 'Pagada', className: 'bg-[#e0eef1] text-[#1d5966] border-[#a8ccd4]' },
   CONFIRMED: { label: 'Confirmada', className: 'bg-[#e0eef1] text-[#1d5966] border-[#a8ccd4]' },
-  COMPLETED: { label: 'Completada', className: 'bg-[#e3f0e9] text-[#256b54] border-[#a4cdbc]' },
-  CANCELLED: { label: 'Cancelada', className: 'bg-[#fae6e0] text-[#a3341c] border-[#e3b3a4]' },
+  COMPLETED: { label: 'Completada', className: 'bg-success-soft text-success-dark border-success-line' },
+  CANCELLED: { label: 'Cancelada', className: 'bg-accent-soft text-accent-deep border-accent-line' },
 }
 
 function formatDate(iso: string): string {
@@ -40,7 +40,7 @@ export function BookingCard({ booking }: { booking: BookingView }) {
   const [reviewOpen, setReviewOpen] = useState(false)
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-[#dce7e1] bg-white">
+    <article className="overflow-hidden rounded-2xl border border-line bg-white">
       <div className="flex flex-col sm:flex-row">
         {booking.image ? (
           <img
@@ -49,7 +49,7 @@ export function BookingCard({ booking }: { booking: BookingView }) {
             className="h-40 w-full object-cover sm:h-auto sm:w-44 sm:shrink-0"
           />
         ) : (
-          <div className="h-40 w-full bg-[#eaf1ed] sm:h-auto sm:w-44 sm:shrink-0" />
+          <div className="h-40 w-full bg-surface-mint sm:h-auto sm:w-44 sm:shrink-0" />
         )}
 
         <div className="flex-1 p-5">
@@ -57,20 +57,20 @@ export function BookingCard({ booking }: { booking: BookingView }) {
             <span className={`rounded-full border px-2.5 py-1 text-[11px] font-bold ${status.className}`}>
               {status.label}
             </span>
-            <span className="font-mono text-[11px] text-[#6a8588]">{booking.code}</span>
+            <span className="font-mono text-[11px] text-muted">{booking.code}</span>
             {booking.isTest && (
               <span className="rounded-full bg-[#eef1f0] px-2.5 py-1 text-[11px] font-bold text-[#50686b]">Prueba</span>
             )}
             {booking.discountCents > 0 && (
-              <span className="flex items-center gap-1 rounded-full bg-[#f4d27c] px-2.5 py-1 text-[11px] font-bold text-[#173f45]">
+              <span className="flex items-center gap-1 rounded-full bg-gold-soft px-2.5 py-1 text-[11px] font-bold text-brand">
                 <Ticket size={11} /> 25% aplicado
               </span>
             )}
           </div>
 
-          <h3 className="text-lg font-semibold text-[#173f45]">{booking.title}</h3>
+          <h3 className="text-lg font-semibold text-brand">{booking.title}</h3>
 
-          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#6a8588]">
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
             <span className="flex items-center gap-1">
               <MapPin size={13} />
               {booking.destination}
@@ -82,16 +82,16 @@ export function BookingCard({ booking }: { booking: BookingView }) {
             </span>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#edf0ed] pt-3">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-line-soft pt-3">
             <span className="text-sm">
-              <span className="text-xs text-[#6a8588]">Total </span>
-              <strong className="text-lg text-[#173f45]">{booking.total}</strong>
+              <span className="text-xs text-muted">Total </span>
+              <strong className="text-lg text-brand">{booking.total}</strong>
             </span>
 
             {(booking.status === 'CONFIRMED' || booking.status === 'PENDING_PAYMENT') && (
               <a
                 href={booking.href}
-                className="flex items-center gap-1.5 rounded-full border border-[#dce7e1] px-4 py-2 text-xs font-bold text-[#173f45] transition hover:bg-[#eaf1ed]"
+                className="flex items-center gap-1.5 rounded-full border border-line px-4 py-2 text-xs font-bold text-brand transition hover:bg-surface-mint"
               >
                 <Ticket size={13} />
                 {booking.status === 'CONFIRMED' ? 'Ver entradas' : 'Completar pago'}
@@ -102,7 +102,7 @@ export function BookingCard({ booking }: { booking: BookingView }) {
               <button
                 type="button"
                 onClick={() => setReviewOpen((value) => !value)}
-                className="flex items-center gap-1.5 rounded-full bg-[#b8481c] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#963b18]"
+                className="flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-xs font-bold text-white transition hover:bg-accent-dark"
               >
                 <Star size={13} />
                 Dejar opinión
@@ -110,7 +110,7 @@ export function BookingCard({ booking }: { booking: BookingView }) {
             )}
 
             {booking.hasReview && (
-              <span className="text-xs font-semibold text-[#256b54]">Opinión enviada</span>
+              <span className="text-xs font-semibold text-success-dark">Opinión enviada</span>
             )}
           </div>
 
@@ -158,7 +158,7 @@ function ReviewForm({ bookingId, onDone }: { bookingId: string; onDone: () => vo
   }
 
   return (
-    <div className="mt-4 rounded-xl bg-[#f4f7f5] p-4">
+    <div className="mt-4 rounded-xl bg-surface-soft p-4">
       <div className="flex items-center gap-1" role="radiogroup" aria-label="Calificación">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
@@ -168,11 +168,11 @@ function ReviewForm({ bookingId, onDone }: { bookingId: string; onDone: () => vo
             aria-checked={rating === star}
             aria-label={`${star} de 5`}
             onClick={() => setRating(star)}
-            className="rounded p-0.5 focus-visible:outline-2 focus-visible:outline-[#173f45]"
+            className="rounded p-0.5 focus-visible:outline-2 focus-visible:outline-brand"
           >
             <Star
               size={20}
-              className={star <= rating ? 'text-[#f4b942]' : 'text-[#c3d1cd]'}
+              className={star <= rating ? 'text-gold' : 'text-[#c3d1cd]'}
               fill={star <= rating ? '#f4b942' : 'none'}
             />
           </button>
@@ -185,17 +185,17 @@ function ReviewForm({ bookingId, onDone }: { bookingId: string; onDone: () => vo
         rows={3}
         maxLength={800}
         placeholder="¿Qué tal estuvo? Cuéntanos brevemente."
-        className="mt-3 w-full rounded-xl border border-[#dce7e1] bg-white px-3 py-2.5 text-sm text-[#173f45] outline-none focus:border-[#173f45]"
+        className="mt-3 w-full rounded-xl border border-line bg-white px-3 py-2.5 text-sm text-brand outline-none focus:border-brand"
       />
 
-      {error && <p className="mt-2 text-xs font-medium text-[#a3341c]">{error}</p>}
+      {error && <p className="mt-2 text-xs font-medium text-accent-deep">{error}</p>}
 
       <div className="mt-3 flex gap-2">
         <button
           type="button"
           onClick={submit}
           disabled={loading || comment.trim().length < 10}
-          className="flex items-center gap-2 rounded-full bg-[#173f45] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#0e3035] disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex items-center gap-2 rounded-full bg-brand px-4 py-2 text-xs font-bold text-white transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading && <Loader2 size={13} className="animate-spin" />}
           Publicar opinión
@@ -203,7 +203,7 @@ function ReviewForm({ bookingId, onDone }: { bookingId: string; onDone: () => vo
         <button
           type="button"
           onClick={onDone}
-          className="rounded-full border border-[#dce7e1] px-4 py-2 text-xs font-bold text-[#173f45] transition hover:bg-white"
+          className="rounded-full border border-line px-4 py-2 text-xs font-bold text-brand transition hover:bg-white"
         >
           Cancelar
         </button>

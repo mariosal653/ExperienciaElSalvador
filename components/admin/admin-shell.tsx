@@ -13,16 +13,16 @@ import type { AdminUser } from '@/lib/admin/session'
  */
 export function AdminShell({ admin, children }: { admin: AdminUser; children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#fbfaf7]">
-      <header className="border-b border-[#0e3035] bg-[#173f45] text-white">
+    <div className="min-h-screen bg-cream">
+      <header className="border-b border-brand-dark bg-brand text-white">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-5 lg:px-8">
           <Link href="/admin" className="flex min-w-0 items-center gap-2.5" aria-label="Panel de administración">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#f4b942] text-[#173f45]">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gold text-brand">
               <ShieldCheck size={18} strokeWidth={2.5} />
             </span>
             <span className="min-w-0">
               <span className="block truncate text-base font-bold tracking-tight">
-                Experiences <span className="text-[#f4b942]">El Salvador</span>
+                Experiences <span className="text-gold">El Salvador</span>
               </span>
               <span className="block text-xs text-white/70">Panel de administración</span>
             </span>

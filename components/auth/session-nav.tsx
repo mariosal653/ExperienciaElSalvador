@@ -22,7 +22,7 @@ export function SessionNav() {
     return (
       <a
         href="/cuenta"
-        className="flex items-center gap-2 rounded-full border border-white/60 px-4 py-2 text-sm font-semibold transition hover:bg-white hover:text-[#173f45]"
+        className="flex items-center gap-2 rounded-full border border-white/60 px-4 py-2 text-sm font-semibold transition hover:bg-white hover:text-brand"
       >
         <User size={15} />
         {first}
@@ -32,12 +32,12 @@ export function SessionNav() {
 
   return (
     <div className="flex items-center gap-2">
-      <a href="/login" className="text-sm font-semibold transition hover:text-[#f4b942]">
+      <a href="/login" className="text-sm font-semibold transition hover:text-gold">
         {es ? 'Iniciar sesión' : 'Sign in'}
       </a>
       <a
         href="/register"
-        className="rounded-full bg-[#b8481c] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#963b18]"
+        className="rounded-full bg-accent px-4 py-2 text-sm font-bold text-white transition hover:bg-accent-dark"
       >
         {es ? 'Crear cuenta' : 'Sign up'}
       </a>

@@ -53,13 +53,13 @@ export function ReviewCard({ review, lang }: { review: Review; lang: Locale }) {
         )}
 
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-[#173f45]">{review.authorName}</p>
-          {date && <p className="text-xs text-[#6a8588]">{date}</p>}
+          <p className="truncate text-sm font-semibold text-brand">{review.authorName}</p>
+          {date && <p className="text-xs text-muted">{date}</p>}
         </div>
 
         <span
           title={SOURCE_LABEL[review.source]}
-          className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-[#dce7e1] bg-white"
+          className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-line bg-white"
         >
           <SourceIcon source={review.source} className="h-3.5 w-3.5" />
           <span className="sr-only">{SOURCE_LABEL[review.source]}</span>
@@ -76,7 +76,7 @@ export function ReviewCard({ review, lang }: { review: Review; lang: Locale }) {
               key={star}
               size={15}
               aria-hidden="true"
-              className={star <= Math.round(review.rating ?? 0) ? 'text-[#f4b942]' : 'text-[#dce7e1]'}
+              className={star <= Math.round(review.rating ?? 0) ? 'text-gold' : 'text-line'}
               fill={star <= Math.round(review.rating ?? 0) ? '#f4b942' : 'none'}
             />
           ))}
@@ -84,16 +84,16 @@ export function ReviewCard({ review, lang }: { review: Review; lang: Locale }) {
       )}
 
       {review.experienceTitle && (
-        <p className="mt-3 flex items-start gap-1.5 text-xs font-semibold text-[#173f45]">
-          <MapPin size={13} className="mt-0.5 shrink-0 text-[#b8481c]" aria-hidden="true" />
+        <p className="mt-3 flex items-start gap-1.5 text-xs font-semibold text-brand">
+          <MapPin size={13} className="mt-0.5 shrink-0 text-accent" aria-hidden="true" />
           <span>{experienceNameById(review.experienceId, lang) ?? review.experienceTitle}</span>
         </p>
       )}
 
-      <p className="mt-2.5 line-clamp-6 text-sm leading-relaxed text-[#547176]">{review.text}</p>
+      <p className="mt-2.5 line-clamp-6 text-sm leading-relaxed text-muted">{review.text}</p>
 
       {review.verified && (
-        <p className="mt-3 flex items-center gap-1.5 text-[11px] font-bold text-[#2f7d63]">
+        <p className="mt-3 flex items-center gap-1.5 text-[11px] font-bold text-success">
           <BadgeCheck size={13} aria-hidden="true" />
           {lang === 'ES' ? 'Opinión verificada' : 'Verified review'}
         </p>
@@ -104,7 +104,7 @@ export function ReviewCard({ review, lang }: { review: Review; lang: Locale }) {
           href={review.permalink}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 text-xs font-bold text-[#b8481c] underline-offset-4 hover:underline"
+          className="mt-4 text-xs font-bold text-accent underline-offset-4 hover:underline"
         >
           {lang === 'ES' ? 'Ver en ' : 'View on '}
           {SOURCE_LABEL[review.source]}

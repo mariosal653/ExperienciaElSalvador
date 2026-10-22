@@ -86,19 +86,19 @@ export function WhatsAppWidget() {
       {showBubble && (
         <div
           role="status"
-          className="relative max-w-[15rem] rounded-2xl border border-[#dce7e1] bg-white px-4 py-3 pr-9 text-sm shadow-[0_12px_40px_rgba(26,65,69,.18)] motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2"
+          className="relative max-w-[15rem] rounded-2xl border border-line bg-white px-4 py-3 pr-9 text-sm shadow-[0_12px_40px_rgba(26,65,69,.18)] motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2"
         >
-          <p className="font-semibold text-[#173f45]">
+          <p className="font-semibold text-brand">
             {es ? '¿Planeando tu viaje? 👋' : 'Planning your trip? 👋'}
           </p>
-          <p className="mt-0.5 text-xs leading-relaxed text-[#6a8588]">
+          <p className="mt-0.5 text-xs leading-relaxed text-muted">
             {es ? 'Podemos ayudarte por WhatsApp' : 'We can help you on WhatsApp'}
           </p>
           <button
             type="button"
             onClick={dismissBubble}
             aria-label={es ? 'Cerrar aviso' : 'Dismiss message'}
-            className="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full text-[#759096] transition hover:bg-[#eaf1ed] hover:text-[#173f45] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#173f45]"
+            className="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full text-faint transition hover:bg-surface-mint hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
             <X size={14} />
           </button>
@@ -111,7 +111,7 @@ export function WhatsAppWidget() {
         target="_blank"
         rel="noopener noreferrer"
         aria-label={es ? 'Contactar por WhatsApp' : 'Contact us on WhatsApp'}
-        className={`group flex items-center gap-0 rounded-full bg-[#173f45] text-white shadow-[0_10px_30px_rgba(23,63,69,.35)] outline-none transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#f4b942] motion-safe:hover:-translate-y-0.5 ${
+        className={`group flex items-center gap-0 rounded-full bg-brand text-white shadow-[0_10px_30px_rgba(23,63,69,.35)] outline-none transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-gold motion-safe:hover:-translate-y-0.5 ${
           mounted ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
         }`}
       >

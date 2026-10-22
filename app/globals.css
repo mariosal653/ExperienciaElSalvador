@@ -13,6 +13,50 @@
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.4);
+
+  /* Tipografía: las variables las publica next/font desde app/layout.tsx. */
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), Georgia, 'Times New Roman', serif;
+
+  /* ------------------------------------------------------------------
+     PALETA
+     Los componentes usan estos nombres (bg-brand, text-muted…) en lugar
+     de repetir el hex. Un tono que no esté aquí es un tono de más: antes
+     de inventar uno, mirar si alguno de estos sirve.
+     ------------------------------------------------------------------ */
+  --color-brand: #173f45; /* verde azulado de la marca: texto y fondos oscuros */
+  --color-brand-dark: #0e3035; /* hover de brand */
+  --color-brand-hero: #174b51; /* fondo del héroe bajo la foto */
+  --color-muted: #547176; /* texto secundario — 5.2:1 sobre blanco, cumple AA */
+  --color-faint: #759096; /* solo para iconos y texto deshabilitado, nunca para leer */
+  --color-accent: #b8481c; /* terracota: acciones principales */
+  --color-accent-dark: #963b18; /* hover de accent */
+  --color-gold: #f4b942; /* dorado de marca: logo y realces */
+  --color-gold-soft: #f4d27c; /* etiquetas sobre foto */
+  --color-gold-deep: #f4c45e; /* acentos serif sobre fondo oscuro */
+  --color-accent-deep: #a3341c; /* texto terracota sobre fondo claro */
+  --color-accent-soft: #fae6e0; /* fondo de avisos de error o cancelación */
+  --color-accent-line: #e3b3a4; /* borde de los mismos */
+  --color-gold-ink: #8a5d0c; /* texto sobre fondo dorado claro */
+  --color-gold-pale: #fdf2dc; /* fondo de avisos pendientes */
+  --color-gold-line: #e2c483; /* borde de los mismos */
+  --color-success: #2f7d63; /* cancelación gratis, confirmaciones */
+  --color-success-dark: #256b54; /* texto de confirmación sobre fondo claro */
+  --color-success-soft: #e3f0e9; /* fondo de las mismas */
+  --color-success-line: #a4cdbc; /* borde de los mismos */
+  --color-line-strong: #b7c5c1; /* borde de campos y controles */
+  --color-surface: #ffffff;
+  --color-surface-soft: #f4f7f5; /* gris verdoso muy claro */
+  --color-surface-mint: #eaf1ed; /* bandas de sección */
+  --color-cream: #fbfaf7; /* fondo general cálido */
+  --color-line: #dce7e1; /* borde normal */
+  --color-line-soft: #edf0ed; /* separadores dentro de una tarjeta */
+
+  /* Elevación: tres niveles y ninguno más. La sombra lleva el verde de la
+     marca en lugar de negro puro, que sobre fondo crema se ve sucio. */
+  --shadow-card: 0 1px 2px rgb(23 63 69 / 0.04), 0 8px 24px rgb(23 63 69 / 0.07);
+  --shadow-card-hover: 0 2px 4px rgb(23 63 69 / 0.06), 0 16px 40px rgb(23 63 69 / 0.13);
+  --shadow-float: 0 8px 32px rgb(23 63 69 / 0.18);
 }
 
 :root {
@@ -57,13 +101,17 @@
 
 @layer base {
   * { @apply border-border outline-ring/50; }
+  /* Un solo anillo de foco en todo el sitio. Antes cada botón decidía el
+     suyo y la mayoría se quedaba con el del navegador. */
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: 2px; }
   /* Red de seguridad: ningún elemento que se escape (p. ej. un .sr-only absoluto) puede ensanchar la página en móvil. `clip` no rompe position: sticky. */
   html { scroll-behavior: smooth; overflow-x: clip; }
-  body { @apply bg-background text-foreground; margin: 0; }
+  body { @apply bg-background text-foreground font-sans; margin: 0; }
   button, a { -webkit-tap-highlight-color: transparent; }
+  /* Los titulares grandes se leen mejor con el interletraje algo cerrado;
+     el texto corrido no. */
+  h1, h2, h3 { letter-spacing: -0.02em; }
 }
-
-.font-serif { font-family: Georgia, 'Times New Roman', serif; }
 
 /* ---------------------------------------------------------------------
    REELS

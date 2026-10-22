@@ -11,7 +11,7 @@ export default async function LoginPage() {
   if (session?.user?.id) redirect('/cuenta')
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#eaf1ed] px-5 py-14">
+    <main className="flex min-h-screen items-center justify-center bg-surface-mint px-5 py-14">
       <Suspense>
         <AuthForm mode="login" socialProviders={enabledSocialProviders()} />
       </Suspense>

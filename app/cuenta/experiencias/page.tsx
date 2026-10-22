@@ -21,8 +21,8 @@ export default async function MyExperiencesPage() {
 
   return (
     <AccountShell user={user} active="experiencias">
-      <h1 className="text-2xl font-semibold tracking-tight text-[#173f45] md:text-3xl">Mis experiencias</h1>
-      <p className="mt-1.5 text-sm text-[#6a8588]">
+      <h1 className="text-2xl font-semibold tracking-tight text-brand md:text-3xl">Mis experiencias</h1>
+      <p className="mt-1.5 text-sm text-muted">
         {bookings.length > 0
           ? `${bookings.length} ${bookings.length === 1 ? 'reserva' : 'reservas'} en total.`
           : 'Aquí aparecerán tus reservas.'}
@@ -52,14 +52,14 @@ export default async function MyExperiencesPage() {
           ))}
         </div>
       ) : (
-        <div className="mt-8 rounded-2xl border border-dashed border-[#b7c5c1] bg-white p-8 text-center md:p-12">
-          <p className="text-lg font-semibold text-[#173f45]">Aún no tienes experiencias</p>
-          <p className="mx-auto mt-2 max-w-sm text-sm text-[#6a8588]">
+        <div className="mt-8 rounded-2xl border border-dashed border-line-strong bg-white p-8 text-center md:p-12">
+          <p className="text-lg font-semibold text-brand">Aún no tienes experiencias</p>
+          <p className="mx-auto mt-2 max-w-sm text-sm text-muted">
             Explora todo lo que puedes descubrir en El Salvador.
           </p>
           <Link
             href="/#experiencias"
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#b8481c] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#963b18]"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-bold text-white transition hover:bg-accent-dark"
           >
             Explorar experiencias <ArrowRight size={16} />
           </Link>

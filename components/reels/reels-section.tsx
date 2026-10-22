@@ -23,7 +23,7 @@ export function ReelsSection() {
     <section id="reels" aria-labelledby="reels-title" className="mx-auto max-w-7xl px-5 pt-14 lg:px-8">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-[#b8481c]">
+          <p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-accent">
             {es ? 'Reels' : 'Reels'}
           </p>
           <h2 id="reels-title" className="text-3xl font-semibold tracking-tight md:text-4xl">
@@ -38,7 +38,7 @@ export function ReelsSection() {
             )}
           </h2>
         </div>
-        <p className="hidden max-w-xs text-right text-sm text-[#6a8588] sm:block">
+        <p className="hidden max-w-xs text-right text-sm text-muted sm:block">
           {es ? 'Toca un reel para verlo en pantalla completa.' : 'Tap a reel to watch it full screen.'}
         </p>
       </div>
@@ -54,7 +54,7 @@ export function ReelsSection() {
             <button
               type="button"
               onClick={() => setActive(index)}
-              className="group relative block aspect-[9/16] w-full overflow-hidden rounded-2xl bg-[#173f45] text-left shadow-[0_8px_30px_rgba(26,65,69,.12)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b8481c]"
+              className="group relative block aspect-[9/16] w-full overflow-hidden rounded-2xl bg-brand text-left shadow-[0_8px_30px_rgba(26,65,69,.12)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               aria-label={`${es ? 'Ver reel' : 'Watch reel'}: ${reel.title[lang]}, ${reel.location}`}
             >
               <Picture
@@ -69,7 +69,7 @@ export function ReelsSection() {
                 className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
               />
               <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,43,48,0)_45%,rgba(10,43,48,.85)_100%)]" />
-              <span className="absolute left-2.5 top-2.5 grid h-8 w-8 place-items-center rounded-full bg-white/90 text-[#173f45] shadow">
+              <span className="absolute left-2.5 top-2.5 grid h-8 w-8 place-items-center rounded-full bg-white/90 text-brand shadow">
                 {reel.videoUrl ? <Clapperboard size={15} /> : <Play size={15} fill="currentColor" />}
               </span>
               <span className="absolute inset-x-0 bottom-0 p-3 text-white">

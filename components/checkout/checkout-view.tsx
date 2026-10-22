@@ -305,14 +305,14 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
   }
 
   const fieldClass = (field: CustomerField) =>
-    `mt-1.5 w-full rounded-xl border bg-white px-3.5 py-3 text-base text-[#173f45] outline-none transition placeholder:text-[#9ab0ad] focus:border-[#173f45] focus:ring-2 focus:ring-[#173f45]/15 sm:text-sm ${
-      showError(field) ? 'border-[#c0492b]' : 'border-[#dce7e1]'
+    `mt-1.5 w-full rounded-xl border bg-white px-3.5 py-3 text-base text-brand outline-none transition placeholder:text-faint focus:border-brand focus:ring-2 focus:ring-brand/15 sm:text-sm ${
+      showError(field) ? 'border-[#c0492b]' : 'border-line'
     }`
 
   const errorText = (field: CustomerField) => {
     const code = showError(field)
     return code ? (
-      <p id={`${field}-error`} className="mt-1.5 text-xs font-medium text-[#a3341c]">
+      <p id={`${field}-error`} className="mt-1.5 text-xs font-medium text-accent-deep">
         {CUSTOMER_ERROR_MESSAGES[lang][code]}
       </p>
     ) : null
@@ -330,22 +330,22 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
         : null
 
   return (
-    <div className="min-h-screen bg-[#fbfaf7] text-[#173f45]">
+    <div className="min-h-screen bg-cream text-brand">
       <SiteHeader />
 
       <main className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-5 lg:px-8 lg:pt-10">
-        <Link href={`/experiences/${experience.id}`} className="text-sm font-semibold text-[#b8481c] hover:underline">
+        <Link href={`/experiences/${experience.id}`} className="text-sm font-semibold text-accent hover:underline">
           ← {t('Volver a la experiencia', 'Back to the experience')}
         </Link>
         <h1 className="mt-3 text-2xl font-semibold tracking-tight md:text-3xl">{t('Completa tu reserva', 'Complete your booking')}</h1>
-        <p className="mt-1.5 text-sm text-[#6a8588]">
+        <p className="mt-1.5 text-sm text-muted">
           {user
             ? t(`Reservando como ${user.email}.`, `Booking as ${user.email}.`)
             : t('No necesitas crear una cuenta.', 'No account needed.')}
         </p>
 
         {testBanner && (
-          <p className="mt-4 flex items-start gap-2 rounded-xl border border-[#e2c483] bg-[#fdf2dc] px-4 py-3 text-sm font-medium text-[#8a5d0c]">
+          <p className="mt-4 flex items-start gap-2 rounded-xl border border-gold-line bg-gold-pale px-4 py-3 text-sm font-medium text-gold-ink">
             <AlertTriangle size={16} className="mt-0.5 shrink-0" /> {testBanner}
           </p>
         )}
@@ -355,7 +355,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
             {/* 1. Fecha */}
             <section aria-labelledby="step-date" className="rounded-2xl bg-white p-4 shadow-[0_8px_30px_rgba(26,65,69,.06)] sm:p-6">
               <h2 id="step-date" className="flex items-center gap-2.5 text-base font-semibold">
-                <Step n={1} /> <CalendarDays size={17} className="text-[#b8481c]" /> {t('Fecha', 'Date')}
+                <Step n={1} /> <CalendarDays size={17} className="text-accent" /> {t('Fecha', 'Date')}
               </h2>
               <div className="mt-4" data-invalid={submitted && !date ? 'true' : undefined} tabIndex={-1}>
                 <DatePicker
@@ -372,11 +372,11 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
                   describedBy="date-help"
                 />
               </div>
-              <p id="date-help" className="mt-2 text-xs text-[#6a8588]" aria-live="polite">
+              <p id="date-help" className="mt-2 text-xs text-muted" aria-live="polite">
                 {submitted && !date ? (
-                  <span className="font-medium text-[#a3341c]">{t('Elige una fecha para continuar.', 'Pick a date to continue.')}</span>
+                  <span className="font-medium text-accent-deep">{t('Elige una fecha para continuar.', 'Pick a date to continue.')}</span>
                 ) : dateLabel ? (
-                  <span className="font-semibold capitalize text-[#173f45]">{dateLabel}</span>
+                  <span className="font-semibold capitalize text-brand">{dateLabel}</span>
                 ) : (
                   t('Elige uno de los días marcados.', 'Pick one of the highlighted days.')
                 )}
@@ -386,7 +386,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
             {/* 2. Viajeros */}
             <section aria-labelledby="step-people" className="rounded-2xl bg-white p-4 shadow-[0_8px_30px_rgba(26,65,69,.06)] sm:p-6">
               <h2 id="step-people" className="flex items-center gap-2.5 text-base font-semibold">
-                <Step n={2} /> <Users size={17} className="text-[#b8481c]" /> {t('Viajeros', 'Travelers')}
+                <Step n={2} /> <Users size={17} className="text-accent" /> {t('Viajeros', 'Travelers')}
               </h2>
               <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -395,7 +395,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
                     onClick={() => setPeople((value) => Math.max(1, value - 1))}
                     disabled={people <= 1}
                     aria-label={t('Quitar un viajero', 'Remove a traveler')}
-                    className="grid h-11 w-11 place-items-center rounded-full border border-[#dce7e1] bg-white transition hover:border-[#173f45] disabled:opacity-35"
+                    className="grid h-11 w-11 place-items-center rounded-full border border-line bg-white transition hover:border-brand disabled:opacity-35"
                   >
                     <Minus size={16} />
                   </button>
@@ -407,26 +407,26 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
                     onClick={() => setPeople((value) => Math.min(maxPeople, value + 1))}
                     disabled={people >= maxPeople || soldOut}
                     aria-label={t('Agregar un viajero', 'Add a traveler')}
-                    className="grid h-11 w-11 place-items-center rounded-full border border-[#dce7e1] bg-white transition hover:border-[#173f45] disabled:opacity-35"
+                    className="grid h-11 w-11 place-items-center rounded-full border border-line bg-white transition hover:border-brand disabled:opacity-35"
                   >
                     <Plus size={16} />
                   </button>
                 </div>
-                <p className="text-xs text-[#6a8588]">
+                <p className="text-xs text-muted">
                   {formatCents(unitCents)} {t('por persona', 'per person')}
                 </p>
               </div>
               <p className="mt-3 text-xs" aria-live="polite">
                 {checkingSeats ? (
-                  <span className="text-[#6a8588]">{t('Consultando plazas…', 'Checking availability…')}</span>
+                  <span className="text-muted">{t('Consultando plazas…', 'Checking availability…')}</span>
                 ) : soldOut ? (
-                  <span className="font-semibold text-[#a3341c]">{t('Sin plazas para esa fecha. Elige otra.', 'Sold out for that date. Pick another one.')}</span>
+                  <span className="font-semibold text-accent-deep">{t('Sin plazas para esa fecha. Elige otra.', 'Sold out for that date. Pick another one.')}</span>
                 ) : remaining !== null && remaining <= 5 ? (
-                  <span className="font-semibold text-[#b8481c]">
+                  <span className="font-semibold text-accent">
                     {es ? `Quedan ${remaining} plazas.` : `Only ${remaining} spots left.`}
                   </span>
                 ) : (
-                  <span className="text-[#6a8588]">
+                  <span className="text-muted">
                     {t(`Grupos de hasta ${experience.maxPeople} personas. Una entrada con QR por viajero.`, `Groups of up to ${experience.maxPeople}. One QR ticket per traveler.`)}
                   </span>
                 )}
@@ -438,7 +438,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
               <h2 id="step-details" className="flex items-center gap-2.5 text-base font-semibold">
                 <Step n={3} /> {t('Tus datos', 'Your details')}
               </h2>
-              <p className="mt-1 text-xs text-[#6a8588]">
+              <p className="mt-1 text-xs text-muted">
                 {t('Te enviaremos la confirmación y las entradas a este correo.', 'We will send your confirmation and tickets to this email.')}
               </p>
 
@@ -498,7 +498,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
                 </div>
                 <div className="sm:col-span-2">
                   <label htmlFor="country" className="text-sm font-semibold">
-                    {t('País', 'Country')} <span className="font-normal text-[#6a8588]">({t('opcional', 'optional')})</span>
+                    {t('País', 'Country')} <span className="font-normal text-muted">({t('opcional', 'optional')})</span>
                   </label>
                   <input
                     id="country"
@@ -521,9 +521,9 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
               </div>
 
               {!user && (
-                <p className="mt-4 rounded-xl bg-[#f4f7f5] px-4 py-3 text-xs text-[#547176]">
+                <p className="mt-4 rounded-xl bg-surface-soft px-4 py-3 text-xs text-muted">
                   {t('¿Tienes cuenta? ', 'Have an account? ')}
-                  <Link href={`/login?next=${encodeURIComponent(`/checkout/${experience.id}`)}`} className="font-bold text-[#b8481c] hover:underline">
+                  <Link href={`/login?next=${encodeURIComponent(`/checkout/${experience.id}`)}`} className="font-bold text-accent hover:underline">
                     {t('Inicia sesión', 'Sign in')}
                   </Link>
                   {t(' para guardar la reserva en tu perfil y usar tu descuento de bienvenida. Es opcional.', ' to save the booking to your profile and use your welcome discount. It is optional.')}
@@ -550,17 +550,17 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
               />
               <div className="min-w-0">
                 <p className="font-semibold leading-snug">{experienceName(experience, lang)}</p>
-                <p className="mt-1 flex items-center gap-1 text-xs text-[#6a8588]">
+                <p className="mt-1 flex items-center gap-1 text-xs text-muted">
                   <MapPin size={12} /> {experience.destination}
                 </p>
-                <p className="mt-1 text-xs text-[#6a8588]">
+                <p className="mt-1 text-xs text-muted">
                   {experience.durationHours} {t('horas', 'hours')}
                 </p>
               </div>
             </div>
 
-            <dl className="mt-5 grid gap-2.5 border-t border-[#edf0ed] pt-4 text-sm">
-              <Row label={t('Fecha', 'Date')} value={dateLabel ? <span className="capitalize">{dateLabel}</span> : <span className="text-[#9ab0ad]">—</span>} />
+            <dl className="mt-5 grid gap-2.5 border-t border-line-soft pt-4 text-sm">
+              <Row label={t('Fecha', 'Date')} value={dateLabel ? <span className="capitalize">{dateLabel}</span> : <span className="text-faint">—</span>} />
               <Row label={t('Viajeros', 'Travelers')} value={String(people)} />
               <Row label={t('Precio por persona', 'Price per person')} value={formatCents(unitCents)} />
               <Row label="Subtotal" value={formatCents(price.subtotalCents)} />
@@ -571,27 +571,27 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
                   accent
                 />
               )}
-              <div className="mt-1 flex items-baseline justify-between gap-3 border-t border-[#edf0ed] pt-3">
+              <div className="mt-1 flex items-baseline justify-between gap-3 border-t border-line-soft pt-3">
                 <dt className="font-semibold">Total</dt>
                 <dd className="text-2xl font-semibold" aria-live="polite">
-                  {formatCents(price.totalCents)} <span className="text-xs font-normal text-[#6a8588]">USD</span>
+                  {formatCents(price.totalCents)} <span className="text-xs font-normal text-muted">USD</span>
                 </dd>
               </div>
             </dl>
 
             {discountPct > 0 && (
-              <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl bg-[#f4d27c]/35 p-3.5">
+              <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl bg-gold-soft/35 p-3.5">
                 <input
                   type="checkbox"
                   checked={useDiscount}
                   onChange={(event) => setUseDiscount(event.target.checked)}
-                  className="mt-0.5 h-4 w-4 shrink-0 accent-[#b8481c]"
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-accent"
                 />
                 <span className="text-sm">
                   <span className="flex items-center gap-1.5 font-bold">
                     <Ticket size={14} /> {t(`Usar mi ${discountPct}% de bienvenida`, `Use my ${discountPct}% welcome discount`)}
                   </span>
-                  <span className="mt-0.5 block text-xs text-[#6a8588]">
+                  <span className="mt-0.5 block text-xs text-muted">
                     {t('Solo se consume si el pago se completa.', 'Only used if the payment goes through.')}
                   </span>
                 </span>
@@ -600,7 +600,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
 
             <label
               className={`mt-4 flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 text-sm ${
-                submitted && !acceptTerms ? 'border-[#c0492b] bg-[#fdf1ed]' : 'border-[#dce7e1]'
+                submitted && !acceptTerms ? 'border-[#c0492b] bg-[#fdf1ed]' : 'border-line'
               }`}
               data-invalid={submitted && !acceptTerms ? 'true' : undefined}
             >
@@ -609,15 +609,15 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
                 checked={acceptTerms}
                 onChange={(event) => setAcceptTerms(event.target.checked)}
                 aria-invalid={submitted && !acceptTerms}
-                className="mt-0.5 h-4 w-4 shrink-0 accent-[#173f45]"
+                className="mt-0.5 h-4 w-4 shrink-0 accent-brand"
               />
-              <span className="text-[#547176]">
+              <span className="text-muted">
                 {t('Acepto los ', 'I accept the ')}
-                <Link href="/legal/terms" target="_blank" className="font-semibold text-[#173f45] underline">{t('Términos', 'Terms')}</Link>
+                <Link href="/legal/terms" target="_blank" className="font-semibold text-brand underline">{t('Términos', 'Terms')}</Link>
                 {', '}
-                <Link href="/legal/cancellation" target="_blank" className="font-semibold text-[#173f45] underline">{t('la Política de cancelación', 'Cancellation Policy')}</Link>
+                <Link href="/legal/cancellation" target="_blank" className="font-semibold text-brand underline">{t('la Política de cancelación', 'Cancellation Policy')}</Link>
                 {t(' y la ', ' and ')}
-                <Link href="/legal/privacy" target="_blank" className="font-semibold text-[#173f45] underline">{t('Política de privacidad', 'Privacy Policy')}</Link>
+                <Link href="/legal/privacy" target="_blank" className="font-semibold text-brand underline">{t('Política de privacidad', 'Privacy Policy')}</Link>
                 .
               </span>
             </label>
@@ -631,7 +631,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
                     <label
                       key={String(later)}
                       className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 text-sm transition ${
-                        payLater === later ? 'border-[#173f45] bg-[#f4f7f5]' : 'border-[#dce7e1]'
+                        payLater === later ? 'border-brand bg-surface-soft' : 'border-line'
                       }`}
                     >
                       <input
@@ -642,13 +642,13 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
                           setPayLaterChoice(later)
                           setServerError(null)
                         }}
-                        className="mt-0.5 h-4 w-4 shrink-0 accent-[#173f45]"
+                        className="mt-0.5 h-4 w-4 shrink-0 accent-brand"
                       />
                       <span>
                         <span className="block font-bold">
                           {later ? t('Reserva ahora, paga después', 'Book now, pay later') : t('Pagar ahora', 'Pay now')}
                         </span>
-                        <span className="mt-0.5 block text-xs text-[#6a8588]">
+                        <span className="mt-0.5 block text-xs text-muted">
                           {later
                             ? t(
                                 `Aparta tu lugar sin pagar hoy. Paga cuando quieras antes del ${deadline ? formatDeadline(deadline, 'ES') : ''}.`,
@@ -674,7 +674,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
                     <label
                       key={choice}
                       className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 text-sm transition ${
-                        method === choice ? 'border-[#173f45] bg-[#f4f7f5]' : 'border-[#dce7e1]'
+                        method === choice ? 'border-brand bg-surface-soft' : 'border-line'
                       }`}
                     >
                       <input
@@ -686,13 +686,13 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
                           setMethod(choice)
                           setServerError(null)
                         }}
-                        className="mt-0.5 h-4 w-4 shrink-0 accent-[#173f45]"
+                        className="mt-0.5 h-4 w-4 shrink-0 accent-brand"
                       />
                       <span>
                         <span className="block font-bold">
                           {choice === 'paypal' ? 'PayPal' : t('Tarjeta con Wompi', 'Card with Wompi')}
                         </span>
-                        <span className="mt-0.5 block text-xs text-[#6a8588]">
+                        <span className="mt-0.5 block text-xs text-muted">
                           {choice === 'paypal'
                             ? t(
                                 'Paga con tu cuenta de PayPal o con tarjeta a través de PayPal.',
@@ -711,7 +711,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
             )}
 
             {serverError && (
-              <p role="alert" className="mt-4 rounded-xl bg-[#fae6e0] px-4 py-3 text-sm font-medium text-[#a3341c]">
+              <p role="alert" className="mt-4 rounded-xl bg-accent-soft px-4 py-3 text-sm font-medium text-accent-deep">
                 {serverError}
               </p>
             )}
@@ -719,7 +719,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
             <button
               type="submit"
               disabled={submitting || !methods.any}
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-[#b8481c] px-6 py-4 text-sm font-bold text-white transition hover:bg-[#963b18] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#173f45] disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-4 text-sm font-bold text-white transition hover:bg-accent-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting ? <Loader2 size={16} className="animate-spin" /> : <Lock size={15} />}
               {submitting
@@ -736,29 +736,29 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
             </button>
 
             {!methods.any && (
-              <p className="mt-3 text-center text-xs font-medium text-[#a3341c]">{SERVER_ERRORS.paymentsDisabled[lang]}</p>
+              <p className="mt-3 text-center text-xs font-medium text-accent-deep">{SERVER_ERRORS.paymentsDisabled[lang]}</p>
             )}
 
             {/* Garantías justo antes de pagar: es donde surge la duda. */}
-            <ul className="mt-4 grid gap-1.5 rounded-2xl bg-[#f3f7f4] p-3.5 text-xs text-[#173f45]">
+            <ul className="mt-4 grid gap-1.5 rounded-2xl bg-[#f3f7f4] p-3.5 text-xs text-brand">
               <li className="flex items-start gap-2">
-                <Check size={14} className="mt-px shrink-0 text-[#2f7d63]" aria-hidden="true" />
+                <Check size={14} className="mt-px shrink-0 text-success" aria-hidden="true" />
                 {t(`Cancelación gratis hasta ${FREE_CANCELLATION_HOURS} h antes`, `Free cancellation up to ${FREE_CANCELLATION_HOURS} h before`)}
               </li>
               <li className="flex items-start gap-2">
-                <Check size={14} className="mt-px shrink-0 text-[#2f7d63]" aria-hidden="true" />
+                <Check size={14} className="mt-px shrink-0 text-success" aria-hidden="true" />
                 {payLater
                   ? t('Tus entradas con QR llegan a tu correo en cuanto pagues', 'Your QR tickets arrive by email as soon as you pay')
                   : t('Confirmación y entradas con QR al instante en tu correo', 'Instant confirmation and QR tickets by email')}
               </li>
               <li className="flex items-start gap-2">
-                <Check size={14} className="mt-px shrink-0 text-[#2f7d63]" aria-hidden="true" />
+                <Check size={14} className="mt-px shrink-0 text-success" aria-hidden="true" />
                 {t('Ayuda por WhatsApp antes y durante tu experiencia', 'WhatsApp support before and during your experience')}
               </li>
             </ul>
 
-            <p className="mt-3 flex items-start justify-center gap-1.5 text-center text-xs text-[#6a8588]">
-              <ShieldCheck size={14} className="mt-px shrink-0 text-[#256b54]" />
+            <p className="mt-3 flex items-start justify-center gap-1.5 text-center text-xs text-muted">
+              <ShieldCheck size={14} className="mt-px shrink-0 text-success-dark" />
               {payLater
                 ? t(
                     'Hoy no se cobra nada. Te enviamos el enlace para pagar a tu correo.',
@@ -785,7 +785,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
 
 function Step({ n }: { n: number }) {
   return (
-    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#173f45] text-xs font-bold text-white" aria-hidden="true">
+    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand text-xs font-bold text-white" aria-hidden="true">
       {n}
     </span>
   )
@@ -793,8 +793,8 @@ function Step({ n }: { n: number }) {
 
 function Row({ label, value, accent = false }: { label: string; value: React.ReactNode; accent?: boolean }) {
   return (
-    <div className={`flex items-start justify-between gap-3 ${accent ? 'text-[#256b54]' : ''}`}>
-      <dt className={accent ? '' : 'text-[#6a8588]'}>{label}</dt>
+    <div className={`flex items-start justify-between gap-3 ${accent ? 'text-success-dark' : ''}`}>
+      <dt className={accent ? '' : 'text-muted'}>{label}</dt>
       <dd className="text-right font-semibold">{value}</dd>
     </div>
   )

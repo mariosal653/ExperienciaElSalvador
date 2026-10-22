@@ -57,12 +57,12 @@ export function ExperienceReviews({
                 <Star
                   key={star}
                   size={16}
-                  className={star <= Math.round(rating.average) ? 'text-[#f4b942]' : 'text-[#dce7e1]'}
+                  className={star <= Math.round(rating.average) ? 'text-gold' : 'text-line'}
                   fill={star <= Math.round(rating.average) ? '#f4b942' : 'none'}
                 />
               ))}
             </div>
-            <p className="mt-1.5 text-sm text-[#6a8588]">
+            <p className="mt-1.5 text-sm text-muted">
               {count} {es ? (count === 1 ? 'opinión' : 'opiniones') : count === 1 ? 'review' : 'reviews'}
             </p>
           </div>
@@ -73,13 +73,13 @@ export function ExperienceReviews({
               const pct = count > 0 ? Math.round((amount / count) * 100) : 0
               return (
                 <li key={stars} className="flex items-center gap-3 text-xs">
-                  <span className="w-12 shrink-0 text-[#547176]">
+                  <span className="w-12 shrink-0 text-muted">
                     {stars} {es ? (stars === 1 ? 'estrella' : 'estrellas') : stars === 1 ? 'star' : 'stars'}
                   </span>
-                  <span className="h-2 flex-1 overflow-hidden rounded-full bg-[#eaf1ed]">
-                    <span className="block h-full rounded-full bg-[#f4b942]" style={{ width: `${pct}%` }} />
+                  <span className="h-2 flex-1 overflow-hidden rounded-full bg-surface-mint">
+                    <span className="block h-full rounded-full bg-gold" style={{ width: `${pct}%` }} />
                   </span>
-                  <span className="w-6 shrink-0 text-right font-semibold text-[#173f45]">{amount}</span>
+                  <span className="w-6 shrink-0 text-right font-semibold text-brand">{amount}</span>
                 </li>
               )
             })}
@@ -105,10 +105,10 @@ export function ExperienceReviews({
 
       {reviews !== null && reviews.length === 0 && (
         <div className="mt-5 flex items-start gap-3 rounded-2xl border border-dashed border-[#c9d9d0] bg-white p-5">
-          <MessageSquareText size={20} className="mt-0.5 shrink-0 text-[#b8481c]" aria-hidden="true" />
+          <MessageSquareText size={20} className="mt-0.5 shrink-0 text-accent" aria-hidden="true" />
           <div>
             <p className="font-semibold">{es ? 'Todavía no hay opiniones de esta experiencia.' : 'No reviews for this experience yet.'}</p>
-            <p className="mt-1 text-sm text-[#6a8588]">
+            <p className="mt-1 text-sm text-muted">
               {es
                 ? 'Solo pueden opinar quienes la reservaron y la completaron, desde su cuenta.'
                 : 'Only travelers who booked and completed it can review it, from their account.'}
