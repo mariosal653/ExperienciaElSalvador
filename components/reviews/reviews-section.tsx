@@ -75,7 +75,7 @@ export function ReviewsSection() {
           </div>
 
           {summary && summary.averageRating !== null && (
-            <div className="flex items-center gap-4 rounded-2xl bg-white px-5 py-4 shadow-[0_8px_30px_rgba(26,65,69,.08)]">
+            <div className="flex items-center gap-4 rounded-2xl bg-white px-5 py-4 shadow-card">
               <div>
                 <p className="text-3xl font-semibold leading-none text-brand">
                   {summary.averageRating.toFixed(1)}
@@ -212,7 +212,7 @@ function NotConnected({ es, payload }: { es: boolean; payload: ReviewsPayload | 
         configure la integracion.
       */}
       {google && !google.configured && (
-        <p className="mt-4 text-xs text-[#8aa09c]">
+        <p className="mt-4 text-xs text-faint">
           {es ? 'Integración pendiente de credenciales.' : 'Integration pending credentials.'}
         </p>
       )}

@@ -23,8 +23,8 @@ type BookingView = {
 
 const STATUS_STYLE: Record<string, { label: string; className: string }> = {
   PENDING_PAYMENT: { label: 'Pago pendiente', className: 'bg-gold-pale text-gold-ink border-gold-line' },
-  PAID: { label: 'Pagada', className: 'bg-[#e0eef1] text-[#1d5966] border-[#a8ccd4]' },
-  CONFIRMED: { label: 'Confirmada', className: 'bg-[#e0eef1] text-[#1d5966] border-[#a8ccd4]' },
+  PAID: { label: 'Pagada', className: 'bg-info-soft text-info border-info-line' },
+  CONFIRMED: { label: 'Confirmada', className: 'bg-info-soft text-info border-info-line' },
   COMPLETED: { label: 'Completada', className: 'bg-success-soft text-success-dark border-success-line' },
   CANCELLED: { label: 'Cancelada', className: 'bg-accent-soft text-accent-deep border-accent-line' },
 }
@@ -59,7 +59,7 @@ export function BookingCard({ booking }: { booking: BookingView }) {
             </span>
             <span className="font-mono text-[11px] text-muted">{booking.code}</span>
             {booking.isTest && (
-              <span className="rounded-full bg-[#eef1f0] px-2.5 py-1 text-[11px] font-bold text-[#50686b]">Prueba</span>
+              <span className="rounded-full bg-surface-soft px-2.5 py-1 text-[11px] font-bold text-muted">Prueba</span>
             )}
             {booking.discountCents > 0 && (
               <span className="flex items-center gap-1 rounded-full bg-gold-soft px-2.5 py-1 text-[11px] font-bold text-brand">
@@ -172,7 +172,7 @@ function ReviewForm({ bookingId, onDone }: { bookingId: string; onDone: () => vo
           >
             <Star
               size={20}
-              className={star <= rating ? 'text-gold' : 'text-[#c3d1cd]'}
+              className={star <= rating ? 'text-gold' : 'text-faint'}
               fill={star <= rating ? '#f4b942' : 'none'}
             />
           </button>

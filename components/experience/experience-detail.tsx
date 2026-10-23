@@ -190,7 +190,7 @@ export function ExperienceDetail({
               <button
                 onClick={() => toggleFavorite(experience.id)}
                 aria-pressed={saved}
-                className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition ${saved ? 'border-accent bg-[#fdf3ee] text-accent' : 'border-line bg-white text-brand hover:bg-surface-mint'}`}
+                className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition ${saved ? 'border-accent bg-accent-soft text-accent' : 'border-line bg-white text-brand hover:bg-surface-mint'}`}
               >
                 <Heart size={14} fill={saved ? '#b8481c' : 'none'} />
                 {saved ? (es ? 'Guardada' : 'Saved') : es ? 'Guardar' : 'Save'}
@@ -204,7 +204,7 @@ export function ExperienceDetail({
             <p className="mt-5 leading-relaxed text-muted">{experience.description[lang]}</p>
 
             <ul className="mt-5 flex flex-wrap gap-2 text-xs font-semibold">
-              <li className="flex items-center gap-1.5 rounded-full bg-[#e3f1ea] px-3 py-1.5 text-success-dark">
+              <li className="flex items-center gap-1.5 rounded-full bg-success-soft px-3 py-1.5 text-success-dark">
                 <ShieldCheck size={14} aria-hidden="true" />
                 {es ? `Cancelación gratis hasta ${FREE_CANCELLATION_HOURS} h antes` : `Free cancellation up to ${FREE_CANCELLATION_HOURS} h before`}
               </li>
@@ -218,7 +218,7 @@ export function ExperienceDetail({
               </li>
             </ul>
 
-            <div ref={bookingCardRef} id="reservar" className="mt-6 scroll-mt-24 rounded-2xl bg-white p-5 shadow-[0_8px_30px_rgba(26,65,69,.08)]">
+            <div ref={bookingCardRef} id="reservar" className="mt-6 scroll-mt-24 rounded-2xl bg-white p-5 shadow-card">
               <p>
                 <span className="text-xs text-muted">{es ? 'Desde' : 'From'}</span>{' '}
                 <strong className="text-3xl">${experience.priceUsd}</strong>{' '}
@@ -234,7 +234,7 @@ export function ExperienceDetail({
                     {iso ? (
                       <Link
                         href={`${bookHref}?date=${iso}`}
-                        className="flex h-full flex-col rounded-xl border border-line px-3 py-2 text-sm transition hover:border-accent hover:bg-[#fdf3ee] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                        className="flex h-full flex-col rounded-xl border border-line px-3 py-2 text-sm transition hover:border-accent hover:bg-accent-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
                       >
                         <span className="font-semibold capitalize">{formatDeparture(iso, lang)}</span>
                         {index === 0 && now && departureLabel(iso, lang, now) !== formatDeparture(iso, lang) && (
@@ -351,9 +351,9 @@ export function ExperienceDetail({
                   ))}
                 </ul>
                 {details.notes && (
-                  <div className="mt-5 grid gap-2 rounded-2xl border border-[#f1d9a6] bg-[#fdf6e7] p-4">
+                  <div className="mt-5 grid gap-2 rounded-2xl border border-gold-line bg-gold-pale p-4">
                     {details.notes[lang].map((note) => (
-                      <p key={note} className="flex items-start gap-2 text-sm text-[#6b4a0c]">
+                      <p key={note} className="flex items-start gap-2 text-sm text-gold-ink">
                         <AlertCircle size={16} className="mt-0.5 shrink-0" aria-hidden="true" /> {note}
                       </p>
                     ))}
@@ -446,7 +446,7 @@ export function ExperienceDetail({
                 <Link
                   key={item.id}
                   href={`/experiences/${item.id}`}
-                  className="group overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_rgba(26,65,69,.08)]"
+                  className="group overflow-hidden rounded-2xl bg-white shadow-card"
                 >
                   <div className="h-44 overflow-hidden">
                     <Picture src={item.image} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" alt={item.imageAlt[lang]} loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />

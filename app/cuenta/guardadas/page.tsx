@@ -34,7 +34,7 @@ export default async function SavedPage() {
       {saved.length > 0 ? (
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {saved.map((item) => (
-            <article key={item.id} className="group relative overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_rgba(26,65,69,.08)]">
+            <article key={item.id} className="group relative overflow-hidden rounded-2xl bg-white shadow-card">
               <Link href={`/experiences/${item.id}`} className="block">
                 <div className="h-40 overflow-hidden">
                   <img src={item.image} alt={item.imageAlt.ES} loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />

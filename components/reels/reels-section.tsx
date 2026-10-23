@@ -54,7 +54,7 @@ export function ReelsSection() {
             <button
               type="button"
               onClick={() => setActive(index)}
-              className="group relative block aspect-[9/16] w-full overflow-hidden rounded-2xl bg-brand text-left shadow-[0_8px_30px_rgba(26,65,69,.12)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="group relative block aspect-[9/16] w-full overflow-hidden rounded-2xl bg-brand text-left shadow-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               aria-label={`${es ? 'Ver reel' : 'Watch reel'}: ${reel.title[lang]}, ${reel.location}`}
             >
               <Picture

@@ -22,17 +22,17 @@ import { PAYMENT_PROVIDER_LABEL, type ReservaRow } from '@/lib/admin/metrics'
 
 const ESTADO_CLASS: Record<string, string> = {
   PENDING_PAYMENT: 'bg-gold-pale text-gold-ink border-gold-line',
-  PAID: 'bg-[#e6eff5] text-[#1c5a80] border-[#a9c8dc]',
+  PAID: 'bg-info-soft text-info border-info-line',
   CONFIRMED: 'bg-success-soft text-success-dark border-success-line',
-  COMPLETED: 'bg-[#eef2f0] text-[#4d6b6f] border-[#cfdad6]',
-  CANCELLED: 'bg-accent-soft text-accent-deep border-[#e3b5a7]',
+  COMPLETED: 'bg-surface-soft text-muted border-line',
+  CANCELLED: 'bg-accent-soft text-accent-deep border-accent-line',
 }
 
 const PAGO_CLASS: Record<string, string> = {
   APPROVED: 'text-success-dark',
   PENDING: 'text-gold-ink',
   DECLINED: 'text-accent-deep',
-  REFUNDED: 'text-[#1c5a80]',
+  REFUNDED: 'text-info',
   NONE: 'text-faint',
 }
 
@@ -105,7 +105,7 @@ export function ReservasTable({
       </h2>
 
       {rows.length === 0 ? (
-        <p className="rounded-2xl bg-white px-5 py-8 text-center text-sm text-muted shadow-[0_8px_30px_rgba(26,65,69,.06)]">
+        <p className="rounded-2xl bg-white px-5 py-8 text-center text-sm text-muted shadow-card">
           {emptyLabel}
         </p>
       ) : (
@@ -113,7 +113,7 @@ export function ReservasTable({
           {/* Fichas: móvil */}
           <ul className="grid gap-3 lg:hidden">
             {rows.map((row) => (
-              <li key={row.id} className="rounded-2xl bg-white p-4 shadow-[0_8px_30px_rgba(26,65,69,.06)]">
+              <li key={row.id} className="rounded-2xl bg-white p-4 shadow-card">
                 <Link href={`/admin/reservas/${row.code}`} className="block">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -145,7 +145,12 @@ export function ReservasTable({
           </ul>
 
           {/* Tabla: escritorio */}
-          <div className="hidden overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_rgba(26,65,69,.06)] lg:block">
+          {/*
+            `overflow-x-auto`, no `hidden`: con doce columnas la tabla pide
+            unos 1 520 px y en una pantalla de 1 440 las últimas (estado,
+            creada, ver) quedaban recortadas SIN forma de llegar a ellas.
+          */}
+          <div className="hidden overflow-x-auto rounded-2xl bg-white shadow-card lg:block">
             <table className="w-full text-left text-sm">
               <caption className="sr-only">
                 Reservas reales registradas, con cliente, fecha, importe, método y estado del pago.
@@ -168,7 +173,7 @@ export function ReservasTable({
               </thead>
               <tbody>
                 {rows.map((row) => (
-                  <tr key={row.id} className="border-b border-[#f3f6f4] transition last:border-0 hover:bg-[#f7faf8]">
+                  <tr key={row.id} className="border-b border-surface-soft transition last:border-0 hover:bg-surface-soft">
                     <th scope="row" className="whitespace-nowrap px-3 py-3 font-mono text-xs font-semibold text-brand">
                       {row.code}
                       {row.isTest && (
@@ -183,7 +188,11 @@ export function ReservasTable({
                       <span className="block truncate text-xs text-muted">{row.customerEmail}</span>
                     </td>
                     <td className="whitespace-nowrap px-3 py-3 capitalize text-muted">{fechaLarga(row.date)}</td>
-                    <td className="px-3 py-3 text-muted">{row.destination}</td>
+                    {/* Sin recorte, un destino de tres palabras parte en tres
+                        líneas y estira toda la fila. */}
+                    <td className="max-w-[9rem] truncate px-3 py-3 text-muted" title={row.destination}>
+                      {row.destination}
+                    </td>
                     <td className="px-3 py-3 text-right font-semibold tabular-nums text-brand">{row.people}</td>
                     <td className="px-3 py-3 text-right tabular-nums text-muted">
                       {formatCents(row.unitPriceCents, row.currency)}

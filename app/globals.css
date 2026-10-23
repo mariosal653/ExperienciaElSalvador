@@ -45,6 +45,12 @@
   --color-success-soft: #e3f0e9; /* fondo de las mismas */
   --color-success-line: #a4cdbc; /* borde de los mismos */
   --color-line-strong: #b7c5c1; /* borde de campos y controles */
+  --color-accent-light: #ee7f47; /* iconos del buscador: terracota aclarado */
+  /* Azul de estado «en curso» / «pagado». Es el único azul del sitio y
+     existe para que no se confunda con el verde de «confirmado». */
+  --color-info: #1c5a80;
+  --color-info-soft: #e6eff5;
+  --color-info-line: #a9c8dc;
   --color-surface: #ffffff;
   --color-surface-soft: #f4f7f5; /* gris verdoso muy claro */
   --color-surface-mint: #eaf1ed; /* bandas de sección */

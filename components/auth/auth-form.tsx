@@ -161,7 +161,7 @@ export function AuthForm({ mode, socialProviders }: { mode: Mode; socialProvider
   const subtitle = mode === 'login' ? t.loginSub : t.registerSub
 
   return (
-    <div className="w-full max-w-md rounded-2xl bg-white p-7 shadow-[0_18px_50px_rgba(26,65,69,.14)] md:p-9">
+    <div className="w-full max-w-md rounded-2xl bg-white p-7 shadow-float md:p-9">
       <div className="mb-7 flex items-center gap-2.5">
         <span className="grid h-9 w-9 place-items-center rounded-full bg-gold text-brand">
           <Compass size={20} strokeWidth={2.5} />
@@ -295,7 +295,7 @@ function Field({
       </label>
       <div
         className={`flex items-center gap-2 rounded-xl border bg-white px-4 py-3 transition focus-within:border-brand ${
-          error ? 'border-[#b4442c]' : 'border-line'
+          error ? 'border-accent' : 'border-line'
         }`}
       >
         <input
@@ -307,7 +307,7 @@ function Field({
           required
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : undefined}
-          className="w-full bg-transparent text-sm font-medium text-brand outline-none placeholder:text-[#96aaa6] disabled:opacity-60"
+          className="w-full bg-transparent text-sm font-medium text-brand outline-none placeholder:text-faint disabled:opacity-60"
         />
         {trailing}
       </div>

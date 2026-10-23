@@ -49,8 +49,8 @@ export function MockPayment({
   const alreadyPaid = status === 'APPROVED'
 
   return (
-    <main className="grid min-h-screen place-items-center bg-[#eef2f1] px-4 py-10 text-brand">
-      <div className="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-[0_20px_60px_rgba(26,65,69,.15)]">
+    <main className="grid min-h-screen place-items-center bg-surface-soft px-4 py-10 text-brand">
+      <div className="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-float">
         <div className="flex items-center gap-2 bg-gold-pale px-5 py-3 text-sm font-bold text-gold-ink">
           <FlaskConical size={16} />
           {es ? 'Pasarela de PRUEBA — no se cobra nada' : 'TEST gateway — nothing is charged'}
@@ -91,7 +91,7 @@ export function MockPayment({
                 type="button"
                 onClick={() => complete('approve')}
                 disabled={loading !== null}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-success-dark px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[#1d5643] disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-success-dark px-6 py-3.5 text-sm font-bold text-white transition hover:bg-success-dark disabled:opacity-60"
               >
                 {loading === 'approve' ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
                 {es ? 'Aprobar pago de prueba' : 'Approve test payment'}
@@ -100,7 +100,7 @@ export function MockPayment({
                 type="button"
                 onClick={() => complete('decline')}
                 disabled={loading !== null}
-                className="flex w-full items-center justify-center gap-2 rounded-full border border-accent-line bg-white px-6 py-3.5 text-sm font-bold text-accent-deep transition hover:bg-[#fdf1ed] disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-full border border-accent-line bg-white px-6 py-3.5 text-sm font-bold text-accent-deep transition hover:bg-accent-soft disabled:opacity-60"
               >
                 {loading === 'decline' ? <Loader2 size={16} className="animate-spin" /> : <XCircle size={16} />}
                 {es ? 'Simular rechazo' : 'Simulate decline'}

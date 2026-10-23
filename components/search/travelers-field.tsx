@@ -28,8 +28,8 @@ export function TravelersField({ value, onChange, lang }: Props) {
   const increase = () => onChange(Math.min(MAX_PEOPLE, value + 1))
 
   return (
-    <div className="flex items-center gap-3 rounded-xl border-t border-[#e5ece9] px-4 py-3 md:border-l md:border-t-0">
-      <Users className="shrink-0 text-[#ee7f47]" size={19} aria-hidden="true" />
+    <div className="flex items-center gap-3 rounded-xl border-t border-line px-4 py-3 md:border-l md:border-t-0">
+      <Users className="shrink-0 text-accent-light" size={19} aria-hidden="true" />
       <span className="flex-1">
         <span className="block text-[11px] font-bold uppercase tracking-wider text-faint">{label}</span>
 

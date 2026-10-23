@@ -30,7 +30,7 @@ export function ReviewCard({ review, lang }: { review: Review; lang: Locale }) {
   const date = review.relativeTime ?? formatDate(review.publishedAt, lang)
 
   return (
-    <article className="flex h-full min-w-[17rem] max-w-[22rem] shrink-0 snap-start flex-col rounded-2xl bg-white p-5 shadow-[0_8px_30px_rgba(26,65,69,.08)] sm:min-w-[19rem]">
+    <article className="flex h-full min-w-[17rem] max-w-[22rem] shrink-0 snap-start flex-col rounded-2xl bg-white p-5 shadow-card sm:min-w-[19rem]">
       <header className="flex items-start gap-3">
         {review.authorPhoto ? (
           <img

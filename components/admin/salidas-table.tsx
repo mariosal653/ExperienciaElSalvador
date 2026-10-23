@@ -17,9 +17,9 @@ import { SALIDA_STATUS_LABEL, type SalidaRow, type SalidaStatus } from '@/lib/ad
 const ESTADO_CLASS: Record<SalidaStatus, string> = {
   PENDIENTE: 'bg-gold-pale text-gold-ink border-gold-line',
   CONFIRMADA: 'bg-success-soft text-success-dark border-success-line',
-  EN_CURSO: 'bg-[#e6eff5] text-[#1c5a80] border-[#a9c8dc]',
-  FINALIZADA: 'bg-[#eef2f0] text-[#4d6b6f] border-[#cfdad6]',
-  CANCELADA: 'bg-accent-soft text-accent-deep border-[#e3b5a7]',
+  EN_CURSO: 'bg-info-soft text-info border-info-line',
+  FINALIZADA: 'bg-surface-soft text-muted border-line',
+  CANCELADA: 'bg-accent-soft text-accent-deep border-accent-line',
 }
 
 function EstadoBadge({ estado }: { estado: SalidaStatus }) {
@@ -60,7 +60,7 @@ export function SalidasTable({
       </h2>
 
       {rows.length === 0 ? (
-        <p className="rounded-2xl bg-white px-5 py-8 text-center text-sm text-muted shadow-[0_8px_30px_rgba(26,65,69,.06)]">
+        <p className="rounded-2xl bg-white px-5 py-8 text-center text-sm text-muted shadow-card">
           {emptyLabel}
         </p>
       ) : (
@@ -68,7 +68,7 @@ export function SalidasTable({
           {/* Fichas: móvil y tablet estrecha */}
           <ul className="grid gap-3 md:hidden">
             {rows.map((row) => (
-              <li key={row.key} className="rounded-2xl bg-white p-4 shadow-[0_8px_30px_rgba(26,65,69,.06)]">
+              <li key={row.key} className="rounded-2xl bg-white p-4 shadow-card">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="truncate font-semibold text-brand">{row.titulo}</p>
@@ -89,7 +89,8 @@ export function SalidasTable({
           </ul>
 
           {/* Tabla: escritorio */}
-          <div className="hidden overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_rgba(26,65,69,.06)] md:block">
+          {/* Igual que en reservas-table: once columnas no caben siempre. */}
+          <div className="hidden overflow-x-auto rounded-2xl bg-white shadow-card md:block">
             <table className="w-full text-left text-sm">
               {caption && <caption className="sr-only">{caption}</caption>}
               <thead>
@@ -109,12 +110,14 @@ export function SalidasTable({
               </thead>
               <tbody>
                 {rows.map((row) => (
-                  <tr key={row.key} className="border-b border-[#f3f6f4] last:border-0">
+                  <tr key={row.key} className="border-b border-surface-soft last:border-0">
                     <th scope="row" className="max-w-[14rem] truncate px-4 py-3 font-semibold text-brand">
                       {row.titulo}
                     </th>
                     <td className="whitespace-nowrap px-4 py-3 capitalize text-muted">{fecha(row.fecha)}</td>
-                    <td className="px-4 py-3 text-muted">{row.destino}</td>
+                    <td className="max-w-[9rem] truncate px-4 py-3 text-muted" title={row.destino}>
+                      {row.destino}
+                    </td>
                     <td className="px-4 py-3 text-right tabular-nums text-muted">
                       {row.durationHours === null ? dash : `${row.durationHours} h`}
                     </td>

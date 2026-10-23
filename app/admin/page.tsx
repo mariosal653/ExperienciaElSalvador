@@ -102,7 +102,7 @@ export default async function AdminDashboardPage({
         </p>
       )}
       {filters.onlyReal && data.ocultasPorFiltro > 0 && (
-        <p className="mt-5 rounded-xl bg-[#eef2f0] px-4 py-3 text-sm text-[#4d6b6f]">
+        <p className="mt-5 rounded-xl bg-surface-soft px-4 py-3 text-sm text-muted">
           Hay {data.ocultasPorFiltro}{' '}
           {data.ocultasPorFiltro === 1 ? 'reserva de prueba oculta' : 'reservas de prueba ocultas'} por el filtro
           «Solo cobros reales».
@@ -110,7 +110,7 @@ export default async function AdminDashboardPage({
       )}
 
       {data.vacio && (
-        <p className="mt-6 rounded-2xl bg-white px-5 py-10 text-center text-sm text-muted shadow-[0_8px_30px_rgba(26,65,69,.06)]">
+        <p className="mt-6 rounded-2xl bg-white px-5 py-10 text-center text-sm text-muted shadow-card">
           No hay reservas registradas que cumplan estos filtros.
         </p>
       )}
@@ -225,7 +225,7 @@ export default async function AdminDashboardPage({
         </div>
 
         {data.comparativa.length > 0 && (
-          <div className="mt-3 overflow-x-auto rounded-2xl bg-white shadow-[0_8px_30px_rgba(26,65,69,.06)]">
+          <div className="mt-3 overflow-x-auto rounded-2xl bg-white shadow-card">
             <table className="w-full min-w-[40rem] text-left text-sm">
               <caption className="sr-only">
                 Métricas derivadas por experiencia: ocupación, promedio de personas por salida e ingreso medio por
@@ -242,7 +242,7 @@ export default async function AdminDashboardPage({
               </thead>
               <tbody>
                 {data.comparativa.map((item) => (
-                  <tr key={item.experienceId} className="border-b border-[#f3f6f4] last:border-0">
+                  <tr key={item.experienceId} className="border-b border-surface-soft last:border-0">
                     <th scope="row" className="max-w-[18rem] truncate px-4 py-3 font-semibold text-brand">
                       {item.titulo}
                     </th>

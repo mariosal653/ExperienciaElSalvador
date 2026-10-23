@@ -306,7 +306,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
 
   const fieldClass = (field: CustomerField) =>
     `mt-1.5 w-full rounded-xl border bg-white px-3.5 py-3 text-base text-brand outline-none transition placeholder:text-faint focus:border-brand focus:ring-2 focus:ring-brand/15 sm:text-sm ${
-      showError(field) ? 'border-[#c0492b]' : 'border-line'
+      showError(field) ? 'border-accent' : 'border-line'
     }`
 
   const errorText = (field: CustomerField) => {
@@ -353,7 +353,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
         <form ref={formRef} onSubmit={submit} noValidate className="mt-6 grid gap-6 lg:grid-cols-[1.35fr_1fr] lg:gap-10">
           <div className="grid min-w-0 gap-6">
             {/* 1. Fecha */}
-            <section aria-labelledby="step-date" className="rounded-2xl bg-white p-4 shadow-[0_8px_30px_rgba(26,65,69,.06)] sm:p-6">
+            <section aria-labelledby="step-date" className="rounded-2xl bg-white p-4 shadow-card sm:p-6">
               <h2 id="step-date" className="flex items-center gap-2.5 text-base font-semibold">
                 <Step n={1} /> <CalendarDays size={17} className="text-accent" /> {t('Fecha', 'Date')}
               </h2>
@@ -384,7 +384,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
             </section>
 
             {/* 2. Viajeros */}
-            <section aria-labelledby="step-people" className="rounded-2xl bg-white p-4 shadow-[0_8px_30px_rgba(26,65,69,.06)] sm:p-6">
+            <section aria-labelledby="step-people" className="rounded-2xl bg-white p-4 shadow-card sm:p-6">
               <h2 id="step-people" className="flex items-center gap-2.5 text-base font-semibold">
                 <Step n={2} /> <Users size={17} className="text-accent" /> {t('Viajeros', 'Travelers')}
               </h2>
@@ -434,7 +434,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
             </section>
 
             {/* 3. Datos del comprador */}
-            <section aria-labelledby="step-details" className="rounded-2xl bg-white p-4 shadow-[0_8px_30px_rgba(26,65,69,.06)] sm:p-6">
+            <section aria-labelledby="step-details" className="rounded-2xl bg-white p-4 shadow-card sm:p-6">
               <h2 id="step-details" className="flex items-center gap-2.5 text-base font-semibold">
                 <Step n={3} /> {t('Tus datos', 'Your details')}
               </h2>
@@ -533,7 +533,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
           </div>
 
           {/* 4. Resumen y pago */}
-          <aside aria-labelledby="summary-title" className="h-fit min-w-0 rounded-2xl bg-white p-4 shadow-[0_8px_30px_rgba(26,65,69,.08)] sm:p-6 lg:sticky lg:top-6">
+          <aside aria-labelledby="summary-title" className="h-fit min-w-0 rounded-2xl bg-white p-4 shadow-card sm:p-6 lg:sticky lg:top-6">
             <h2 id="summary-title" className="flex items-center gap-2.5 text-base font-semibold">
               <Step n={4} /> {t('Resumen', 'Summary')}
             </h2>
@@ -600,7 +600,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
 
             <label
               className={`mt-4 flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 text-sm ${
-                submitted && !acceptTerms ? 'border-[#c0492b] bg-[#fdf1ed]' : 'border-line'
+                submitted && !acceptTerms ? 'border-accent bg-accent-soft' : 'border-line'
               }`}
               data-invalid={submitted && !acceptTerms ? 'true' : undefined}
             >
@@ -740,7 +740,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
             )}
 
             {/* Garantías justo antes de pagar: es donde surge la duda. */}
-            <ul className="mt-4 grid gap-1.5 rounded-2xl bg-[#f3f7f4] p-3.5 text-xs text-brand">
+            <ul className="mt-4 grid gap-1.5 rounded-2xl bg-surface-soft p-3.5 text-xs text-brand">
               <li className="flex items-start gap-2">
                 <Check size={14} className="mt-px shrink-0 text-success" aria-hidden="true" />
                 {t(`Cancelación gratis hasta ${FREE_CANCELLATION_HOURS} h antes`, `Free cancellation up to ${FREE_CANCELLATION_HOURS} h before`)}

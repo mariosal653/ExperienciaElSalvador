@@ -88,7 +88,7 @@ export function DatePicker({
 
   return (
     <div
-      className={`rounded-2xl border bg-white p-3 sm:p-4 ${invalid ? 'border-[#c0492b]' : 'border-line'}`}
+      className={`rounded-2xl border bg-white p-3 sm:p-4 ${invalid ? 'border-accent' : 'border-line'}`}
       aria-describedby={describedBy}
     >
       <div className="mb-2 flex items-center justify-between">
@@ -139,7 +139,7 @@ export function DatePicker({
                 isSelected
                   ? 'bg-brand text-white'
                   : enabled
-                    ? 'bg-surface-mint text-brand hover:bg-[#d7e7df]'
+                    ? 'bg-surface-mint text-brand hover:bg-line'
                     : 'text-line-strong line-through decoration-transparent'
               }`}
             >

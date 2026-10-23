@@ -29,7 +29,7 @@ export function KpiCard({
   }
 
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-[0_8px_30px_rgba(26,65,69,.06)] sm:p-5">
+    <div className="rounded-2xl bg-white p-4 shadow-card sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <p className="text-xs font-bold uppercase tracking-[.12em] text-faint">{label}</p>
         <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${accents[accent]}`}>

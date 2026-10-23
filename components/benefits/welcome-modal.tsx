@@ -76,7 +76,7 @@ export function WelcomeModal() {
       aria-labelledby="welcome-title"
       className="fixed inset-0 z-50 flex items-center justify-center bg-[#0a2b30]/60 p-5 motion-safe:animate-in motion-safe:fade-in"
     >
-      <div className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-[0_24px_70px_rgba(10,43,48,.4)] motion-safe:animate-in motion-safe:zoom-in-95">
+      <div className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-float motion-safe:animate-in motion-safe:zoom-in-95">
         <button
           type="button"
           onClick={dismiss}
@@ -123,7 +123,7 @@ export function WelcomeModal() {
             </button>
           </div>
 
-          <p className="mt-4 text-xs text-[#8aa09c]">
+          <p className="mt-4 text-xs text-faint">
             {es
               ? 'Cerrar esto no consume tu descuento.'
               : 'Closing this does not use up your discount.'}

@@ -43,7 +43,7 @@ export function ExportButtons({ filters, total }: { filters: AdminFilters; total
       <a
         href={href('pdf')}
         download
-        className={`${base} border-[#e3b5a7] bg-white text-accent hover:bg-accent-soft`}
+        className={`${base} border-accent-line bg-white text-accent hover:bg-accent-soft`}
       >
         <FileText size={16} />
         PDF

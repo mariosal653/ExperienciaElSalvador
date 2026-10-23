@@ -213,11 +213,11 @@ export function BookingView({
           <section className="rounded-3xl border border-success-line bg-success-soft p-6 text-center sm:p-10">
             <CheckCircle2 size={48} className="mx-auto text-success-dark" />
             <h1 className="mt-4 text-2xl font-semibold sm:text-3xl">{t('Reserva confirmada', 'Booking confirmed')}</h1>
-            <p className="mt-2 text-sm text-[#3f6a5c]">
+            <p className="mt-2 text-sm text-success-dark">
               {t('Número de reserva', 'Booking number')}{' '}
               <strong className="font-mono text-base text-brand">{booking.code}</strong>
             </p>
-            <p className="mx-auto mt-2 max-w-md text-sm text-[#3f6a5c]">
+            <p className="mx-auto mt-2 max-w-md text-sm text-success-dark">
               {booking.emailSent
                 ? t(`Te enviamos la confirmación a ${booking.customerEmail}.`, `We sent the confirmation to ${booking.customerEmail}.`)
                 : t('Guarda el enlace de esta página: es tu acceso a las entradas.', 'Save this page link — it is your access to the tickets.')}
@@ -240,20 +240,20 @@ export function BookingView({
         )}
 
         {heldForLater && (
-          <section className="rounded-3xl border border-gold-line bg-[#fdf8ec] p-6 text-center sm:p-10">
+          <section className="rounded-3xl border border-gold-line bg-gold-pale p-6 text-center sm:p-10">
             <CalendarClock size={46} className="mx-auto text-accent" />
             <h1 className="mt-4 text-2xl font-semibold sm:text-3xl">{t('Tu lugar está apartado', 'Your spot is held')}</h1>
-            <p className="mt-2 text-sm text-[#6b5a35]">
+            <p className="mt-2 text-sm text-gold-ink">
               {t('Número de reserva', 'Booking number')}{' '}
               <strong className="font-mono text-base text-brand">{booking.code}</strong>
             </p>
-            <p className="mx-auto mt-3 max-w-md text-sm text-[#6b5a35]">
+            <p className="mx-auto mt-3 max-w-md text-sm text-gold-ink">
               {t('Aún no se ha cobrado nada. Plazo para pagar:', 'Nothing has been charged yet. Pay before:')}
             </p>
             <p className="mt-1 text-base font-bold capitalize text-brand">
               {formatDeadline(new Date(booking.holdExpiresAt as string), lang)}
             </p>
-            <p className="mx-auto mt-2 max-w-md text-xs text-[#6b5a35]">
+            <p className="mx-auto mt-2 max-w-md text-xs text-gold-ink">
               {t('Si no pagas a tiempo, la reserva vence sola y las plazas se liberan, sin ningún cargo.', 'If you do not pay in time, the booking expires on its own and the spots are released, with no charge.')}
             </p>
             {payment?.status === 'DECLINED' && (
@@ -330,10 +330,10 @@ export function BookingView({
         )}
 
         {declined && (
-          <section className="rounded-3xl border border-accent-line bg-[#fdf1ed] p-6 text-center sm:p-10" role="alert">
+          <section className="rounded-3xl border border-accent-line bg-accent-soft p-6 text-center sm:p-10" role="alert">
             <XCircle size={44} className="mx-auto text-accent-deep" />
             <h1 className="mt-4 text-2xl font-semibold">{t('El pago no se completó', 'The payment did not go through')}</h1>
-            <p className="mx-auto mt-2 max-w-md text-sm text-[#7a4a3c]">
+            <p className="mx-auto mt-2 max-w-md text-sm text-accent-deep">
               {t('No se hizo ningún cargo. Puedes intentarlo otra vez con la misma u otra tarjeta.', 'You have not been charged. You can try again with the same or another card.')}
             </p>
             <div className="no-print mt-6 flex flex-col justify-center gap-3 sm:flex-row">
@@ -365,7 +365,7 @@ export function BookingView({
         )}
 
         {/* Detalle */}
-        <section className="mt-6 overflow-hidden rounded-3xl bg-white shadow-[0_8px_30px_rgba(26,65,69,.08)]" aria-labelledby="details-title">
+        <section className="mt-6 overflow-hidden rounded-3xl bg-white shadow-card" aria-labelledby="details-title">
           <div className="flex flex-col sm:flex-row">
             {booking.experienceImage && (
               <img src={booking.experienceImage} alt="" decoding="async" className="h-44 w-full object-cover sm:h-auto sm:w-56 sm:shrink-0" />

@@ -55,7 +55,7 @@ export function TicketValidation({
 
   const STATUS = {
     ACTIVE: { label: t('ACTIVA', 'ACTIVE'), hint: t('Entrada válida. Aún no se ha usado.', 'Valid ticket. Not used yet.'), icon: BadgeCheck, className: 'bg-success-soft text-success-dark border-success-line' },
-    USED: { label: t('USADA', 'USED'), hint: t('Esta entrada ya se utilizó.', 'This ticket has already been used.'), icon: TicketCheck, className: 'bg-[#eef1f0] text-[#50686b] border-[#cfd9d6]' },
+    USED: { label: t('USADA', 'USED'), hint: t('Esta entrada ya se utilizó.', 'This ticket has already been used.'), icon: TicketCheck, className: 'bg-surface-soft text-muted border-line' },
     CANCELLED: { label: t('CANCELADA', 'CANCELLED'), hint: t('Esta entrada fue cancelada.', 'This ticket was cancelled.'), icon: Ban, className: 'bg-accent-soft text-accent-deep border-accent-line' },
     INVALID: { label: t('NO VÁLIDA', 'INVALID'), hint: t('No reconocemos esta entrada.', 'We do not recognise this ticket.'), icon: CircleSlash, className: 'bg-accent-soft text-accent-deep border-accent-line' },
   }[status]
@@ -123,7 +123,7 @@ export function TicketValidation({
           </div>
         </div>
 
-        <section className="overflow-hidden rounded-3xl bg-white shadow-[0_8px_30px_rgba(26,65,69,.1)]">
+        <section className="overflow-hidden rounded-3xl bg-white shadow-card">
           <div className={`flex flex-col items-center gap-2 border-b px-6 py-8 text-center ${STATUS.className}`} role="status">
             <Icon size={52} />
             <p className="text-3xl font-bold tracking-wide">{STATUS.label}</p>

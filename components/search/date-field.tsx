@@ -85,9 +85,9 @@ export function DateField({ value, onChange, lang }: Props) {
         onClick={() => setOpen(!open)}
         aria-expanded={open}
         aria-label={lang === 'ES' ? 'Elegir fecha' : 'Choose date'}
-        className="flex w-full items-center gap-3 rounded-xl border-t border-[#e5ece9] px-4 py-3 text-left md:border-l md:border-t-0"
+        className="flex w-full items-center gap-3 rounded-xl border-t border-line px-4 py-3 text-left md:border-l md:border-t-0"
       >
-        <CalendarDays className="shrink-0 text-[#ee7f47]" size={19} aria-hidden="true" />
+        <CalendarDays className="shrink-0 text-accent-light" size={19} aria-hidden="true" />
         <span>
           <span className="block text-[11px] font-bold uppercase tracking-wider text-faint">
             {lang === 'ES' ? 'Cuándo' : 'When'}
@@ -100,7 +100,7 @@ export function DateField({ value, onChange, lang }: Props) {
           Quien decide que tape a la tira de categorias es la capa 30 del
           contenido del heroe. Escala completa en app/globals.css. */}
       {open && (
-        <div className="absolute left-0 top-[calc(100%+.5rem)] z-30 w-[19.5rem] rounded-2xl border border-[#e5ece9] bg-white p-4 shadow-2xl">
+        <div className="absolute left-0 top-[calc(100%+.5rem)] z-30 w-[19.5rem] rounded-2xl border border-line bg-white p-4 shadow-2xl">
           <div className="mb-3 flex items-center justify-between">
             <button
               type="button"
@@ -159,7 +159,7 @@ export function DateField({ value, onChange, lang }: Props) {
                     isSelected
                       ? 'bg-brand font-bold text-white'
                       : isPast
-                        ? 'cursor-not-allowed text-[#c3d1cd]'
+                        ? 'cursor-not-allowed text-faint'
                         : isToday
                           ? 'font-bold text-accent hover:bg-surface-mint'
                           : 'text-brand hover:bg-surface-mint'

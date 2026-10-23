@@ -113,11 +113,11 @@ export default async function ReservaDetallePage({ params }: Params) {
         </h2>
 
         {pagos.length === 0 ? (
-          <p className="rounded-2xl bg-white px-5 py-8 text-center text-sm text-muted shadow-[0_8px_30px_rgba(26,65,69,.06)]">
+          <p className="rounded-2xl bg-white px-5 py-8 text-center text-sm text-muted shadow-card">
             Esta reserva no llegó a generar ningún intento de pago.
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-2xl bg-white shadow-[0_8px_30px_rgba(26,65,69,.06)]">
+          <div className="overflow-x-auto rounded-2xl bg-white shadow-card">
             <table className="w-full min-w-[46rem] text-left text-sm">
               <thead>
                 <tr className="border-b border-line-soft text-xs uppercase tracking-[.1em] text-faint">
@@ -132,7 +132,7 @@ export default async function ReservaDetallePage({ params }: Params) {
               </thead>
               <tbody>
                 {pagos.map((pago) => (
-                  <tr key={pago.id} className="border-b border-[#f3f6f4] last:border-0">
+                  <tr key={pago.id} className="border-b border-surface-soft last:border-0">
                     <th scope="row" className="px-4 py-3 font-semibold text-brand">
                       {PAYMENT_PROVIDER_LABEL[pago.provider] ?? pago.provider}
                     </th>
@@ -172,7 +172,7 @@ function Bloque({
   children: React.ReactNode
 }) {
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-[0_8px_30px_rgba(26,65,69,.06)]">
+    <section className="rounded-2xl bg-white p-5 shadow-card">
       <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-[.12em] text-faint">
         <Icon size={15} /> {titulo}
       </h2>
@@ -195,7 +195,7 @@ function Campo({
   destacado?: boolean
 }) {
   return (
-    <div className="flex items-baseline justify-between gap-4 border-b border-[#f3f6f4] pb-2.5 last:border-0 last:pb-0">
+    <div className="flex items-baseline justify-between gap-4 border-b border-surface-soft pb-2.5 last:border-0 last:pb-0">
       <dt className="shrink-0 text-xs text-muted">{label}</dt>
       <dd
         className={`min-w-0 break-words text-right ${capitalize ? 'capitalize ' : ''}${

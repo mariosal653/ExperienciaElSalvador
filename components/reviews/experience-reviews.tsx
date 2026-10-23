@@ -49,7 +49,7 @@ export function ExperienceReviews({
       </h2>
 
       {count > 0 && rating && (
-        <div className="mt-5 grid gap-6 rounded-2xl bg-white p-5 shadow-[0_8px_30px_rgba(26,65,69,.08)] sm:grid-cols-[auto_1fr] sm:items-center sm:gap-10">
+        <div className="mt-5 grid gap-6 rounded-2xl bg-white p-5 shadow-card sm:grid-cols-[auto_1fr] sm:items-center sm:gap-10">
           <div className="text-center sm:text-left">
             <p className="text-5xl font-semibold leading-none">{rating.average.toFixed(1)}</p>
             <div className="mt-2 flex justify-center gap-0.5 sm:justify-start" aria-hidden="true">
@@ -104,7 +104,7 @@ export function ExperienceReviews({
       )}
 
       {reviews !== null && reviews.length === 0 && (
-        <div className="mt-5 flex items-start gap-3 rounded-2xl border border-dashed border-[#c9d9d0] bg-white p-5">
+        <div className="mt-5 flex items-start gap-3 rounded-2xl border border-dashed border-line bg-white p-5">
           <MessageSquareText size={20} className="mt-0.5 shrink-0 text-accent" aria-hidden="true" />
           <div>
             <p className="font-semibold">{es ? 'Todavía no hay opiniones de esta experiencia.' : 'No reviews for this experience yet.'}</p>

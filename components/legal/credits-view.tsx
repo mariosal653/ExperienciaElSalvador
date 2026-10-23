@@ -23,7 +23,7 @@ export function CreditsView() {
 
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {allCredits.map((credit) => (
-            <li key={credit.source} className="overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_rgba(26,65,69,.08)]">
+            <li key={credit.source} className="overflow-hidden rounded-2xl bg-white shadow-card">
               {credit.file.endsWith('.webm') ? (
                 <div className="grid h-40 place-items-center bg-brand text-sm font-semibold text-white">{es ? 'Vídeo' : 'Video'}</div>
               ) : (

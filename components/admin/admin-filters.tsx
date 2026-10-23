@@ -35,7 +35,7 @@ export function AdminFilters({ filters, catalogo, destinos, hoy }: {
   const label = 'text-xs font-bold uppercase tracking-[.1em] text-faint'
 
   return (
-    <section aria-labelledby="filtros" className="rounded-2xl bg-white p-4 shadow-[0_8px_30px_rgba(26,65,69,.06)] sm:p-5">
+    <section aria-labelledby="filtros" className="rounded-2xl bg-white p-4 shadow-card sm:p-5">
       <h2 id="filtros" className="flex items-center gap-2 text-sm font-bold uppercase tracking-[.12em] text-faint">
         <Filter size={15} /> Filtros
       </h2>

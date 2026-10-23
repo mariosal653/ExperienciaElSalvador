@@ -72,7 +72,7 @@ export function AdminLoginForm() {
     'mt-1.5 w-full rounded-xl border border-line bg-white px-3.5 py-3 text-base text-brand outline-none transition placeholder:text-faint focus:border-brand focus:ring-2 focus:ring-brand/15 sm:text-sm'
 
   return (
-    <div className="w-full max-w-md rounded-2xl bg-white p-7 shadow-[0_18px_50px_rgba(26,65,69,.14)] md:p-9">
+    <div className="w-full max-w-md rounded-2xl bg-white p-7 shadow-float md:p-9">
       <div className="mb-7 flex items-center gap-2.5">
         <span className="grid h-9 w-9 place-items-center rounded-full bg-brand text-gold">
           <ShieldCheck size={20} strokeWidth={2.5} />
@@ -119,7 +119,7 @@ export function AdminLoginForm() {
               type="button"
               onClick={() => setVisible((value) => !value)}
               aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-              className="absolute right-3 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-lg text-muted transition hover:bg-[#f2f6f3]"
+              className="absolute right-3 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-lg text-muted transition hover:bg-surface-soft"
             >
               {visible ? <EyeOff size={17} /> : <Eye size={17} />}
             </button>
