@@ -70,6 +70,21 @@ export const metadata: Metadata = {
     title: `${SITE_NAME} | ${SITE_TAGLINE}`,
     description: SITE_DESCRIPTION,
   },
+  /*
+    Verificación de Google Search Console por etiqueta <meta>.
+
+    Search Console es lo único que hace que Google se entere de que el
+    sitio existe: sin eso, un dominio nuevo y sin enlaces entrantes puede
+    tardar semanas en ser descubierto, o no serlo nunca. El código de
+    verificación se pega en GOOGLE_SITE_VERIFICATION, en las variables de
+    entorno de Netlify, y así no hay que tocar el repositorio ni queda un
+    identificador de la cuenta escrito en el código.
+
+    Sin la variable no se escribe ninguna etiqueta.
+  */
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
 }
 
 export const viewport: Viewport = {
