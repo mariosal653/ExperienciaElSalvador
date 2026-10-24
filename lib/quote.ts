@@ -25,6 +25,11 @@ export type QuoteLead = {
   lang: Locale
   /** Nombre del servicio que se está cotizando. */
   service: string
+  /**
+   * Resumen de la cotización (ruta, distancia, total) cuando viene del
+   * cotizador automático. Sustituye a las preguntas que ya ha respondido.
+   */
+  details?: string | null
 }
 
 /** Asunto del correo. Lleva el servicio para poder filtrarlo en la bandeja. */
@@ -38,33 +43,25 @@ export function quoteSubject({ lang, service }: QuoteLead): string {
  * Cuerpo del correo: las preguntas cuya respuesta hace falta para cotizar,
  * ya escritas, para que el visitante solo rellene.
  */
-export function quoteBody({ lang, service }: QuoteLead): string {
-  const lines = lang === 'ES'
-    ? [
-        `Hola, quisiera cotizar el servicio ${service}.`,
-        '',
-        'Fecha:',
-        'Hora de recogida:',
-        'Punto de recogida (hotel, alojamiento o dirección):',
-        'Número de pasajeros:',
-        'Ruta o lugares que quiero visitar:',
-        'Guía bilingüe: sí / no',
-        '',
-        'Gracias.',
-      ]
-    : [
-        `Hello, I would like a quote for the ${service} service.`,
-        '',
-        'Date:',
-        'Pickup time:',
-        'Pickup point (hotel, rental or address):',
-        'Number of passengers:',
-        'Route or places I want to visit:',
-        'Bilingual guide: yes / no',
-        '',
-        'Thank you.',
-      ]
-  return lines.join('\n')
+export function quoteBody({ lang, service, details }: QuoteLead): string {
+  const es = lang === 'ES'
+  const intro = es
+    ? `Hola, quisiera cotizar el servicio ${service}.`
+    : `Hello, I would like a quote for the ${service} service.`
+
+  // Con la ruta ya montada en el cotizador, se manda esa y solo se
+  // pregunta lo que falta: volver a pedir la ruta sería hacerla dos veces.
+  const pending = es
+    ? ['Fecha:', 'Hora de recogida:', 'Punto exacto de recogida:', 'Número de pasajeros:', 'Guía bilingüe: sí / no']
+    : ['Date:', 'Pickup time:', 'Exact pickup point:', 'Number of passengers:', 'Bilingual guide: yes / no']
+
+  const route = es
+    ? ['Ruta o lugares que quiero visitar:']
+    : ['Route or places I want to visit:']
+
+  const closing = es ? 'Gracias.' : 'Thank you.'
+
+  return [intro, '', ...(details ? [details, ''] : []), ...pending, ...(details ? [] : route), '', closing].join('\n')
 }
 
 /**

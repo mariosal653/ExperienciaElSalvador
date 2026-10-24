@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { Picture } from '@/components/ui/picture'
 import { QuoteActions } from '@/components/services/quote-actions'
+import { QuoteCalculator } from '@/components/services/quote-calculator'
 import { useLanguage } from '@/components/i18n/language-provider'
 import { useWhatsAppLead } from '@/components/whatsapp/whatsapp-provider'
 import { SiteHeader } from '@/components/site/site-header'
@@ -94,6 +95,14 @@ export function ServiceDetail({ service, other }: { service: Service; other: Ser
                 </ul>
               </div>
             </section>
+
+            {/*
+              El cotizador calcula kilómetros, así que aparece en el
+              servicio que se cobra por kilómetro y no en el que va por
+              horas. Si mañana hay un tercero por distancia, lo hereda sin
+              tocar nada aquí.
+            */}
+            {service.priceUnitCode === 'KMT' && <QuoteCalculator service={service.name} />}
 
             <section className="rounded-3xl border border-line bg-surface p-6 lg:p-7">
               <h2 className="text-xl font-semibold">{es ? 'Cómo funciona' : 'How it works'}</h2>

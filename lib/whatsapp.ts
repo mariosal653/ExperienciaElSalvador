@@ -61,6 +61,11 @@ export type WhatsAppLead = {
    * botón de un servicio quiere hablar de ese servicio.
    */
   service?: string | null
+  /**
+   * Resumen ya montado de la cotización (ruta, distancia, total), si viene
+   * del cotizador. Solo se usa junto con `service`.
+   */
+  details?: string | null
   /** Nombre de la experiencia, si está viendo su detalle. */
   experience?: string | null
   destination?: string | null
@@ -82,6 +87,13 @@ export function buildMessage(lead: WhatsAppLead): string {
   const lang = lead.lang
 
   if (lead.service) {
+    // Con cotización hecha, el mensaje la lleva entera: el equipo recibe
+    // la ruta y el total en lugar de «hola, ¿cuánto cuesta?».
+    if (lead.details) {
+      return lang === 'ES'
+        ? `Hola 👋, quisiera cotizar el servicio ${lead.service}.\n\n${lead.details}\n\n¿Me confirman el total?`
+        : `Hi 👋, I would like a quote for the ${lead.service} service.\n\n${lead.details}\n\nCould you confirm the total?`
+    }
     return lang === 'ES'
       ? `Hola 👋, quisiera cotizar el servicio ${lead.service}. ¿Podrían darme más información?`
       : `Hi 👋, I would like a quote for the ${lead.service} service. Could you send me more information?`

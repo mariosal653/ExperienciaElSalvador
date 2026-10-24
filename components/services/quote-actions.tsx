@@ -21,6 +21,7 @@ export function QuoteActions({
   lang,
   source,
   size = 'md',
+  details,
 }: {
   /** Nombre del servicio que se cotiza. Entra en el mensaje y en el evento. */
   service: string
@@ -28,10 +29,15 @@ export function QuoteActions({
   /** De dónde sale la pulsación: «home» o «detalle». Va a la analítica. */
   source: string
   size?: 'md' | 'lg'
+  /**
+   * Resumen de la cotización, cuando el visitante viene de calcularla.
+   * Viaja dentro del mensaje para que no tenga que repetir la ruta.
+   */
+  details?: string
 }) {
   const es = lang === 'ES'
-  const whatsappUrl = buildWhatsAppUrl({ lang, service })
-  const mailto = buildQuoteMailto({ lang, service })
+  const whatsappUrl = buildWhatsAppUrl({ lang, service, details })
+  const mailto = buildQuoteMailto({ lang, service, details })
 
   const base = `inline-flex items-center justify-center gap-2 rounded-full font-bold transition ${
     size === 'lg' ? 'px-6 py-3.5 text-sm' : 'px-4 py-2.5 text-xs'
