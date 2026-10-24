@@ -1,5 +1,15 @@
 import { describe, it, expect } from 'vitest'
-import { GUIDE_PER_DAY_USD, HOURLY_USD, MIN_HOURS, VEHICLE_SEATS, getService, services, vehicle } from '../lib/services'
+import {
+  GUIDE_PER_DAY_USD,
+  HOURLY_USD,
+  MIN_HOURS,
+  PER_KM_USD,
+  VEHICLE_SEATS,
+  WAITING_PER_HOUR_USD,
+  getService,
+  services,
+  vehicle,
+} from '../lib/services'
 import { quoteBody, quoteSubject } from '../lib/quote'
 import { buildMessage } from '../lib/whatsapp'
 
@@ -22,6 +32,8 @@ describe('servicios de conductor', () => {
     expect(MIN_HOURS).toBe(3)
     expect(HOURLY_USD).toBe(15)
     expect(GUIDE_PER_DAY_USD).toBe(75)
+    expect(PER_KM_USD).toBe(0.75)
+    expect(WAITING_PER_HOUR_USD).toBe(5)
     expect(vehicle.model).toBe('Chevrolet N400')
   })
 
@@ -36,8 +48,18 @@ describe('servicios de conductor', () => {
     expect(service?.priceNote?.ES).toContain(`${MIN_HOURS} horas`)
   })
 
-  it('Driver by Tour no publica cifra: se cotiza por ruta', () => {
-    expect(getService('driver-by-tour')?.priceFromUsd).toBeNull()
+  it('Driver by Tour publica el kilómetro y avisa de la espera', () => {
+    const service = getService('driver-by-tour')
+    expect(service?.priceFromUsd).toBe(PER_KM_USD)
+    expect(service?.priceUnitCode).toBe('KMT')
+    expect(service?.priceNote?.ES).toContain(`$${WAITING_PER_HOUR_USD}`)
+  })
+
+  it('la excepción de la espera está escrita en la página del servicio', () => {
+    // Traslado de varios puntos a uno: se cobra el viaje, no la espera.
+    const notes = getService('driver-by-tour')?.notes
+    expect(notes?.ES.some((note) => /no se cobra espera/i.test(note))).toBe(true)
+    expect(notes?.EN.some((note) => /no waiting charge/i.test(note))).toBe(true)
   })
 
   it('cada servicio tiene texto en los dos idiomas', () => {

@@ -51,8 +51,8 @@ export default async function ServicePage({ params }: Params) {
   const site = getSiteUrl()
 
   // Datos estructurados (schema.org). La oferta solo se marca cuando hay
-  // una cifra publicada: Driver by Tour se cotiza por ruta y marcar un
-  // precio inventado sería falsear el dato.
+  // una cifra publicada: marcar un precio que no está en la página sería
+  // falsear el dato.
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Service',
@@ -72,8 +72,8 @@ export default async function ServicePage({ params }: Params) {
               '@type': 'UnitPriceSpecification',
               price: service.priceFromUsd.toFixed(2),
               priceCurrency: 'USD',
-              // HUR: hora, en el catálogo de unidades UN/CEFACT.
-              unitCode: 'HUR',
+              // Unidades UN/CEFACT: HUR es hora y KMT, kilómetro.
+              unitCode: service.priceUnitCode,
             },
             url: `${site}/servicios/${service.id}`,
           },

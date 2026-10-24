@@ -20,10 +20,10 @@ import type { Locale } from './data'
  *   Personal Driver  el vehículo con conductor queda a disposición del
  *                    cliente, que arma su propio itinerario → por hora.
  *
- * Confirmado con el cliente: capacidad de 6 personas, mínimo de 3 horas y
- * guía bilingüe a US$75 por día. Sigue pendiente de confirmar la tarifa
- * por kilómetro y por tiempo de espera del cotizador automático: por eso
- * Driver by Tour no publica ninguna cifra todavía.
+ * Confirmado con el cliente: capacidad de 6 personas, mínimo de 3 horas,
+ * guía bilingüe a US$75 por día, US$0.75 por kilómetro y US$5 por hora de
+ * espera, esta última con la excepción que se explica en
+ * WAITING_PER_HOUR_USD. Ya no queda ninguna tarifa sin confirmar.
  */
 
 export type ServiceId = 'driver-by-tour' | 'personal-driver'
@@ -46,6 +46,20 @@ export const GUIDE_PER_DAY_USD = 75
 
 /** Capacidad comercial del vehículo: una sola cifra en todo el sitio. */
 export const VEHICLE_SEATS = 6
+
+/** Recorrido del Driver by Tour: dólares por kilómetro. */
+export const PER_KM_USD = 0.75
+
+/**
+ * Tiempo de espera, por hora. Se suma al recorrido cuando el conductor
+ * espera al cliente en una parada.
+ *
+ * EXCEPCIÓN confirmada: en las rutas que recogen en varios puntos y
+ * terminan en uno solo —un traslado, no un recorrido con paradas— no se
+ * cobra espera, solo el viaje. El cotizador automático tendrá que
+ * distinguir los dos casos antes de sumar nada por este concepto.
+ */
+export const WAITING_PER_HOUR_USD = 5
 
 /* ------------------------------------------------------------------ */
 /* Vehículo                                                            */
@@ -101,6 +115,11 @@ export type Service = {
   priceFromUsd: number | null
   /** Unidad del precio, o la etiqueta de cotización cuando no hay cifra. */
   priceUnit: Text
+  /**
+   * La misma unidad en el catálogo UN/CEFACT, para los datos
+   * estructurados: HUR (hora) o KMT (kilómetro).
+   */
+  priceUnitCode: 'HUR' | 'KMT'
   /** Condición que acompaña al precio (mínimo de horas, exclusiones…). */
   priceNote: Text | null
   /** Clave del icono, resuelta en el componente. */
@@ -128,11 +147,14 @@ export const services: Service[] = [
       ES: 'Conductor y vehículo para una ruta concreta: el volcán de Santa Ana, la Ruta de las Flores, Suchitoto, la costa de La Libertad o el itinerario que ya tengas en mente. Te recogemos en tu hotel o alojamiento, te acompañamos durante el recorrido y te devolvemos al punto de partida. Se cotiza por ruta, así que el precio se ajusta a la distancia real y no a un paquete cerrado.',
       EN: 'Driver and vehicle for one specific route: the Santa Ana volcano, the Ruta de las Flores, Suchitoto, the La Libertad coast or whatever itinerary you already have in mind. We pick you up at your hotel or rental, stay with you along the way and bring you back to the starting point. It is quoted per route, so the price follows the real distance instead of a fixed package.',
     },
-    priceFromUsd: null,
-    priceUnit: { ES: 'Cotización por ruta', EN: 'Quoted per route' },
+    priceFromUsd: PER_KM_USD,
+    // «por km», no «por kilómetro»: con la palabra entera, en el móvil la
+    // línea del precio se parte y las dos tarjetas dejan de ir a la par.
+    priceUnit: { ES: 'por km', EN: 'per km' },
+    priceUnitCode: 'KMT',
     priceNote: {
-      ES: 'Te damos el total antes de que decidas.',
-      EN: 'You get the total before you decide.',
+      ES: `Más $${WAITING_PER_HOUR_USD} por hora de espera · te damos el total antes de que decidas`,
+      EN: `Plus $${WAITING_PER_HOUR_USD} per hour of waiting · you get the total before you decide`,
     },
     icon: 'route',
     highlights: {
@@ -149,11 +171,13 @@ export const services: Service[] = [
     },
     notes: {
       ES: [
-        'El precio depende de la distancia y del tiempo de espera en cada parada: escríbenos con la ruta y te damos el total.',
+        `El total sale de la distancia del recorrido, a $${PER_KM_USD} por kilómetro, más $${WAITING_PER_HOUR_USD} por cada hora que el conductor te espere en una parada.`,
+        'Si solo necesitas que te llevemos de un sitio a otro, aunque recojamos en varios puntos, no se cobra espera: pagas únicamente el viaje.',
         'Para rutas de madrugada, como el amanecer en el volcán de Santa Ana, conviene avisar con un día de antelación.',
       ],
       EN: [
-        'The price depends on the distance and the waiting time at each stop: send us the route and we send back the total.',
+        `The total comes from the distance of the route, at $${PER_KM_USD} per kilometre, plus $${WAITING_PER_HOUR_USD} for every hour the driver waits for you at a stop.`,
+        'If you only need to get from one place to another, even with several pickup points, there is no waiting charge: you pay for the ride alone.',
         'For early-morning routes, such as sunrise on the Santa Ana volcano, it is best to ask a day ahead.',
       ],
     },
@@ -175,6 +199,7 @@ export const services: Service[] = [
     },
     priceFromUsd: HOURLY_USD,
     priceUnit: { ES: 'por hora', EN: 'per hour' },
+    priceUnitCode: 'HUR',
     priceNote: {
       ES: `Mínimo ${MIN_HOURS} horas · gasolina no incluida`,
       EN: `${MIN_HOURS}-hour minimum · fuel not included`,
