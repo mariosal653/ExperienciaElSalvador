@@ -210,6 +210,16 @@ export const credits = {
     license: 'CC BY-SA 4.0',
     source: `${COMMONS}Volcan_Conchagua.jpg`,
   },
+  // Vídeo del héroe. Pixabay no obliga a citar, pero se cita igual: desde
+  // esta página se sabe de dónde sale cada archivo. Lo que se sirve es un
+  // recorte de 11 s a 1080p del original de 4K (ver lib/hero-video.ts).
+  surfCityMalecon: {
+    file: '/video/el-salvador-surf-city.mp4',
+    title: 'Malecón y playa del Puerto de La Libertad, Surf City',
+    author: 'Irvinteli',
+    license: 'Licencia de contenido de Pixabay',
+    source: 'https://pixabay.com/videos/beach-park-noria-sea-surf-city-190945/',
+  },
   // ÚNICA imagen de banco del sitio. Las demás son fotografías reales de
   // los lugares, de Wikimedia Commons. Esta ilustra una clase de surf al
   // atardecer, pero NO está tomada en El Zonte: por eso su texto

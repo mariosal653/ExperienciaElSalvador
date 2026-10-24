@@ -33,6 +33,7 @@ export function WhatsAppProvider({ children }: { children: ReactNode }) {
     setLeadState((current) => {
       const same =
         current.lang === next.lang &&
+        (current.service ?? null) === (next.service ?? null) &&
         (current.experience ?? null) === (next.experience ?? null) &&
         (current.destination ?? null) === (next.destination ?? null) &&
         (current.date ?? null) === (next.date ?? null) &&

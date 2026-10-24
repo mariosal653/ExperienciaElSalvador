@@ -10,6 +10,7 @@
  * tiempo de ejecución (images.unoptimized en next.config.mjs).
  *
  * Nombre de cada versión: foto.jpg -> foto.w400.webp, foto.w800.webp…
+ * (igual con .png, que se usa cuando la imagen necesita transparencia).
  * Solo se generan anchos MENORES que el original, más el original.
  */
 import { createRequire } from 'node:module'
@@ -52,10 +53,13 @@ let written = 0
 let before = 0
 let after = 0
 
-for (const file of (await walk(SOURCE_DIR)).filter((f) => /\.jpe?g$/i.test(f)).sort()) {
+// También PNG: la foto del vehículo lleva fondo transparente y un JPG la
+// pegaría sobre un blanco que no es el de la tarjeta. WebP conserva el
+// canal alfa, así que la versión optimizada sigue recortada.
+for (const file of (await walk(SOURCE_DIR)).filter((f) => /\.(jpe?g|png)$/i.test(f)).sort()) {
   const { width } = await sharp(file).metadata()
   const widths = [...WIDTHS.filter((w) => w < width), width]
-  const base = file.replace(/\.jpe?g$/i, '')
+  const base = file.replace(/\.(jpe?g|png)$/i, '')
   const url = '/' + path.relative(PUBLIC, file).split(path.sep).join('/')
 
   for (const w of widths) {

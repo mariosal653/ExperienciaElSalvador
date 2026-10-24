@@ -149,3 +149,12 @@ export function trackPurchase(booking: {
 export function trackWhatsApp(source: string) {
   track('contact_whatsapp', { source })
 }
+
+/**
+ * Solicitud de cotización de un servicio de conductor. `channel` distingue
+ * WhatsApp de correo: son las dos vías del acuerdo y conviene saber cuál
+ * usa la gente antes de construir el cotizador automático.
+ */
+export function trackQuoteRequest(params: { service: string; channel: 'whatsapp' | 'email'; source: string }) {
+  track('quote_request', params)
+}

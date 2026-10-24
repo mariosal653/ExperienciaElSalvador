@@ -26,6 +26,8 @@ import { SessionNav } from '@/components/auth/session-nav'
 import { WelcomeModal } from '@/components/benefits/welcome-modal'
 import { LanguageSwitch } from '@/components/i18n/language-switch'
 import { ReelsSection } from '@/components/reels/reels-section'
+import { ServicesSection } from '@/components/services/services-section'
+import { HeroVideo } from '@/components/home/hero-video'
 import { SiteFooter } from '@/components/site/site-footer'
 import { useReviewStats } from '@/components/reviews/use-review-stats'
 import { ExperienceCard } from '@/components/experience/experience-card'
@@ -177,25 +179,39 @@ export function HomeView() {
       {/* Capa 40 — ver la escala documentada en app/globals.css */}
       <header className="absolute inset-x-0 top-0 z-40 border-b border-white/20 text-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
-          <a href="#inicio" className="flex items-center gap-2.5" aria-label="Experiences El Salvador · Inicio">
+          <a href="#inicio" className="flex shrink-0 items-center gap-2.5" aria-label="Experiences El Salvador · Inicio">
             <span className="grid h-9 w-9 place-items-center rounded-full bg-gold text-brand"><Compass size={21} strokeWidth={2.5} /></span>
-            <span className="text-lg font-bold tracking-tight">Experiences <span className="text-gold">El Salvador</span></span>
+            <span className="whitespace-nowrap text-lg font-bold tracking-tight">Experiences <span className="text-gold">El Salvador</span></span>
           </a>
-          <nav className="hidden items-center gap-8 text-sm font-medium md:flex" aria-label={es ? 'Navegación principal' : 'Main navigation'}>
+          {/*
+            El menú abierto empieza en lg, no en md: con «Servicios» son
+            cinco enlaces y en una tableta de 768 px la fila se salía de la
+            pantalla y aparecía scroll horizontal. Hasta lg manda el botón
+            de menú, que lleva los mismos enlaces.
+          */}
+          <nav className="hidden items-center gap-6 whitespace-nowrap text-sm font-medium lg:flex xl:gap-8" aria-label={es ? 'Navegación principal' : 'Main navigation'}>
+            <a href="#servicios" className="transition hover:text-gold">{es ? 'Servicios' : 'Services'}</a>
             <a href="#experiencias" className="transition hover:text-gold">{es ? 'Explorar' : 'Explore'}</a>
             <a href="#destinos" className="transition hover:text-gold">{es ? 'Destinos' : 'Destinations'}</a>
             <a href="#opiniones" className="transition hover:text-gold">{es ? 'Opiniones' : 'Reviews'}</a>
-            <a href="#como-funciona" className="transition hover:text-gold">{es ? 'Cómo funciona' : 'How it works'}</a>
+            {/*
+              En la franja de 1024 a 1280 px el quinto enlace no cabe junto
+              al logo, el idioma y la cuenta: la fila se desbordaba. Se cae
+              este, que es el menos buscado y además está al alcance
+              bajando la página; el menú de móvil los lleva todos.
+            */}
+            <a href="#como-funciona" className="hidden transition hover:text-gold xl:inline">{es ? 'Cómo funciona' : 'How it works'}</a>
           </nav>
-          <div className="hidden items-center gap-4 md:flex">
+          <div className="hidden shrink-0 items-center gap-4 lg:flex">
             <LanguageSwitch lang={language} onChange={setLang} />
             <SessionNav />
           </div>
-          <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? (es ? 'Cerrar menú' : 'Close menu') : (es ? 'Abrir menú' : 'Open menu')}>{menuOpen ? <X /> : <Menu />}</button>
+          <button className="lg:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? (es ? 'Cerrar menú' : 'Close menu') : (es ? 'Abrir menú' : 'Open menu')}>{menuOpen ? <X /> : <Menu />}</button>
         </div>
         {menuOpen && (
-          <div className="border-t border-white/20 bg-brand px-5 pb-5 pt-3 md:hidden">
+          <div className="border-t border-white/20 bg-brand px-5 pb-5 pt-3 lg:hidden">
             <nav className="flex flex-col gap-4 text-sm">
+              <a href="#servicios" onClick={() => setMenuOpen(false)}>{es ? 'Servicios' : 'Services'}</a>
               <a href="#experiencias" onClick={() => setMenuOpen(false)}>{es ? 'Explorar' : 'Explore'}</a>
               <a href="#destinos" onClick={() => setMenuOpen(false)}>{es ? 'Destinos' : 'Destinations'}</a>
               <a href="#opiniones" onClick={() => setMenuOpen(false)}>{es ? 'Opiniones' : 'Reviews'}</a>
@@ -237,6 +253,12 @@ export function HomeView() {
           alt={es ? 'Cerro Verde y el volcán de Izalco, El Salvador' : 'Cerro Verde and Izalco volcano, El Salvador'}
           className="absolute inset-0 h-full w-full object-cover object-[74%_50%] md:object-center"
         />
+        {/*
+          Vídeo de inicio, encima de la foto y debajo del degradado: así el
+          texto del héroe conserva el mismo contraste con vídeo y sin él.
+          Sin vídeo configurado no dibuja nada (ver lib/hero-video.ts).
+        */}
+        <HeroVideo lang={language} />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(12,55,61,.35),rgba(12,55,61,.1)_45%,rgba(251,250,247,.9)_100%)]" />
         {/*
           Capa 30. Este div crea el contexto de apilamiento donde viven los
@@ -269,15 +291,23 @@ export function HomeView() {
       </section>
 
       {/*
-        Capa 20: por encima del degradado del héroe, gracias al -mt-3 que la
-        solapa, pero por debajo del buscador (capa 30).
+        Servicios principales, pegados al héroe (acuerdo 01). Lo que antes
+        ocupaba este sitio —la tira de categorías— baja junto al catálogo,
+        que es lo que filtra: así nada secundario desplaza las dos ofertas
+        de transporte de la parte principal de la página.
       */}
+      <ServicesSection />
+
+      {/* Reels: debajo de los servicios principales, antes del catálogo. */}
+      <ReelsSection />
+
       {/*
-        pt-2 / -mt-5: el contenedor con scroll horizontal recorta también en
-        vertical, y cortaba el anillo de la categoría activa y el salto del
-        hover. El margen compensa para que la tira quede donde estaba.
+        Tira de categorías: filtra el catálogo, así que vive justo encima de
+        él. Ya no se solapa con el héroe, de ahí que no lleve z-20 ni el
+        -mt-5 que compensaba el recorte vertical del scroll horizontal; el
+        pt-2 sigue haciendo falta para el anillo de la categoría activa.
       */}
-      <section className="relative z-20 mx-auto -mt-5 max-w-7xl px-5 lg:px-8"><div className="flex gap-3 overflow-x-auto px-1 pb-2 pt-2 [scrollbar-width:none]">
+      <section aria-label={es ? 'Categorías' : 'Categories'} className="mx-auto max-w-7xl px-5 pt-14 lg:px-8"><div className="flex gap-3 overflow-x-auto px-1 pb-2 pt-2 [scrollbar-width:none]">
         {categories.map((category) => {
           const Icon = CATEGORY_ICONS[category.icon]
           const isActive = activeCategory === category.id
@@ -296,10 +326,7 @@ export function HomeView() {
         })}
       </div></section>
 
-      {/* Reels: justo debajo del héroe y sus categorías, antes del catálogo. */}
-      <ReelsSection />
-
-      <section id="experiencias" className="mx-auto max-w-7xl px-5 pb-20 pt-16 lg:px-8">
+      <section id="experiencias" className="mx-auto max-w-7xl px-5 pb-20 pt-10 lg:px-8">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
             <p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-accent">{es ? 'Para empezar' : 'To get started'}</p>

@@ -17,14 +17,15 @@ export function CreditsView() {
         <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">{es ? 'Créditos de fotos y vídeo' : 'Photo & video credits'}</h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
           {es
-            ? 'Casi todas estas imágenes son fotografías reales de El Salvador tomadas de Wikimedia Commons, y se usan bajo licencias Creative Commons, que permiten su uso citando al autor. La excepción es una imagen de banco de Pixabay, señalada como tal: Pixabay no exige citar al autor, pero se cita igual para que se distinga de las fotos del país.'
-            : 'Almost all of these images are real photographs of El Salvador taken from Wikimedia Commons, used under Creative Commons licenses, which allow reuse with attribution. The exception is one stock image from Pixabay, labelled as such: Pixabay does not require attribution, but it is credited anyway so it can be told apart from the photos of the country.'}
+            ? 'Casi todo este material son fotografías y vídeos reales de El Salvador tomados de Wikimedia Commons, bajo licencias Creative Commons, que permiten su uso citando al autor. Dos archivos vienen de Pixabay: el vídeo de la portada, grabado en el Puerto de La Libertad, y una imagen de banco que no está tomada en el país y se señala como tal. Pixabay no exige citar al autor; se cita igual para saber de dónde sale cada archivo.'
+            : 'Almost all of this material consists of real photographs and videos of El Salvador taken from Wikimedia Commons, under Creative Commons licenses, which allow reuse with attribution. Two files come from Pixabay: the home page video, filmed at Puerto de La Libertad, and one stock image that was not taken in the country and is labelled as such. Pixabay does not require attribution; they are credited anyway so the origin of every file is known.'}
         </p>
 
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {allCredits.map((credit) => (
             <li key={credit.source} className="overflow-hidden rounded-2xl bg-white shadow-card">
-              {credit.file.endsWith('.webm') ? (
+              {/* Los vídeos no caben en un <img>: se marcan con una ficha. */}
+              {/\.(webm|mp4)$/.test(credit.file) ? (
                 <div className="grid h-40 place-items-center bg-brand text-sm font-semibold text-white">{es ? 'Vídeo' : 'Video'}</div>
               ) : (
                 <img src={credit.file} alt="" loading="lazy" decoding="async" className="h-40 w-full object-cover" />

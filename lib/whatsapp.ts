@@ -55,6 +55,12 @@ function longDate(iso: string, lang: Locale): string | null {
  */
 export type WhatsAppLead = {
   lang: Locale
+  /**
+   * Nombre del servicio de transporte («Personal Driver»), si está
+   * cotizando uno. Tiene prioridad sobre todo lo demás: quien pulsa el
+   * botón de un servicio quiere hablar de ese servicio.
+   */
+  service?: string | null
   /** Nombre de la experiencia, si está viendo su detalle. */
   experience?: string | null
   destination?: string | null
@@ -66,13 +72,20 @@ export type WhatsAppLead = {
 /**
  * Construye el mensaje según el contexto, de más específico a más general:
  *
- *   1. Viendo una experiencia  → la menciona por nombre.
- *   2. Con búsqueda hecha      → menciona destino, fecha y viajeros,
+ *   1. Cotizando un servicio   → lo menciona por nombre.
+ *   2. Viendo una experiencia  → la menciona por nombre.
+ *   3. Con búsqueda hecha      → menciona destino, fecha y viajeros,
  *                                omitiendo lo que no haya elegido.
- *   3. Sin contexto            → mensaje por defecto.
+ *   4. Sin contexto            → mensaje por defecto.
  */
 export function buildMessage(lead: WhatsAppLead): string {
   const lang = lead.lang
+
+  if (lead.service) {
+    return lang === 'ES'
+      ? `Hola 👋, quisiera cotizar el servicio ${lead.service}. ¿Podrían darme más información?`
+      : `Hi 👋, I would like a quote for the ${lead.service} service. Could you send me more information?`
+  }
 
   if (lead.experience) {
     return lang === 'ES'

@@ -6,8 +6,9 @@ El sitio no tiene nada que impida indexarlo. Comprobado en producción:
 
 - `robots.txt` permite el rastreo de todo lo público y deja fuera lo privado
   (`/admin`, `/checkout`, `/cuenta`, `/api`, entradas y reservas).
-- `sitemap.xml` lista la portada, los 13 destinos, las 14 experiencias y los
-  legales, con URL absolutas al dominio real.
+- `sitemap.xml` lista la portada, los 2 servicios de conductor, los 13
+  destinos, las 14 experiencias y los legales, con URL absolutas al dominio
+  real.
 - Ninguna página pública lleva `noindex`, ni en la etiqueta ni en la cabecera
   `X-Robots-Tag`.
 - Cada página se genera en el servidor: el HTML llega con el contenido ya
