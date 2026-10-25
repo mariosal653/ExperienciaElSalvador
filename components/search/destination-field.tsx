@@ -89,7 +89,7 @@ export function DestinationField({ value, onChange, lang }: Props) {
   return (
     <div ref={containerRef} className="relative">
       <div
-        className="flex items-center gap-3 rounded-xl px-4 py-3 md:rounded-full"
+        className="flex items-center gap-3 rounded-xl px-4 py-3.5"
         onClick={() => setOpen(true)}
       >
         <MapPin className="shrink-0 text-accent-light" size={20} aria-hidden="true" />

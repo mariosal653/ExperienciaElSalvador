@@ -112,6 +112,10 @@
   :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: 2px; }
   /* Red de seguridad: ningún elemento que se escape (p. ej. un .sr-only absoluto) puede ensanchar la página en móvil. `clip` no rompe position: sticky. */
   html { scroll-behavior: smooth; overflow-x: clip; }
+  /* La barra de secciones (components/site/section-nav) se queda pegada
+     arriba: sin este margen taparia el titulo de la seccion a la que se
+     acaba de saltar. #inicio no lo lleva: el heroe empieza en el borde. */
+  section[id]:not(#inicio) { scroll-margin-top: 4.5rem; }
   body { @apply bg-background text-foreground font-sans; margin: 0; }
   button, a { -webkit-tap-highlight-color: transparent; }
   /* Los titulares grandes se leen mejor con el interletraje algo cerrado;

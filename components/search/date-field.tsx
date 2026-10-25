@@ -85,7 +85,7 @@ export function DateField({ value, onChange, lang }: Props) {
         onClick={() => setOpen(!open)}
         aria-expanded={open}
         aria-label={lang === 'ES' ? 'Elegir fecha' : 'Choose date'}
-        className="flex w-full items-center gap-3 rounded-xl border-t border-line px-4 py-3 text-left md:border-l md:border-t-0"
+        className="flex w-full items-center gap-3 rounded-xl border-t border-line px-4 py-3.5 text-left md:border-l md:border-t-0"
       >
         <CalendarDays className="shrink-0 text-accent-light" size={19} aria-hidden="true" />
         <span>

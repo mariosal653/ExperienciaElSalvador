@@ -29,6 +29,7 @@ import { ReelsSection } from '@/components/reels/reels-section'
 import { ServicesSection } from '@/components/services/services-section'
 import { HeroVideo } from '@/components/home/hero-video'
 import { SiteFooter } from '@/components/site/site-footer'
+import { SectionNav } from '@/components/site/section-nav'
 import { useReviewStats } from '@/components/reviews/use-review-stats'
 import { ExperienceCard } from '@/components/experience/experience-card'
 import { useFavorites } from '@/components/favorites/use-favorites'
@@ -289,6 +290,12 @@ export function HomeView() {
           )}
         </div>
       </section>
+
+      {/*
+        Barra de secciones. Va aquí, justo después del héroe, para que
+        `sticky` la saque sola al pasarlo: ver components/site/section-nav.
+      */}
+      <SectionNav />
 
       {/*
         Servicios principales, pegados al héroe (acuerdo 01). Lo que antes
