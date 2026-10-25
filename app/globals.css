@@ -85,7 +85,7 @@
    Contenedores de nivel de página, de arriba abajo:
 
      50  widget de WhatsApp         (components/whatsapp)  flotante, siempre visible
-     40  header                     (app/page.tsx)  fijo sobre el héroe
+     40  header                     (components/site/home-header)  fixed; transparente sobre el héroe, sólido al pasarlo
      30  contenido del héroe        (app/page.tsx)  contiene el buscador
      20  tira de categorías         (app/page.tsx)  solapa el héroe con -mt-3
       –  resto de secciones                         flujo normal
@@ -112,7 +112,7 @@
   :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: 2px; }
   /* Red de seguridad: ningún elemento que se escape (p. ej. un .sr-only absoluto) puede ensanchar la página en móvil. `clip` no rompe position: sticky. */
   html { scroll-behavior: smooth; overflow-x: clip; }
-  /* La barra de secciones (components/site/section-nav) se queda pegada
+  /* La cabecera de la portada (components/site/home-header) se queda fija
      arriba: sin este margen taparia el titulo de la seccion a la que se
      acaba de saltar. #inicio no lo lleva: el heroe empieza en el borde. */
   section[id]:not(#inicio) { scroll-margin-top: 4.5rem; }
