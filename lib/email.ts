@@ -11,7 +11,9 @@ import { parseLocalDate } from './data'
  *   RESEND_API_KEY   clave de Resend. Sin ella, NO se envía nada y se deja
  *                    constancia en el log. La reserva sigue confirmada.
  *   EMAIL_FROM       remitente verificado en Resend, p. ej.
- *                    "Experiences El Salvador <reservas@tu-dominio.com>".
+ *                    "Experiences El Salvador
+ *                    <discover@experiencesinelsalvador.com>". El dominio
+ *                    debe estar verificado en Resend (registros DNS).
  */
 
 export type ConfirmationEmail = {

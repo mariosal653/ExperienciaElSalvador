@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { HomeView } from '@/components/home/home-view'
 import { experiences } from '@/lib/data'
 import { getSiteUrl } from '@/lib/site'
+import { CONTACT_EMAIL, GOOGLE_PROFILE_URL } from '@/lib/contact'
+import { whatsappConfig } from '@/lib/whatsapp'
 
 /**
  * Inicio. Componente de SERVIDOR: aporta la URL canónica y los datos
@@ -17,6 +19,24 @@ export const metadata: Metadata = {
   },
 }
 
+/**
+ * Perfiles externos del negocio. Van en `sameAs` de los datos estructurados:
+ * es la señal con la que Google asocia este dominio al perfil que ya existe
+ * en Maps y en los resultados locales.
+ *
+ * El Perfil de Empresa va fijo, porque es público y no cambia. Las redes
+ * sociales se añaden desde Netlify cuando existan, en una lista separada por
+ * comas y sin tocar el repositorio:
+ *   NEXT_PUBLIC_PROFILE_URLS=https://www.instagram.com/...,https://www.facebook.com/...
+ */
+const SAME_AS = [
+  GOOGLE_PROFILE_URL,
+  ...(process.env.NEXT_PUBLIC_PROFILE_URLS ?? '')
+    .split(',')
+    .map((url) => url.trim())
+    .filter((url) => /^https?:\/\//.test(url)),
+]
+
 export default function HomePage() {
   const site = getSiteUrl()
 
@@ -31,8 +51,17 @@ export default function HomePage() {
         name: 'Experiences El Salvador',
         url: site,
         image: `${site}/img/hero/cerro-verde-izalco-1920.jpg`,
+        logo: `${site}/icon.svg`,
+        // El mismo número que el Perfil de Empresa en Google. Coincidir en
+        // nombre, teléfono y web es lo que permite a Google entender que el
+        // perfil y este sitio son el mismo negocio.
+        telephone: whatsappConfig.phone,
+        email: CONTACT_EMAIL,
         areaServed: { '@type': 'Country', name: 'El Salvador' },
         currenciesAccepted: 'USD',
+        // Perfil de Empresa y redes: cada URL confirma la identidad del
+        // negocio ante Google.
+        sameAs: SAME_AS,
       },
       {
         '@type': 'ItemList',

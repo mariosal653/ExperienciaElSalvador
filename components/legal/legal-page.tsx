@@ -6,6 +6,7 @@ import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
 import type { Locale } from '@/lib/data'
 import { LEGAL_SLUGS, type LegalSlug } from '@/lib/legal'
+import { CONTACT_EMAIL } from '@/lib/contact'
 
 /*
  * IMPORTANTE — REVISIÓN LEGAL PENDIENTE
@@ -33,7 +34,7 @@ const DOCS: Record<LegalSlug, Record<Locale, Doc>> = {
         { heading: 'Reservas y pago', body: ['Puedes reservar sin crear una cuenta. La reserva se confirma solo cuando la pasarela de pago Wompi aprueba el cobro; hasta entonces las plazas se guardan durante 30 minutos.', 'Los precios se muestran en dólares estadounidenses (USD) por persona. El importe final se calcula en nuestro servidor y es el que verás en la página de pago.', 'Los datos de tu tarjeta se introducen en la página segura de Wompi. Experiences El Salvador no ve ni almacena esos datos.'] },
         { heading: 'Entradas', body: ['Recibirás una entrada digital con código QR por cada viajero. Cada entrada es válida para una persona, en la fecha reservada, y solo puede usarse una vez.', 'Guarda el enlace de tu reserva: es tu acceso a las entradas. No lo compartas públicamente.'] },
         { heading: 'Responsabilidades del viajero', body: ['Llega puntual al punto de encuentro, sigue las indicaciones del guía y valora con honestidad tu condición física para cada actividad. Algunas experiencias pueden modificarse por clima o por seguridad.'] },
-        { heading: 'Contacto', body: ['Para cualquier consulta sobre tu reserva, escríbenos por WhatsApp desde el botón del sitio indicando tu número de reserva.'] },
+        { heading: 'Contacto', body: [`Para cualquier consulta sobre tu reserva, escríbenos por WhatsApp desde el botón del sitio o a ${CONTACT_EMAIL}, indicando tu número de reserva.`] },
       ],
     },
     EN: {
@@ -44,7 +45,7 @@ const DOCS: Record<LegalSlug, Record<Locale, Doc>> = {
         { heading: 'Bookings and payment', body: ['You can book without creating an account. A booking is confirmed only when the Wompi payment gateway approves the charge; until then your spots are held for 30 minutes.', 'Prices are shown in US dollars (USD) per person. The final amount is calculated on our server and is the amount you will see on the payment page.', "Your card details are entered on Wompi's secure page. Experiences El Salvador never sees or stores them."] },
         { heading: 'Tickets', body: ['You will receive one digital ticket with a QR code per traveler. Each ticket is valid for one person, on the booked date, and can be used only once.', 'Keep your booking link safe: it is your access to the tickets. Do not share it publicly.'] },
         { heading: 'Traveler responsibilities', body: ['Arrive on time at the meeting point, follow your guide’s instructions and honestly assess your fitness for each activity. Some experiences may change due to weather or safety.'] },
-        { heading: 'Contact', body: ['For any question about your booking, message us on WhatsApp from the button on the site and include your booking number.'] },
+        { heading: 'Contact', body: [`For any question about your booking, message us on WhatsApp from the button on the site or write to ${CONTACT_EMAIL}, including your booking number.`] },
       ],
     },
   },
@@ -76,7 +77,7 @@ const DOCS: Record<LegalSlug, Record<Locale, Doc>> = {
         { heading: 'Qué datos recogemos', body: ['Al reservar: nombre, correo, teléfono y, si quieres, país. Si creas una cuenta, además tu contraseña, que se guarda cifrada (hash) y nunca en claro.', 'No recogemos ni guardamos datos de tarjetas: el pago se hace en la página de Wompi.'] },
         { heading: 'Para qué los usamos', body: ['Para gestionar tu reserva, enviarte la confirmación y las entradas, y contactarte si hay cambios en tu experiencia. No vendemos tus datos.'] },
         { heading: 'Con quién los compartimos', body: ['Con Wompi para procesar el pago, con nuestro proveedor de correo para enviarte la confirmación, y con el guía u operador de tu experiencia en la medida necesaria para prestarla.'] },
-        { heading: 'Tus derechos', body: ['Puedes pedir acceso, corrección o eliminación de tus datos escribiéndonos por WhatsApp. Conservaremos lo mínimo que exija la ley para fines contables.'] },
+        { heading: 'Tus derechos', body: [`Puedes pedir acceso, corrección o eliminación de tus datos escribiéndonos a ${CONTACT_EMAIL} o por WhatsApp. Conservaremos lo mínimo que exija la ley para fines contables.`] },
       ],
     },
     EN: {
@@ -86,7 +87,7 @@ const DOCS: Record<LegalSlug, Record<Locale, Doc>> = {
         { heading: 'What we collect', body: ['When you book: name, email, phone and, optionally, country. If you create an account, also your password, stored only as a hash — never in plain text.', "We do not collect or store card details: payment happens on Wompi's page."] },
         { heading: 'How we use it', body: ['To manage your booking, send your confirmation and tickets, and contact you if anything changes. We do not sell your data.'] },
         { heading: 'Who we share it with', body: ['Wompi to process the payment, our email provider to send your confirmation, and the guide or operator of your experience as needed to run it.'] },
-        { heading: 'Your rights', body: ['You can ask to access, correct or delete your data by messaging us on WhatsApp. We keep the minimum required by law for accounting.'] },
+        { heading: 'Your rights', body: [`You can ask to access, correct or delete your data by writing to ${CONTACT_EMAIL} or messaging us on WhatsApp. We keep the minimum required by law for accounting.`] },
       ],
     },
   },

@@ -1,5 +1,83 @@
 # Aparecer en Google
 
+## El dominio oficial
+
+El dominio de este proyecto es **`experiencesinelsalvador.com`** (con el «in»).
+Es el que sirve este repositorio y el que aparece en la canónica de todas las
+páginas.
+
+Conviene tenerlo presente porque circulan nombres parecidos:
+
+| Dominio | Qué es |
+| --- | --- |
+| `experiencesinelsalvador.com` | **El oficial.** Este repositorio. |
+| `experienceselsalvador.com` | Otro sitio distinto, con rutas que este código no tiene (`/destinations`, `/operator/`, `/my-trips/`). No se despliega desde aquí. |
+| `experienceinelsalvador.com` | No existe. Un error de tecleo habitual. |
+
+Dos consecuencias prácticas:
+
+1. El **Perfil de Empresa en Google** debe apuntar a `experiencesinelsalvador.com`
+   en el campo *Sitio web*. Si apunta a otro dominio, el enlace entrante que
+   daría el perfil —el más valioso de todos— se lo lleva ese otro sitio.
+2. Si `experienceselsalvador.com` también es del proyecto, debe redirigir con
+   **301** al oficial. Dos dominios con contenido parecido compiten entre sí
+   por las mismas búsquedas y Google reparte la autoridad entre ambos.
+
+Antes de dar nada por perdido: buscar el nombre del negocio en Google **no**
+sirve para saber si el sitio está indexado. Para eso está `site:` (ver más
+abajo).
+
+## Los datos del negocio, idénticos en todas partes
+
+Google reconoce un negocio comparando nombre, teléfono y web entre el Perfil
+de Empresa y el sitio. Si un dato baila, los trata como dos negocios distintos
+y el perfil deja de reforzar al dominio.
+
+El correo no entra en esa comparación: **el Perfil de Empresa no tiene campo
+de correo electrónico** (Google lo retiró). Vive solo en el sitio, donde sirve
+de contacto público y de vía para ejercer derechos sobre los datos.
+
+| Dato | Valor | Dónde vive en el código |
+| --- | --- | --- |
+| Nombre | Experiences El Salvador | `lib/contact.ts` |
+| Correo | discover@experiencesinelsalvador.com | `lib/contact.ts` (solo en el sitio) |
+| Teléfono | +503 7230 8067 | `lib/whatsapp.ts` |
+| Web | https://experiencesinelsalvador.com | `SITE_URL` en Netlify |
+
+El correo sale en el pie de página, en los textos legales (contacto y derechos
+sobre los datos) y en los datos estructurados de la portada. **Si cambia el
+nombre, el teléfono o la web, hay que cambiarlos también en el Perfil de
+Empresa.**
+
+En el perfil, el contacto equivalente es el **usuario de chat**, que debe
+apuntar al mismo número: `https://wa.me/50372308067`.
+
+### El perfil, enlazado desde el sitio
+
+La portada declara el Perfil de Empresa en el campo `sameAs` de sus datos
+estructurados, con la URL canónica por `cid`
+(`https://maps.google.com/?cid=11241112588317624963`, en `lib/contact.ts`).
+Esa forma es la estable: no cambia aunque se edite el nombre del negocio.
+
+Con el perfil apuntando al sitio y el sitio declarando el perfil, la relación
+queda cerrada en los dos sentidos.
+
+Las redes sociales, cuando existan, se añaden sin tocar el repositorio con la
+variable `NEXT_PUBLIC_PROFILE_URLS` en Netlify (URL separadas por comas).
+
+### Reseñas
+
+El ranking en Maps depende sobre todo de las reseñas, y es la única palanca
+que no se toca desde el código. El enlace directo al formulario es:
+
+```
+https://g.page/r/CYMK2FJXdACcEBM/review
+```
+
+Con el servicio de conductor el momento natural de pedirla es al dejar al
+cliente en su destino, mandándole ese enlace por WhatsApp el mismo día.
+
+
 ## Lo que ya está hecho
 
 El sitio no tiene nada que impida indexarlo. Comprobado en producción:
@@ -68,9 +146,22 @@ Es lo que más acelera el proceso y lo que más cuesta. Sirve cualquier sitio qu
 Google ya rastree a menudo:
 
 - Perfil de empresa en Google (antes Google My Business), que además la hace
-  aparecer en Maps.
+  aparecer en Maps. **Comprobar que el campo *Sitio web* apunta al dominio
+  oficial**, no a otro parecido.
 - Redes sociales del proyecto con el enlace en la biografía.
 - Directorios de turismo de El Salvador.
+
+Además, conviene declarar esos perfiles en el propio sitio. La portada escribe
+un campo `sameAs` en sus datos estructurados a partir de la variable
+`NEXT_PUBLIC_PROFILE_URLS` (en Netlify, URL separadas por comas):
+
+```
+NEXT_PUBLIC_PROFILE_URLS=https://maps.app.goo.gl/XXXX,https://www.instagram.com/XXXX
+```
+
+El enlace, así, queda en los dos sentidos: el perfil apunta al sitio y el sitio
+apunta al perfil. Es lo que le permite a Google tratarlos como un mismo
+negocio. Sin la variable, el campo simplemente no se escribe.
 
 ### 5. Bing, de paso
 
