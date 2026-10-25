@@ -57,8 +57,22 @@ export default function HomePage() {
         // perfil y este sitio son el mismo negocio.
         telephone: whatsappConfig.phone,
         email: CONTACT_EMAIL,
+        /*
+          Sin calle ni número a propósito: el negocio no tiene local, solo
+          área de servicio, y así está declarado también en el Perfil de
+          Empresa. Se marca el país, que es cierto y verificable, en lugar
+          de inventar una dirección para callar el aviso de Google.
+        */
+        address: { '@type': 'PostalAddress', addressCountry: 'SV' },
         areaServed: { '@type': 'Country', name: 'El Salvador' },
         currenciesAccepted: 'USD',
+        /*
+          Notación simbólica en vez de un rango en dólares: las experiencias
+          van de 28 a 55 USD por persona, pero los servicios de conductor se
+          cobran por kilómetro y por hora. Un rango concreto describiría solo
+          una parte del catálogo y dejaría fuera la oferta principal.
+        */
+        priceRange: '$$',
         // Perfil de Empresa y redes: cada URL confirma la identidad del
         // negocio ante Google.
         sameAs: SAME_AS,
