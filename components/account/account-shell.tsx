@@ -20,8 +20,9 @@ export function AccountShell({
 
   return (
     <div className="min-h-screen bg-cream">
-      <header className="border-b border-line bg-brand text-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-5 py-4 lg:px-8">
+      {/* La misma píldora de vidrio que components/site/site-header. */}
+      <header className="sticky top-0 z-40 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white sm:px-4">
+        <div className="liquid-glass-tinted mx-auto flex max-w-5xl items-center justify-between gap-4 rounded-full py-2 pl-2.5 pr-2.5 sm:pl-3 sm:pr-3">
           <Link href="/" className="flex items-center gap-2.5" aria-label="Experiences El Salvador · Inicio">
             <span className="grid h-8 w-8 place-items-center rounded-full bg-gold text-brand">
               <Compass size={18} strokeWidth={2.5} />

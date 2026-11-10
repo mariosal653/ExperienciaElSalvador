@@ -115,12 +115,54 @@
   /* La cabecera de la portada (components/site/home-header) se queda fija
      arriba: sin este margen taparia el titulo de la seccion a la que se
      acaba de saltar. #inicio no lo lleva: el heroe empieza en el borde. */
-  section[id]:not(#inicio) { scroll-margin-top: 4.5rem; }
+  section[id]:not(#inicio) { scroll-margin-top: 5.5rem; }
   body { @apply bg-background text-foreground font-sans; margin: 0; }
   button, a { -webkit-tap-highlight-color: transparent; }
   /* Los titulares grandes se leen mejor con el interletraje algo cerrado;
      el texto corrido no. */
   h1, h2, h3 { letter-spacing: -0.02em; }
+}
+
+/* ---------------------------------------------------------------------
+   LIQUID GLASS
+   Vidrio al estilo de Apple para la cabecera de la portada. Tres capas:
+   el desenfoque saturado del fondo, un degradado blanco casi transparente
+   y dos brillos interiores (el borde de arriba recibe la luz, el de abajo
+   la devuelve). La sombra exterior lo despega de la foto.
+
+   .liquid-glass         sobre la foto del héroe: casi incoloro.
+   .liquid-glass-tinted  con el verde de marca, para cuando debajo pasan
+                         secciones claras y el texto blanco necesita fondo.
+
+   OJO: backdrop-filter crea contexto de apilamiento y bloque contenedor
+   para hijos `fixed`. Dentro no debe ir nada `fixed`.
+   --------------------------------------------------------------------- */
+.liquid-glass,
+.liquid-glass-tinted {
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgb(255 255 255 / 0.22);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.35),
+    inset 0 -1px 0 rgb(255 255 255 / 0.08),
+    0 10px 30px -10px rgb(7 31 34 / 0.45);
+  transition: background 300ms, border-color 300ms, box-shadow 300ms;
+}
+.liquid-glass {
+  background: linear-gradient(135deg, rgb(255 255 255 / 0.18), rgb(255 255 255 / 0.05) 60%);
+}
+.liquid-glass-tinted {
+  background: linear-gradient(135deg, rgb(23 63 69 / 0.72), rgb(14 48 53 / 0.6) 60%);
+  border-color: rgb(255 255 255 / 0.16);
+}
+
+/* Sin backdrop-filter (navegadores viejos) o con «reducir transparencia»
+   activado, el vidrio no se lee: fondo sólido de marca. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .liquid-glass, .liquid-glass-tinted { background: rgb(23 63 69 / 0.95); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .liquid-glass, .liquid-glass-tinted { background: var(--color-brand); -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
 
 /* ---------------------------------------------------------------------
@@ -153,4 +195,50 @@
   .no-print { display: none !important; }
   .print-ticket { break-inside: avoid; page-break-inside: avoid; }
   body { background: #fff !important; }
+}
+
+/* ---------------------------------------------------------------------
+   VIEW TRANSITIONS
+   Navegación de una tarjeta (destino o experiencia) a su página (ver
+   components/ui/shared-transition.tsx). Curva tipo Apple:
+   arranque rápido y frenada larga y suave, sin rebote.
+   --------------------------------------------------------------------- */
+:root { --ease-apple: cubic-bezier(0.32, 0.72, 0, 1); }
+
+/* La foto viaja de la tarjeta al héroe. Las dos capturas llenan el grupo
+   y se recortan (cover): sin esto, la foto apaisada del héroe se
+   estiraría al salir de una tarjeta casi cuadrada. */
+::view-transition-group(.foto-compartida),
+::view-transition-group(.nombre-compartido) {
+  animation-duration: 560ms;
+  animation-timing-function: var(--ease-apple);
+}
+/* Recorta las capturas al marco que vuela: sin esto, la que se va
+   desvaneciendo asoma por fuera durante el trayecto. */
+::view-transition-group(.foto-compartida) { overflow: clip; }
+::view-transition-old(.foto-compartida),
+::view-transition-new(.foto-compartida) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation-duration: 560ms;
+  animation-timing-function: var(--ease-apple);
+}
+/* Un toque de desenfoque a mitad de camino tapa el cambio de resolución
+   entre la miniatura y la foto grande. */
+::view-transition-image-pair(.foto-compartida) { animation: vt-via-blur 560ms var(--ease-apple); }
+@keyframes vt-via-blur { 35% { filter: blur(4px); } }
+
+/* El resto de la página: la vieja se desvanece rápido y la nueva entra
+   con un leve ascenso, mientras la foto hace su recorrido. */
+::view-transition-old(root) { animation: 200ms ease-out both vt-fade-out; }
+::view-transition-new(root) { animation: 420ms var(--ease-apple) 80ms both vt-rise-in; }
+@keyframes vt-fade-out { to { opacity: 0; } }
+@keyframes vt-rise-in { from { opacity: 0; transform: translateY(12px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-image-pair(*) { animation: none !important; }
 }

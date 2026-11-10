@@ -13,7 +13,7 @@ type Section = { id: string; label: Record<Locale, string> }
  * Enlaces de la cabecera, en el orden en que se muestran.
  *
  * OJO: este orden NO es el de la página. «Destinos» se enseña en tercer
- * lugar porque es de lo más buscado, pero su sección está al final. Para
+ * lugar, pero su sección es la primera, justo debajo del buscador. Para
  * saber qué sección se está leyendo hace falta el orden real: DOCUMENT_ORDER.
  */
 const SECTIONS: Section[] = [
@@ -25,17 +25,17 @@ const SECTIONS: Section[] = [
 ]
 
 /** Las mismas secciones, en el orden en que aparecen al bajar la página. */
-const DOCUMENT_ORDER = ['servicios', 'experiencias', 'opiniones', 'como-funciona', 'destinos']
+const DOCUMENT_ORDER = ['destinos', 'servicios', 'experiencias', 'opiniones', 'como-funciona']
 
 /**
  * Cabecera de la portada. Una sola barra, dos estados.
  *
- * Sobre el héroe va transparente, como siempre: la foto del Izalco se ve
- * entera y el texto blanco se apoya en el degradado. Al pasar el héroe se
- * queda fija con el verde de marca —el mismo de las páginas interiores, así
- * que el idioma y la cuenta, que están hechos para fondo oscuro, siguen
- * sirviendo tal cual—, resalta la sección que se está leyendo y saca el
- * botón que devuelve al buscador.
+ * Es una píldora de vidrio (.liquid-glass, en app/globals.css) que flota
+ * separada de los bordes. Sobre el héroe el vidrio es casi incoloro y deja
+ * ver la foto del Izalco. Al pasar el héroe se tiñe con el verde de marca
+ * —el mismo de las páginas interiores, así que el idioma y la cuenta, que
+ * están hechos para fondo oscuro, siguen sirviendo tal cual—, resalta la
+ * sección que se está leyendo y saca el botón que devuelve al buscador.
  *
  * Hubo un intento anterior con DOS barras: esta encima del héroe y otra
  * pegajosa debajo. Se descartó porque repetía los mismos enlaces a media
@@ -117,15 +117,16 @@ export function HomeHeader() {
 
   return (
     // Capa 40 — ver la escala documentada en app/globals.css
-    <header
-      className={`no-print fixed inset-x-0 top-0 z-40 text-white transition-colors duration-300 ${
-        scrolled ? 'border-b border-brand-dark bg-brand/95 backdrop-blur-md' : 'border-b border-white/20'
-      }`}
-    >
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 lg:px-8">
-        <a href="#inicio" className="flex shrink-0 items-center gap-2.5" aria-label="Experiences El Salvador · Inicio">
+    // El margen superior respeta la muesca del iPhone (safe-area).
+    <header className="no-print fixed inset-x-0 top-0 z-40 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white sm:px-4">
+      <div
+        className={`mx-auto flex max-w-7xl items-center justify-between gap-2 rounded-full py-2.5 pl-2.5 pr-2.5 sm:gap-4 sm:pl-4 sm:pr-4 lg:pr-3 ${
+          scrolled ? 'liquid-glass-tinted' : 'liquid-glass'
+        }`}
+      >
+        <a href="#inicio" className="flex shrink-0 items-center gap-2 sm:gap-2.5" aria-label="Experiences El Salvador · Inicio">
           <span className="grid h-9 w-9 place-items-center rounded-full bg-gold text-brand"><Compass size={21} strokeWidth={2.5} /></span>
-          <span className="whitespace-nowrap text-lg font-bold tracking-tight">Experiences <span className="text-gold">El Salvador</span></span>
+          <span className="whitespace-nowrap text-base font-bold sm:text-lg tracking-tight">Experiences <span className="text-gold">El Salvador</span></span>
         </a>
 
         {/*
@@ -178,11 +179,13 @@ export function HomeHeader() {
               className="flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-2 text-xs font-bold text-white transition hover:bg-accent-dark"
             >
               <Search size={14} aria-hidden="true" />
-              <ArrowUp size={13} aria-hidden="true" />
+              {/* En teléfonos la flecha no cabe junto al logo. */}
+              <ArrowUp size={13} aria-hidden="true" className="hidden sm:block" />
             </a>
           )}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
+            className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-white/15"
             aria-expanded={menuOpen}
             aria-label={menuOpen ? (es ? 'Cerrar menú' : 'Close menu') : (es ? 'Abrir menú' : 'Open menu')}
           >
@@ -192,7 +195,9 @@ export function HomeHeader() {
       </div>
 
       {menuOpen && (
-        <div className="border-t border-white/20 bg-brand px-5 pb-5 pt-3 lg:hidden">
+        // Panel aparte bajo la píldora, siempre teñido: el menú se abre
+        // sobre cualquier sección y el texto blanco necesita fondo.
+        <div className="liquid-glass-tinted mx-auto mt-2 max-h-[calc(100dvh-6rem)] max-w-7xl overflow-y-auto rounded-3xl px-5 pb-5 pt-4 lg:hidden">
           <nav className="flex flex-col gap-4 text-sm">
             {SECTIONS.map((section) => (
               <a key={section.id} href={`#${section.id}`} onClick={() => setMenuOpen(false)}>
