@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import {
   AlertCircle,
@@ -25,6 +25,7 @@ import {
   Zap,
 } from 'lucide-react'
 import { Picture } from '@/components/ui/picture'
+import { SharedName, SharedPhoto } from '@/components/ui/shared-transition'
 import { useLanguage } from '@/components/i18n/language-provider'
 import { useWhatsAppLead } from '@/components/whatsapp/whatsapp-provider'
 import { SiteHeader } from '@/components/site/site-header'
@@ -135,6 +136,20 @@ export function ExperienceDetail({
     .filter(Boolean)
     .join(es ? ' o ' : ' or ')
 
+  /**
+   * Arriba del todo ANTES de que el navegador capture la página para la
+   * transición desde la tarjeta: si no, la galería queda fuera de la
+   * pantalla y la foto no tiene a dónde volar. Misma razón y mismo
+   * `instant` que en components/destination/destination-view.tsx.
+   */
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+    setLeavingTo(null)
+  }, [experience.id])
+
+  /** Tarjeta de «También te puede gustar» pulsada: la única que vuela. */
+  const [leavingTo, setLeavingTo] = useState<string | null>(null)
+
   /*
    * Barra fija de reserva en móvil. Aparece cuando la tarjeta de precio sale
    * de la pantalla, para que «Reservar» esté siempre a un toque, como en
@@ -174,7 +189,7 @@ export function ExperienceDetail({
         </nav>
 
         <div className="grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:gap-12">
-          <Gallery images={images} tag={experience.tag?.[lang]} lang={lang} />
+          <Gallery images={images} tag={experience.tag?.[lang]} lang={lang} transitionName={`experiencia-foto-${experience.id}`} />
 
           <div className="flex flex-col">
             <div className="flex items-start justify-between gap-4">
@@ -196,7 +211,9 @@ export function ExperienceDetail({
                 {saved ? (es ? 'Guardada' : 'Saved') : es ? 'Guardar' : 'Save'}
               </button>
             </div>
-            <h1 className="mt-2 text-3xl font-semibold leading-tight tracking-tight md:text-4xl">{name}</h1>
+            <SharedName name={`experiencia-nombre-${experience.id}`}>
+              <h1 className="mt-2 text-3xl font-semibold leading-tight tracking-tight md:text-4xl">{name}</h1>
+            </SharedName>
             <a href="#opiniones-experiencia" className="mt-2 inline-flex w-fit hover:underline">
               <RatingBadge rating={rating} loading={stats === undefined} lang={lang} size="md" />
             </a>
@@ -446,17 +463,20 @@ export function ExperienceDetail({
                 <Link
                   key={item.id}
                   href={`/experiences/${item.id}`}
+                  onClick={() => setLeavingTo(item.id)}
                   className="group overflow-hidden rounded-2xl bg-white shadow-card"
                 >
-                  <div className="h-44 overflow-hidden">
+                  <SharedPhoto name={`experiencia-foto-${item.id}`} enabled={leavingTo === item.id} className="h-44 overflow-hidden rounded-t-2xl">
                     <Picture src={item.image} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" alt={item.imageAlt[lang]} loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-                  </div>
+                  </SharedPhoto>
                   <div className="p-4">
                     <div className="flex items-center justify-between gap-2 text-xs text-muted">
                       <span className="flex items-center gap-1"><MapPin size={13} />{item.destination}</span>
                       <RatingBadge rating={stats?.[item.id]} loading={stats === undefined} lang={lang} />
                     </div>
-                    <p className="mt-1 font-semibold">{experienceName(item, lang)}</p>
+                    <SharedName name={`experiencia-nombre-${item.id}`} enabled={leavingTo === item.id}>
+                      <p className="mt-1 font-semibold">{experienceName(item, lang)}</p>
+                    </SharedName>
                     <p className="mt-2 text-sm"><strong>${item.priceUsd}</strong> <span className="text-xs text-muted">{es ? '/ persona' : '/ person'}</span></p>
                   </div>
                 </Link>
@@ -505,10 +525,13 @@ function Gallery({
   images,
   tag,
   lang,
+  transitionName,
 }: {
   images: { src: string; alt: Record<Locale, string> }[]
   tag: string | undefined
   lang: Locale
+  /** Para que la foto de la tarjeta pulsada vuele hasta aquí. */
+  transitionName: string
 }) {
   const es = lang === 'ES'
   const [active, setActive] = useState(0)
@@ -533,17 +556,19 @@ function Gallery({
           touchStart.current = null
         }}
       >
-        <Picture
-          key={images[active].src}
-          src={images[active].src}
-          sizes="(min-width: 1024px) 60vw, 100vw"
-          alt={images[active].alt[lang]}
-          fetchPriority={active === 0 ? 'high' : 'auto'}
-          decoding="async"
-          width={960}
-          height={720}
-          className="aspect-[4/3] h-full w-full object-cover"
-        />
+        <SharedPhoto name={transitionName} className="overflow-hidden rounded-3xl">
+          <Picture
+            key={images[active].src}
+            src={images[active].src}
+            sizes="(min-width: 1024px) 60vw, 100vw"
+            alt={images[active].alt[lang]}
+            fetchPriority={active === 0 ? 'high' : 'auto'}
+            decoding="async"
+            width={960}
+            height={720}
+            className="aspect-[4/3] h-full w-full object-cover"
+          />
+        </SharedPhoto>
         {tag && (
           <span className="absolute left-4 top-4 rounded-full bg-gold-soft px-3 py-1 text-xs font-bold text-brand">{tag}</span>
         )}

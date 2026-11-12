@@ -131,7 +131,7 @@ export function ServiceDetail({ service, other }: { service: Service; other: Ser
           </div>
 
           {/* Columna de decisión: precio, vehículo y cotización. */}
-          <aside className="space-y-5 lg:sticky lg:top-6 lg:self-start">
+          <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
             <div className="rounded-3xl border border-line bg-surface p-6 shadow-card">
               {service.priceFromUsd === null ? (
                 <p className="text-2xl font-bold leading-tight">{service.priceUnit[lang]}</p>

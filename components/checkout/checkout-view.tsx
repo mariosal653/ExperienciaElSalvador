@@ -533,7 +533,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
           </div>
 
           {/* 4. Resumen y pago */}
-          <aside aria-labelledby="summary-title" className="h-fit min-w-0 rounded-2xl bg-white p-4 shadow-card sm:p-6 lg:sticky lg:top-6">
+          <aside aria-labelledby="summary-title" className="h-fit min-w-0 rounded-2xl bg-white p-4 shadow-card sm:p-6 lg:sticky lg:top-24">
             <h2 id="summary-title" className="flex items-center gap-2.5 text-base font-semibold">
               <Step n={4} /> {t('Resumen', 'Summary')}
             </h2>

@@ -1,7 +1,10 @@
 'use client'
 
+import { useState } from 'react'
+import Link from 'next/link'
 import { CalendarCheck, Clock, Heart, MapPin, ShieldCheck } from 'lucide-react'
 import { Picture } from '@/components/ui/picture'
+import { SharedName, SharedPhoto } from '@/components/ui/shared-transition'
 import { RatingBadge } from '@/components/reviews/rating-badge'
 import { experienceName, type Experience, type Locale } from '@/lib/data'
 import { departureLabel, nextDepartures } from '@/lib/departures'
@@ -42,6 +45,14 @@ export function ExperienceCard({
   const next = now ? nextDepartures(item.weekdays, 1, now)[0] : undefined
   const detailHref = `/experiences/${item.id}`
   const bookHref = `/checkout/${item.id}${bookQuery ? `?${bookQuery}` : ''}`
+  /**
+   * Al pulsar, la foto y el nombre vuelan hasta la galería y el título del
+   * detalle. Solo la tarjeta pulsada recibe nombre de transición: ver
+   * components/ui/shared-transition.tsx. Los enlaces al detalle son <Link>
+   * por eso: con un <a> normal la página se recarga y no hay transición.
+   */
+  const [leaving, setLeaving] = useState(false)
+  const leave = () => setLeaving(true)
 
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl bg-surface shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-card-hover">
@@ -51,18 +62,20 @@ export function ExperienceCard({
         al cambiar de filtro.
       */}
       <div className="relative aspect-[16/10] overflow-hidden bg-surface-mint">
-        <a href={detailHref} tabIndex={-1} aria-hidden="true" className="block h-full">
-          <Picture
-            src={item.image}
-            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-            alt={item.imageAlt[lang]}
-            loading="lazy"
-            decoding="async"
-            width={640}
-            height={400}
-            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-          />
-        </a>
+        <Link href={detailHref} onClick={leave} tabIndex={-1} aria-hidden="true" className="block h-full">
+          <SharedPhoto name={`experiencia-foto-${item.id}`} enabled={leaving} className="h-full overflow-hidden rounded-t-2xl">
+            <Picture
+              src={item.image}
+              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+              alt={item.imageAlt[lang]}
+              loading="lazy"
+              decoding="async"
+              width={640}
+              height={400}
+              className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            />
+          </SharedPhoto>
+        </Link>
         {/* Degradado inferior: sin él, las fotos claras dejan la etiqueta y el corazón sin contraste. */}
         <span aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgb(14_48_53/0.28)_0%,transparent_38%)]" />
         {item.tag && (
@@ -89,9 +102,11 @@ export function ExperienceCard({
           <RatingBadge rating={stats?.[item.id]} loading={stats === undefined} lang={lang} />
         </div>
 
-        <h3 className="text-lg font-bold leading-snug text-brand">
-          <a href={detailHref} className="transition hover:text-accent">{name}</a>
-        </h3>
+        <SharedName name={`experiencia-nombre-${item.id}`} enabled={leaving}>
+          <h3 className="text-lg font-bold leading-snug text-brand">
+            <Link href={detailHref} onClick={leave} className="transition hover:text-accent">{name}</Link>
+          </h3>
+        </SharedName>
 
         {/* Apoyo: dos datos en una sola línea de chips, no cuatro renglones. */}
         <ul className="mt-2.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px]">
