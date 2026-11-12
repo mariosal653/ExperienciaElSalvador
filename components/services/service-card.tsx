@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { ArrowRight, Car, Check, Route } from 'lucide-react'
 import { QuoteActions } from '@/components/services/quote-actions'
 import type { Locale } from '@/lib/data'
-import type { Service } from '@/lib/services'
+import { formatUsd, type Service } from '@/lib/services'
 
 /** Iconos de los servicios, resueltos por clave (como la tira de categorías). */
 const ICONS = { route: Route, car: Car } as const
@@ -57,7 +57,7 @@ export function ServiceCard({ service, lang }: { service: Service; lang: Locale 
             ) : (
               <>
                 <span className="text-xs text-muted">{es ? 'Desde' : 'From'}</span>
-                <strong className="text-3xl font-extrabold leading-none text-brand">${service.priceFromUsd}</strong>
+                <strong className="text-3xl font-extrabold leading-none text-brand">${formatUsd(service.priceFromUsd)}</strong>
                 <span className="text-xs text-muted">{service.priceUnit[lang]}</span>
               </>
             )}

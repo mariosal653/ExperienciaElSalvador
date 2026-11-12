@@ -35,3 +35,27 @@ export const GOOGLE_PROFILE_URL = 'https://maps.google.com/?cid=1124111258831762
  * Se documenta aquí para no perderlo. Ver docs/SEO.md.
  */
 export const GOOGLE_REVIEW_URL = 'https://g.page/r/CYMK2FJXdACcEBM/review'
+
+/**
+ * Redes sociales del negocio. Se muestran en el pie y van en `sameAs` de
+ * los datos estructurados de la portada.
+ *
+ * `url: null` = la red existe pero falta su enlace confirmado: no se
+ * muestra ni se publica en `sameAs` hasta tenerlo (un enlace inventado a
+ * una página que no es la nuestra sería peor que ninguno).
+ */
+export const SOCIAL_LINKS: Array<{ network: 'instagram' | 'facebook'; label: string; handle: string; url: string | null }> = [
+  {
+    network: 'instagram',
+    label: 'Instagram',
+    handle: '@experienceinelsalvador',
+    url: 'https://www.instagram.com/experienceinelsalvador/',
+  },
+  {
+    network: 'facebook',
+    label: 'Facebook',
+    handle: 'Experiences in El Salvador',
+    // Pendiente: el cliente dio el nombre de la página, no su URL.
+    url: null,
+  },
+]

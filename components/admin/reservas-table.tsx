@@ -99,7 +99,7 @@ export function ReservasTable({
 
   return (
     <section aria-labelledby={id} className="min-w-0">
-      <h2 id={id} className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-[.12em] text-faint">
+      <h2 id={id} className="mb-3 flex items-center gap-2 text-lg font-medium tracking-tight text-[#17181a]">
         <Users size={15} /> {title}
         <span className="font-normal normal-case tracking-normal text-faint">({rows.length})</span>
       </h2>
@@ -113,7 +113,7 @@ export function ReservasTable({
           {/* Fichas: móvil */}
           <ul className="grid gap-3 lg:hidden">
             {rows.map((row) => (
-              <li key={row.id} className="rounded-2xl bg-white p-4 shadow-card">
+              <li key={row.id} className="rounded-2xl border border-[#e3e3de] bg-white p-4">
                 <Link href={`/admin/reservas/${row.code}`} className="block">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -150,7 +150,7 @@ export function ReservasTable({
             unos 1 520 px y en una pantalla de 1 440 las últimas (estado,
             creada, ver) quedaban recortadas SIN forma de llegar a ellas.
           */}
-          <div className="hidden overflow-x-auto rounded-2xl bg-white shadow-card lg:block">
+          <div className="hidden overflow-x-auto rounded-2xl border border-[#e3e3de] bg-white lg:block">
             <table className="w-full text-left text-sm">
               <caption className="sr-only">
                 Reservas reales registradas, con cliente, fecha, importe, método y estado del pago.

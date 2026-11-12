@@ -51,7 +51,7 @@ export function BarComparison({
   const hayDatos = rows.length > 0 && max > 0
 
   return (
-    <figure className="min-w-0 rounded-2xl bg-white p-4 shadow-card sm:p-5">
+    <figure className="min-w-0 rounded-2xl border border-[#e3e3de] bg-white p-4 sm:p-5">
       <figcaption>
         <h3 className="text-sm font-bold text-brand">{title}</h3>
         {description && <p className="mt-1 text-xs text-muted">{description}</p>}
@@ -75,7 +75,7 @@ export function BarComparison({
                 </div>
                 <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-surface-soft">
                   <div
-                    className="h-full rounded-full bg-accent"
+                    className="h-full rounded-full bg-[#17181a]"
                     style={{ width: `${pct}%` }}
                     role="img"
                     aria-label={`${row.label}: ${row.display}`}

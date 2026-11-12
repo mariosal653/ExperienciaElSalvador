@@ -10,15 +10,24 @@ import { LogOut } from 'lucide-react'
  * conviene volver a su propio login y no a la portada. Por defecto se
  * mantiene el comportamiento del área de cliente.
  */
-export function SignOutButton({ redirectTo = '/' }: { redirectTo?: string } = {}) {
+export function SignOutButton({
+  redirectTo = '/',
+  compact = false,
+  className,
+}: { redirectTo?: string; compact?: boolean; className?: string } = {}) {
   return (
     <button
       type="button"
       onClick={() => signOut({ redirectTo })}
-      className="flex items-center gap-2 rounded-full border border-white/50 px-4 py-2 text-sm font-semibold transition hover:bg-white hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+      aria-label={compact ? 'Cerrar sesión' : undefined}
+      title={compact ? 'Cerrar sesión' : undefined}
+      className={
+        className ??
+        'flex items-center gap-2 rounded-full border border-white/50 px-4 py-2 text-sm font-semibold transition hover:bg-white hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold'
+      }
     >
-      <LogOut size={15} />
-      Cerrar sesión
+      <LogOut size={compact ? 18 : 15} />
+      {!compact && 'Cerrar sesión'}
     </button>
   )
 }

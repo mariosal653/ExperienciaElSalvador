@@ -6,14 +6,10 @@ import {
   ArrowRight,
   ArrowUpDown,
   Check,
-  Compass,
   Heart,
   MapPin,
   RotateCcw,
-  ShieldCheck,
   SlidersHorizontal,
-  Sparkles,
-  Waves,
 } from 'lucide-react'
 import { Picture } from '@/components/ui/picture'
 import { SearchPanel } from '@/components/search/search-panel'
@@ -40,23 +36,13 @@ import {
 } from '@/lib/catalog-filters'
 import { destinationPages } from '@/lib/destination-details'
 import {
-  categories,
   emptyCriteria,
   filterExperiences,
   hasActiveCriteria,
   parseLocalDate,
-  type CategoryId,
   type Locale,
   type SearchCriteria,
 } from '@/lib/data'
-
-/** Iconos de la tira de categorías, resueltos por clave. */
-const CATEGORY_ICONS = {
-  waves: Waves,
-  compass: Compass,
-  sparkles: Sparkles,
-  shield: ShieldCheck,
-} as const
 
 /** Destinos con experiencias; cada uno tiene su página en /destinos/<id>. */
 const DESTINATION_TILES = destinationPages()
@@ -88,7 +74,6 @@ function formatDate(iso: string, lang: Locale): string {
  */
 export function HomeView() {
   const { lang: language } = useLanguage()
-  const [activeCategory, setActiveCategory] = useState<CategoryId | null>(null)
   const { ids: favorites, toggle: toggleFavorite } = useFavorites()
   const [onlySaved, setOnlySaved] = useState(false)
   const [refine, setRefine] = useState<Refinements>(emptyRefinements)
@@ -122,17 +107,17 @@ export function HomeView() {
   const results = useMemo(
     () =>
       sortExperiences(
-        applyRefinements(filterExperiences(criteria, activeCategory), refine).filter(
+        applyRefinements(filterExperiences(criteria, null), refine).filter(
           (item) => !onlySaved || favorites.includes(item.id),
         ),
         sort,
         stats,
       ),
-    [criteria, activeCategory, refine, onlySaved, favorites, sort, stats],
+    [criteria, refine, onlySaved, favorites, sort, stats],
   )
 
   const isFiltered =
-    (applied !== null && hasActiveCriteria(applied)) || activeCategory !== null || onlySaved || hasRefinements(refine)
+    (applied !== null && hasActiveCriteria(applied)) || onlySaved || hasRefinements(refine)
 
   // Si el visitante ya buscó, el checkout llega con su fecha y viajeros.
   const bookQuery = useMemo(() => {
@@ -156,7 +141,6 @@ export function HomeView() {
 
   function resetAll() {
     setApplied(null)
-    setActiveCategory(null)
     setOnlySaved(false)
     setRefine(emptyRefinements)
     setFormKey((value) => value + 1)
@@ -180,6 +164,11 @@ export function HomeView() {
         `absolute inset-0`, así que no se desbordan por sí solos.
       */}
       <section id="inicio" className="relative flex min-h-[620px] items-center bg-brand-hero pt-24">
+        {/*
+          RESPALDO, no velo: va ANTES de la foto en el orden del documento,
+          así que queda DEBAJO de ella y solo se ve si la imagen no carga.
+          El velo que sostiene el texto es el de después del vídeo.
+        */}
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,43,48,.86)_0%,rgba(10,43,48,.55)_45%,rgba(10,43,48,.15)_100%)]" />
         {/*
           Imagen del LCP: prioridad alta y tamaños por ancho de pantalla.
@@ -204,7 +193,20 @@ export function HomeView() {
           Sin vídeo configurado no dibuja nada (ver lib/hero-video.ts).
         */}
         <HeroVideo lang={language} />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(12,55,61,.35),rgba(12,55,61,.1)_45%,rgba(251,250,247,.9)_100%)]" />
+        {/*
+          El velo. Dos degradados en una sola capa, cada uno con su trabajo:
+
+          90deg  oscurece el LADO DEL TEXTO y abre el derecho, que es donde
+                 está el cono del Izalco. Antes el velo era uniforme (.35 →
+                 .1): daba poco contraste al titular blanco sobre el cielo
+                 claro y, aun así, apagaba el volcán.
+
+          180deg asienta la cabecera arriba y cierra abajo con un teal muy
+                 leve. Antes terminaba en crema al 90 %, que borraba el
+                 tercio inferior de la foto —se pagaban 520 KB de JPG para
+                 taparlo— y dejaba una banda gris sucia bajo el buscador.
+        */}
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,43,48,.72)_0%,rgba(10,43,48,.38)_52%,rgba(10,43,48,.05)_100%),linear-gradient(180deg,rgba(12,55,61,.30)_0%,transparent_38%,rgba(12,55,61,.18)_100%)]" />
         {/*
           Capa 30. Este div crea el contexto de apilamiento donde viven los
           desplegables del buscador, así que su z decide si el buscador queda
@@ -236,50 +238,17 @@ export function HomeView() {
       </section>
 
       {/*
-        Servicios principales, pegados al héroe (acuerdo 01). Lo que antes
-        ocupaba este sitio —la tira de categorías— baja junto al catálogo,
-        que es lo que filtra: así nada secundario desplaza las dos ofertas
-        de transporte de la parte principal de la página.
+        Servicios principales, pegados al héroe (acuerdo 01): nada
+        secundario desplaza las dos ofertas de transporte de la parte
+        principal de la página. La tira de categorías se retiró de la
+        portada a petición del cliente.
       */}
       <ServicesSection />
 
       {/* Reels: debajo de los servicios principales, antes del catálogo. */}
       <ReelsSection />
 
-      {/*
-        Tira de categorías: filtra el catálogo, así que vive justo encima de
-        él. Ya no se solapa con el héroe, de ahí que no lleve z-20 ni el
-        -mt-5 que compensaba el recorte vertical del scroll horizontal; el
-        pt-2 sigue haciendo falta para el anillo de la categoría activa.
-
-        El centrado empieza en md y NO antes. Las cuatro tarjetas ocupan
-        676 px (4 × 160 + 3 huecos de 12), así que de 768 px en adelante
-        caben de sobra y no hay desbordamiento que centrar mal. Por debajo
-        mandan el scroll horizontal y el alineado a la izquierda: con
-        `justify-center` y contenido más ancho que la caja, las primeras
-        tarjetas se salen por el lado izquierdo y ya no hay forma de
-        llegar a ellas deslizando.
-      */}
-      <section aria-label={es ? 'Categorías' : 'Categories'} className="mx-auto max-w-7xl px-5 pt-14 lg:px-8"><div className="flex gap-3 overflow-x-auto px-1 pb-2 pt-2 [scrollbar-width:none] md:justify-center">
-        {categories.map((category) => {
-          const Icon = CATEGORY_ICONS[category.icon]
-          const isActive = activeCategory === category.id
-          return (
-            <button
-              key={category.id}
-              onClick={() => setActiveCategory(isActive ? null : category.id)}
-              aria-pressed={isActive}
-              className={`group relative h-24 min-w-40 shrink-0 overflow-hidden rounded-2xl text-left shadow-lg transition hover:-translate-y-1 ${isActive ? 'ring-2 ring-gold ring-offset-2' : ''}`}
-            >
-              <Picture src={category.image} sizes="160px" alt="" width={320} height={192} decoding="async" className="absolute inset-0 h-full w-full object-cover transition group-hover:scale-105" />
-              <span className="absolute inset-0 bg-[#103f44]/55" />
-              <span className="relative flex h-full flex-col justify-between p-4 text-white"><Icon size={20} /><span className="font-semibold">{category.label[language]}</span></span>
-            </button>
-          )
-        })}
-      </div></section>
-
-      <section id="experiencias" className="mx-auto max-w-7xl px-5 pb-20 pt-10 lg:px-8">
+      <section id="experiencias" className="mx-auto max-w-7xl px-5 pb-20 pt-14 lg:px-8">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
             <p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-accent">{es ? 'Para empezar' : 'To get started'}</p>
@@ -361,11 +330,6 @@ export function HomeView() {
             {applied && applied.people !== emptyCriteria.people && (
               <span className="rounded-full bg-surface-mint px-3 py-1.5 text-xs font-semibold text-brand">
                 {applied.people} {es ? (applied.people === 1 ? 'viajero' : 'viajeros') : applied.people === 1 ? 'traveler' : 'travelers'}
-              </span>
-            )}
-            {activeCategory && (
-              <span className="rounded-full bg-gold-soft px-3 py-1.5 text-xs font-bold text-brand">
-                {categories.find((category) => category.id === activeCategory)?.label[language]}
               </span>
             )}
             {onlySaved && (

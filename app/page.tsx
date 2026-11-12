@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { HomeView } from '@/components/home/home-view'
 import { experiences } from '@/lib/data'
 import { getSiteUrl } from '@/lib/site'
-import { CONTACT_EMAIL, GOOGLE_PROFILE_URL } from '@/lib/contact'
+import { CONTACT_EMAIL, GOOGLE_PROFILE_URL, SOCIAL_LINKS } from '@/lib/contact'
 import { whatsappConfig } from '@/lib/whatsapp'
 
 /**
@@ -31,6 +31,7 @@ export const metadata: Metadata = {
  */
 const SAME_AS = [
   GOOGLE_PROFILE_URL,
+  ...SOCIAL_LINKS.flatMap((link) => (link.url ? [link.url] : [])),
   ...(process.env.NEXT_PUBLIC_PROFILE_URLS ?? '')
     .split(',')
     .map((url) => url.trim())

@@ -22,7 +22,7 @@ import { useLanguage } from '@/components/i18n/language-provider'
 import { useWhatsAppLead } from '@/components/whatsapp/whatsapp-provider'
 import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
-import { guideAddOn, vehicle, type Service } from '@/lib/services'
+import { formatUsd, guideAddOn, vehicle, type Service } from '@/lib/services'
 
 const ICONS = { route: Route, car: Car } as const
 
@@ -138,7 +138,7 @@ export function ServiceDetail({ service, other }: { service: Service; other: Ser
               ) : (
                 <p className="flex items-baseline gap-1.5">
                   <span className="text-sm text-muted">{es ? 'Desde' : 'From'}</span>
-                  <strong className="text-4xl font-extrabold leading-none">${service.priceFromUsd}</strong>
+                  <strong className="text-4xl font-extrabold leading-none">${formatUsd(service.priceFromUsd)}</strong>
                   <span className="text-sm text-muted">{service.priceUnit[lang]}</span>
                 </p>
               )}

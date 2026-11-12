@@ -40,6 +40,7 @@ export default async function ReservaDetallePage({ params }: Params) {
 
   return (
     <AdminShell admin={admin}>
+      <div className="px-4 py-7 sm:px-6 lg:px-10 lg:py-10">
       <Link href="/admin" className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline">
         <ArrowLeft size={15} /> Volver al panel
       </Link>
@@ -113,11 +114,11 @@ export default async function ReservaDetallePage({ params }: Params) {
         </h2>
 
         {pagos.length === 0 ? (
-          <p className="rounded-2xl bg-white px-5 py-8 text-center text-sm text-muted shadow-card">
+          <p className="rounded-2xl border border-[#e3e3de] bg-white px-5 py-8 text-center text-sm text-muted">
             Esta reserva no llegó a generar ningún intento de pago.
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-2xl bg-white shadow-card">
+          <div className="overflow-x-auto rounded-2xl border border-[#e3e3de] bg-white">
             <table className="w-full min-w-[46rem] text-left text-sm">
               <thead>
                 <tr className="border-b border-line-soft text-xs uppercase tracking-[.1em] text-faint">
@@ -158,6 +159,7 @@ export default async function ReservaDetallePage({ params }: Params) {
           </div>
         )}
       </section>
+      </div>
     </AdminShell>
   )
 }
@@ -172,7 +174,7 @@ function Bloque({
   children: React.ReactNode
 }) {
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-card">
+    <section className="rounded-2xl border border-[#e3e3de] bg-white p-5">
       <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-[.12em] text-faint">
         <Icon size={15} /> {titulo}
       </h2>

@@ -21,8 +21,8 @@ import type { Locale } from './data'
  *                    cliente, que arma su propio itinerario → por hora.
  *
  * Confirmado con el cliente: capacidad de 6 personas, mínimo de 3 horas,
- * guía bilingüe a US$75 por día, US$0.75 por kilómetro y US$5 por hora de
- * espera, esta última con la excepción que se explica en
+ * guía bilingüe a US$75 por día, US$1.50 por kilómetro (Driver by Tour),
+ * US$20 por hora (Personal Driver) y US$5 por hora de espera, esta última con la excepción que se explica en
  * WAITING_PER_HOUR_USD. Ya no queda ninguna tarifa sin confirmar.
  */
 
@@ -39,7 +39,7 @@ type List = Record<Locale, string[]>
 export const MIN_HOURS = 3
 
 /** Tarifa por hora del Personal Driver, en dólares. */
-export const HOURLY_USD = 15
+export const HOURLY_USD = 20
 
 /** Guía turístico bilingüe como complemento, por DÍA de servicio. */
 export const GUIDE_PER_DAY_USD = 75
@@ -48,7 +48,7 @@ export const GUIDE_PER_DAY_USD = 75
 export const VEHICLE_SEATS = 6
 
 /** Recorrido del Driver by Tour: dólares por kilómetro. */
-export const PER_KM_USD = 0.75
+export const PER_KM_USD = 1.5
 
 /**
  * Tiempo de espera, por hora. Se suma al recorrido cuando el conductor
@@ -60,6 +60,14 @@ export const PER_KM_USD = 0.75
  * distinguir los dos casos antes de sumar nada por este concepto.
  */
 export const WAITING_PER_HOUR_USD = 5
+
+/**
+ * Cifra en dólares para mostrar: entera sin decimales ($20) y con centavos
+ * siempre a dos cifras ($1.50, nunca $1.5).
+ */
+export function formatUsd(value: number): string {
+  return Number.isInteger(value) ? String(value) : value.toFixed(2)
+}
 
 /* ------------------------------------------------------------------ */
 /* Vehículo                                                            */
@@ -171,12 +179,12 @@ export const services: Service[] = [
     },
     notes: {
       ES: [
-        `El total sale de la distancia del recorrido, a $${PER_KM_USD} por kilómetro, más $${WAITING_PER_HOUR_USD} por cada hora que el conductor te espere en una parada.`,
+        `El total sale de la distancia del recorrido, a $${formatUsd(PER_KM_USD)} por kilómetro, más $${WAITING_PER_HOUR_USD} por cada hora que el conductor te espere en una parada.`,
         'Si solo necesitas que te llevemos de un sitio a otro, aunque recojamos en varios puntos, no se cobra espera: pagas únicamente el viaje.',
         'Para rutas de madrugada, como el amanecer en el volcán de Santa Ana, conviene avisar con un día de antelación.',
       ],
       EN: [
-        `The total comes from the distance of the route, at $${PER_KM_USD} per kilometre, plus $${WAITING_PER_HOUR_USD} for every hour the driver waits for you at a stop.`,
+        `The total comes from the distance of the route, at $${formatUsd(PER_KM_USD)} per kilometre, plus $${WAITING_PER_HOUR_USD} for every hour the driver waits for you at a stop.`,
         'If you only need to get from one place to another, even with several pickup points, there is no waiting charge: you pay for the ride alone.',
         'For early-morning routes, such as sunrise on the Santa Ana volcano, it is best to ask a day ahead.',
       ],

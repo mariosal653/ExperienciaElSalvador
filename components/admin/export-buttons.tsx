@@ -22,35 +22,22 @@ export function ExportButtons({ filters, total }: { filters: AdminFilters; total
   }
 
   const base =
-    'inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
+    'inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#17181a]'
 
   if (total === 0) {
-    return (
-      <p className="text-xs text-faint">No hay nada que exportar con estos filtros.</p>
-    )
+    return <p className="text-xs text-[#17181a]/45">Nada que exportar con estos filtros.</p>
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <a
-        href={href('xlsx')}
-        download
-        className={`${base} border-success-line bg-white text-success-dark hover:bg-success-soft`}
-      >
-        <FileSpreadsheet size={16} />
+    <div className="flex items-center gap-2" title={`${total} ${total === 1 ? 'reserva' : 'reservas'} con los filtros actuales`}>
+      <a href={href('xlsx')} download className={`${base} border border-[#dcdcd6] bg-white text-[#17181a] hover:bg-[#f2f2ee]`}>
+        <FileSpreadsheet size={16} aria-hidden="true" />
         Excel
       </a>
-      <a
-        href={href('pdf')}
-        download
-        className={`${base} border-accent-line bg-white text-accent hover:bg-accent-soft`}
-      >
-        <FileText size={16} />
-        PDF
+      <a href={href('pdf')} download className={`${base} bg-[#17181a] text-white hover:bg-black`}>
+        <FileText size={16} aria-hidden="true" />
+        Exportar PDF
       </a>
-      <span className="text-xs text-muted">
-        {total} {total === 1 ? 'reserva' : 'reservas'} con los filtros actuales
-      </span>
     </div>
   )
 }

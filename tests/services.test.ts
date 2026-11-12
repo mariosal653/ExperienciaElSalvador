@@ -30,9 +30,9 @@ describe('servicios de conductor', () => {
   it('las condiciones acordadas son las publicadas', () => {
     expect(VEHICLE_SEATS).toBe(6)
     expect(MIN_HOURS).toBe(3)
-    expect(HOURLY_USD).toBe(15)
+    expect(HOURLY_USD).toBe(20)
     expect(GUIDE_PER_DAY_USD).toBe(75)
-    expect(PER_KM_USD).toBe(0.75)
+    expect(PER_KM_USD).toBe(1.5)
     expect(WAITING_PER_HOUR_USD).toBe(5)
     expect(vehicle.model).toBe('Chevrolet N400')
   })

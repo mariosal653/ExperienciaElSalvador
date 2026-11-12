@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { ArrowRight, Clock, Info, MapPin, Minus, Plus, Route, Trash2 } from 'lucide-react'
 import { QuoteActions } from '@/components/services/quote-actions'
 import { useLanguage } from '@/components/i18n/language-provider'
-import { PER_KM_USD, WAITING_PER_HOUR_USD } from '@/lib/services'
+import { formatUsd, PER_KM_USD, WAITING_PER_HOUR_USD } from '@/lib/services'
 import {
   getPlace,
   places,
@@ -216,7 +216,7 @@ export function QuoteCalculator({ service }: { service: string }) {
             </div>
             <div className="flex items-center justify-between gap-4">
               <dt className="text-muted">
-                {es ? `Recorrido · $${PER_KM_USD} por km` : `Route · $${PER_KM_USD} per km`}
+                {es ? `Recorrido · $${formatUsd(PER_KM_USD)} por km` : `Route · $${formatUsd(PER_KM_USD)} per km`}
               </dt>
               <dd className="font-semibold">${quote.tripUsd}</dd>
             </div>
