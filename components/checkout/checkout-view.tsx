@@ -9,7 +9,7 @@ import { useWhatsAppLead } from '@/components/whatsapp/whatsapp-provider'
 import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
 import { DatePicker } from './date-picker'
-import { calculatePrice, formatCents } from '@/lib/pricing'
+import { formatCents, quote } from '@/lib/pricing'
 import { experienceName, parseLocalDate, type Locale } from '@/lib/data'
 import { track, trackBeginCheckout } from '@/lib/analytics'
 import { FREE_CANCELLATION_HOURS } from '@/lib/experience-details'
@@ -106,6 +106,8 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
   )
   const [remaining, setRemaining] = useState<number | null>(null)
   const [checkingSeats, setCheckingSeats] = useState(false)
+  /** Plazas que quedaban en la fecha que se soltó al crecer el grupo. */
+  const [dateNotice, setDateNotice] = useState<number | null>(null)
 
   const [customer, setCustomer] = useState({
     name: user?.name ?? '',
@@ -192,16 +194,23 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
     return () => controller.abort()
   }, [date, experience.id])
 
-  const maxPeople = Math.max(1, Math.min(experience.maxPeople, remaining ?? experience.maxPeople))
+  // Primero las personas, luego la fecha: el grupo manda. Si el grupo
+  // crece y ya no cabe en el día elegido, se suelta la fecha y se avisa,
+  // en vez de recortar el grupo a escondidas.
+  const maxPeople = experience.maxPeople
   useEffect(() => {
-    if (remaining !== null && remaining > 0 && people > remaining) setPeople(remaining)
-  }, [remaining, people])
+    if (date && remaining !== null && remaining > 0 && people > remaining) {
+      setDateNotice(remaining)
+      setDate(null)
+    }
+  }, [remaining, people, date])
 
   const soldOut = remaining === 0
 
-  // Vista previa. El importe que vale es el que calcula el servidor.
-  const unitCents = Math.round(experience.priceUsd * 100)
-  const price = calculatePrice(unitCents, people, useDiscount ? discountPct : 0)
+  // Vista previa con la misma función que cobra el servidor (quote). El
+  // importe que vale es el que calcula el servidor.
+  const price = quote(experience, date ?? undefined, people, useDiscount ? discountPct : 0)!
+  const unitCents = price.unitPriceCents
 
   const clientErrors = useMemo(() => validateCustomer(customer), [customer])
   const errors: CustomerErrors = { ...clientErrors }
@@ -352,41 +361,10 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
 
         <form ref={formRef} onSubmit={submit} noValidate className="mt-6 grid gap-6 lg:grid-cols-[1.35fr_1fr] lg:gap-10">
           <div className="grid min-w-0 gap-6">
-            {/* 1. Fecha */}
-            <section aria-labelledby="step-date" className="rounded-2xl bg-white p-4 shadow-card sm:p-6">
-              <h2 id="step-date" className="flex items-center gap-2.5 text-base font-semibold">
-                <Step n={1} /> <CalendarDays size={17} className="text-accent" /> {t('Fecha', 'Date')}
-              </h2>
-              <div className="mt-4" data-invalid={submitted && !date ? 'true' : undefined} tabIndex={-1}>
-                <DatePicker
-                  value={date}
-                  onChange={(value) => {
-                    setDate(value)
-                    setServerError(null)
-                  }}
-                  weekdays={experience.weekdays}
-                  first={range.first}
-                  last={range.last}
-                  lang={lang}
-                  invalid={submitted && !date}
-                  describedBy="date-help"
-                />
-              </div>
-              <p id="date-help" className="mt-2 text-xs text-muted" aria-live="polite">
-                {submitted && !date ? (
-                  <span className="font-medium text-accent-deep">{t('Elige una fecha para continuar.', 'Pick a date to continue.')}</span>
-                ) : dateLabel ? (
-                  <span className="font-semibold capitalize text-brand">{dateLabel}</span>
-                ) : (
-                  t('Elige uno de los días marcados.', 'Pick one of the highlighted days.')
-                )}
-              </p>
-            </section>
-
-            {/* 2. Viajeros */}
+            {/* 1. Viajeros */}
             <section aria-labelledby="step-people" className="rounded-2xl bg-white p-4 shadow-card sm:p-6">
               <h2 id="step-people" className="flex items-center gap-2.5 text-base font-semibold">
-                <Step n={2} /> <Users size={17} className="text-accent" /> {t('Viajeros', 'Travelers')}
+                <Step n={1} /> <Users size={17} className="text-accent" /> {t('Viajeros', 'Travelers')}
               </h2>
               <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -429,6 +407,46 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
                   <span className="text-muted">
                     {t(`Grupos de hasta ${experience.maxPeople} personas. Una entrada con QR por viajero.`, `Groups of up to ${experience.maxPeople}. One QR ticket per traveler.`)}
                   </span>
+                )}
+              </p>
+            </section>
+
+            {/* 2. Fecha: debajo de las personas, porque cada día muestra el total del grupo */}
+            <section aria-labelledby="step-date" className="rounded-2xl bg-white p-4 shadow-card sm:p-6">
+              <h2 id="step-date" className="flex items-center gap-2.5 text-base font-semibold">
+                <Step n={2} /> <CalendarDays size={17} className="text-accent" /> {t('Fecha', 'Date')}
+              </h2>
+              <div className="mt-4" data-invalid={submitted && !date ? 'true' : undefined} tabIndex={-1}>
+                <DatePicker
+                  value={date}
+                  onChange={(value) => {
+                    setDate(value)
+                    setDateNotice(null)
+                    setServerError(null)
+                  }}
+                  experience={experience}
+                  people={people}
+                  weekdays={experience.weekdays}
+                  first={range.first}
+                  last={range.last}
+                  lang={lang}
+                  invalid={submitted && !date}
+                  describedBy="date-help"
+                />
+              </div>
+              <p id="date-help" className="mt-2 text-xs text-muted" aria-live="polite">
+                {submitted && !date ? (
+                  <span className="font-medium text-accent-deep">{t('Elige una fecha para continuar.', 'Pick a date to continue.')}</span>
+                ) : dateNotice !== null ? (
+                  <span className="font-medium text-accent-deep">
+                    {es
+                      ? `Ese día solo quedan ${dateNotice} ${dateNotice === 1 ? 'lugar' : 'lugares'} y tu grupo es de ${people}. Elige otra fecha.`
+                      : `That day only has ${dateNotice} ${dateNotice === 1 ? 'spot' : 'spots'} left for your ${people}. Pick another date.`}
+                  </span>
+                ) : dateLabel ? (
+                  <span className="font-semibold capitalize text-brand">{dateLabel}</span>
+                ) : (
+                  t(`Cada día muestra el total para ${people} ${people === 1 ? 'persona' : 'personas'}, sin descuentos.`, `Each day shows the total for ${people} ${people === 1 ? 'person' : 'people'}, before discounts.`)
                 )}
               </p>
             </section>

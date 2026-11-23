@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { prisma } from './db'
-import { calculatePrice, getExperiencePriceCents } from './pricing'
+import { quote } from './pricing'
 import {
   getUsableWelcomeBenefit,
   releaseStaleReservation,
@@ -168,9 +168,10 @@ export async function createPendingBooking(
     discountPct = benefit.percentage
   }
 
-  const unitPriceCents = getExperiencePriceCents(experience.id)
-  if (unitPriceCents === null) return { ok: false, failure: { code: 'experienceNotFound', status: 404 } }
-  const price = calculatePrice(unitPriceCents, input.people, discountPct)
+  // La misma función que pinta el calendario y el resumen: lo que se ve es
+  // lo que se cobra. El precio queda congelado en la reserva.
+  const price = quote(experience, input.date, input.people, discountPct)
+  if (price === null) return { ok: false, failure: { code: 'experienceNotFound', status: 404 } }
 
   try {
     const booking = await withRetry(() =>

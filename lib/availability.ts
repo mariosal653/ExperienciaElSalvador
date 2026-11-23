@@ -1,6 +1,7 @@
 import type { Prisma, PrismaClient } from '@prisma/client'
 import { experiences, parseLocalDate, type Experience } from './data'
 import { bookableRange } from './dates'
+import { quote } from './pricing'
 
 /**
  * Disponibilidad y cupo por fecha. SOLO SERVIDOR.
@@ -89,4 +90,106 @@ export async function seatsFor(client: Client, experience: Experience, date: str
     seatsTaken(client, experience.id, date),
   ])
   return { capacity, taken, remaining: Math.max(0, capacity - taken) }
+}
+
+/* ------------------------------------------------------------------ */
+/* Calendario del checkout: un mes entero de una vez                   */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Estado de un día para un grupo de `people` personas:
+ *   available    se puede reservar
+ *   limited      quedan plazas, pero menos que el grupo («Solo 2 lugares»)
+ *   soldOut      no queda ninguna plaza
+ *   closed       el operador cerró la fecha (feriado, clima)
+ *   unavailable  la experiencia no sale ese día, o está fuera de plazo
+ */
+export type DayStatus = 'available' | 'limited' | 'soldOut' | 'closed' | 'unavailable'
+
+export type DayAvailability = {
+  date: string
+  status: DayStatus
+  remaining: number
+  /** Precio por persona de ese día. `null` si no se puede reservar. */
+  unitPriceCents: number | null
+  /** Total del grupo, sin descuentos. `null` si no se puede reservar. */
+  totalCents: number | null
+}
+
+/** Clasifica un día. Función pura: la usan el servidor y las pruebas. */
+export function dayStatus(input: {
+  bookable: boolean
+  closed: boolean
+  capacity: number
+  taken: number
+  people: number
+}): { status: DayStatus; remaining: number } {
+  if (!input.bookable) return { status: 'unavailable', remaining: 0 }
+  if (input.closed || input.capacity <= 0) return { status: 'closed', remaining: 0 }
+  const remaining = Math.max(0, input.capacity - input.taken)
+  if (remaining === 0) return { status: 'soldOut', remaining }
+  if (remaining < input.people) return { status: 'limited', remaining }
+  return { status: 'available', remaining }
+}
+
+/** Días AAAA-MM-DD de un mes AAAA-MM. */
+export function daysOfMonth(month: string): string[] {
+  const [year, monthNumber] = month.split('-').map(Number)
+  const count = new Date(year, monthNumber, 0).getDate()
+  return Array.from({ length: count }, (_, index) => `${month}-${String(index + 1).padStart(2, '0')}`)
+}
+
+/**
+ * Disponibilidad y precio de todos los días de un mes para un grupo.
+ *
+ * Dos consultas para el mes entero (excepciones y plazas ocupadas), no
+ * una por día. El precio sale de `quote()`, la misma función que cobra.
+ */
+export async function monthAvailability(
+  client: Client,
+  experience: Experience,
+  month: string,
+  people: number,
+  now = new Date(),
+): Promise<DayAvailability[]> {
+  const prefix = `${month}-`
+  const [overrides, taken] = await Promise.all([
+    client.availability.findMany({
+      where: { experienceId: experience.id, date: { startsWith: prefix } },
+    }),
+    client.booking.groupBy({
+      by: ['date'],
+      _sum: { people: true },
+      where: {
+        experienceId: experience.id,
+        date: { startsWith: prefix },
+        OR: [
+          { status: { in: ['PAID', 'CONFIRMED', 'COMPLETED'] } },
+          { status: 'PENDING_PAYMENT', holdExpiresAt: { gt: now } },
+        ],
+      },
+    }),
+  ])
+
+  const overrideByDate = new Map(overrides.map((row) => [row.date, row]))
+  const takenByDate = new Map(taken.map((row) => [row.date, row._sum.people ?? 0]))
+
+  return daysOfMonth(month).map((date) => {
+    const override = overrideByDate.get(date)
+    const { status, remaining } = dayStatus({
+      bookable: checkBookableDate(experience, date, now).ok,
+      closed: override?.closed ?? false,
+      capacity: override?.capacity ?? experience.maxPeople,
+      taken: takenByDate.get(date) ?? 0,
+      people,
+    })
+    const price = status === 'available' ? quote(experience, date, people) : null
+    return {
+      date,
+      status,
+      remaining,
+      unitPriceCents: price?.unitPriceCents ?? null,
+      totalCents: price?.totalCents ?? null,
+    }
+  })
 }
