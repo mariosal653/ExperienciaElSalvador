@@ -213,7 +213,7 @@ export async function createPayPalPaymentForBooking(
       amountCents: booking.totalCents,
       currency: booking.currency,
       description: `${booking.experienceTitle} — ${booking.date} — ${booking.people} pax`,
-      brandName: 'Experiences El Salvador',
+      brandName: 'Experiences in El Salvador',
       locale,
       returnUrl: `${site}/checkout/return?ref=${encodeURIComponent(reference)}&provider=paypal`,
       cancelUrl: `${site}/checkout/return?ref=${encodeURIComponent(reference)}&provider=paypal&cancelado=1`,

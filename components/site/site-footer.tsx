@@ -16,14 +16,16 @@ export function SiteFooter() {
     { href: '/legal/terms', label: es ? 'Términos' : 'Terms' },
     { href: '/legal/cancellation', label: es ? 'Cancelación' : 'Cancellation' },
     { href: '/legal/privacy', label: es ? 'Privacidad' : 'Privacy' },
-    { href: '/credits', label: es ? 'Créditos de fotos' : 'Photo credits' },
+    // «Créditos de fotos» ya no va en el pie (lo pidió el cliente). La página
+    // sigue existiendo y se enlaza desde Términos: las fotos con licencia
+    // Creative Commons exigen citar al autor (ver lib/credits.ts).
   ]
 
   return (
     <footer className="no-print border-t border-line px-5 py-8 text-sm text-muted">
       <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 md:flex-row md:items-center">
         <span className="font-bold text-brand">
-          Experiences <span className="text-accent">El Salvador</span>
+          Experiences in <span className="text-accent">El Salvador</span>
         </span>
         <span>{es ? 'Hecho con cariño desde El Salvador · © 2026' : 'Made with care in El Salvador · © 2026'}</span>
         {/*

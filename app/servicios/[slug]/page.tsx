@@ -46,8 +46,6 @@ export default async function ServicePage({ params }: Params) {
   const service = getService(slug)
   if (!service) notFound()
 
-  // Son dos servicios: el «otro» es siempre el que no es este.
-  const other = services.find((item) => item.id !== service.id) ?? service
   const site = getSiteUrl()
 
   // Datos estructurados (schema.org). La oferta solo se marca cuando hay
@@ -60,7 +58,7 @@ export default async function ServicePage({ params }: Params) {
     serviceType: service.tagline.EN,
     description: service.description.EN,
     url: `${site}/servicios/${service.id}`,
-    provider: { '@type': 'TravelAgency', '@id': `${site}/#organization`, name: 'Experiences El Salvador', url: site },
+    provider: { '@type': 'TravelAgency', '@id': `${site}/#organization`, name: 'Experiences in El Salvador', url: site },
     areaServed: { '@type': 'Country', name: 'El Salvador' },
     ...(service.priceFromUsd === null
       ? {}
@@ -72,7 +70,7 @@ export default async function ServicePage({ params }: Params) {
               '@type': 'UnitPriceSpecification',
               price: service.priceFromUsd.toFixed(2),
               priceCurrency: 'USD',
-              // Unidades UN/CEFACT: HUR es hora y KMT, kilómetro.
+              // Unidad UN/CEFACT: HUR es hora.
               unitCode: service.priceUnitCode,
             },
             url: `${site}/servicios/${service.id}`,
@@ -88,7 +86,7 @@ export default async function ServicePage({ params }: Params) {
         // nunca pueda cerrar la etiqueta <script>.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
-      <ServiceDetail service={service} other={other} />
+      <ServiceDetail service={service} />
     </>
   )
 }

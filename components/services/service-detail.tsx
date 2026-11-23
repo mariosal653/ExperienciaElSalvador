@@ -17,7 +17,6 @@ import {
 } from 'lucide-react'
 import { Picture } from '@/components/ui/picture'
 import { QuoteActions } from '@/components/services/quote-actions'
-import { QuoteCalculator } from '@/components/services/quote-calculator'
 import { useLanguage } from '@/components/i18n/language-provider'
 import { useWhatsAppLead } from '@/components/whatsapp/whatsapp-provider'
 import { SiteHeader } from '@/components/site/site-header'
@@ -37,7 +36,7 @@ const ICONS = { route: Route, car: Car } as const
  * No hay reserva ni pago: un traslado se cierra hablando. Cuando exista el
  * cotizador automático, entra en esta página como un bloque más.
  */
-export function ServiceDetail({ service, other }: { service: Service; other: Service }) {
+export function ServiceDetail({ service }: { service: Service }) {
   const { lang } = useLanguage()
   const es = lang === 'ES'
   const Icon = ICONS[service.icon]
@@ -95,14 +94,6 @@ export function ServiceDetail({ service, other }: { service: Service; other: Ser
                 </ul>
               </div>
             </section>
-
-            {/*
-              El cotizador calcula kilómetros, así que aparece en el
-              servicio que se cobra por kilómetro y no en el que va por
-              horas. Si mañana hay un tercero por distancia, lo hereda sin
-              tocar nada aquí.
-            */}
-            {service.priceUnitCode === 'KMT' && <QuoteCalculator service={service.name} />}
 
             <section className="rounded-3xl border border-line bg-surface p-6 lg:p-7">
               <h2 className="text-xl font-semibold">{es ? 'Cómo funciona' : 'How it works'}</h2>
@@ -207,21 +198,22 @@ export function ServiceDetail({ service, other }: { service: Service; other: Ser
           </aside>
         </div>
 
-        {/* El otro servicio: son dos, así que se nombra el que falta. */}
+        {/* Ya no hay otro servicio que enlazar: se cierra con los tours. */}
         <section className="mt-12 rounded-3xl border border-line bg-surface p-6 lg:p-7">
           <p className="text-xs font-bold uppercase tracking-[.16em] text-muted">
-            {es ? '¿Buscabas otra cosa?' : 'Looking for something else?'}
+            {es ? '¿Prefieres un tour armado?' : 'Prefer a ready-made tour?'}
           </p>
           <div className="mt-3 flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <h2 className="text-xl font-semibold">{other.name}</h2>
-              <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted">{other.summary[lang]}</p>
-            </div>
+            <p className="max-w-xl text-sm leading-relaxed text-muted">
+              {es
+                ? 'Si no quieres planear la ruta, mira nuestros tours: el transporte ya va incluido.'
+                : 'If you would rather not plan the route, see our tours: transport is already included.'}
+            </p>
             <Link
-              href={`/servicios/${other.id}`}
+              href="/#experiencias"
               className="group inline-flex items-center gap-1.5 rounded-full border border-line-strong px-4 py-2.5 text-sm font-bold transition hover:bg-surface-mint"
             >
-              {es ? 'Ver servicio' : 'See service'}
+              {es ? 'Ver tours' : 'See tours'}
               <ArrowRight size={15} className="transition group-hover:translate-x-0.5" aria-hidden="true" />
             </Link>
           </div>

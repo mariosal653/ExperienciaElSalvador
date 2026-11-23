@@ -33,10 +33,29 @@ export type Experience = {
   /** Debe coincidir con el `name` de un destino. */
   destination: string
   category: CategoryId
-  priceUsd: number
+  /**
+   * Cómo se contrata:
+   *   'online'  se reserva y se paga en la web (calendario + pasarela).
+   *   'quote'   el precio es una REFERENCIA por persona y la reserva se
+   *             confirma por WhatsApp o correo. Desde noviembre de 2026
+   *             solo se venden en línea los seis tours del documento
+   *             «Tours y precios»; el resto del catálogo queda para cotizar.
+   */
+  booking: 'online' | 'quote'
+  /** Precio por persona en USD. `null` = «Precio a consultar» (solo con booking 'quote'). */
+  priceUsd: number | null
   durationHours: number
   image: string
   imageAlt: Record<Locale, string>
+  /**
+   * Etiqueta dorada sobre la foto. Es PRUEBA SOCIAL: «Más reservado»,
+   * «Favorito local», «Patrimonio»… lo que empuja a entrar en la ficha.
+   *
+   * NUNCA «Nuevo». Esa palabra ya la dice RatingBadge, en verde y con una
+   * chispa, cuando la experiencia no tiene opiniones todavía. Dos
+   * experiencias la llevaban aquí además: salían con «Nuevo» dos veces,
+   * en dos colores y con dos significados distintos.
+   */
   tag?: Record<Locale, string>
   /** Capacidad máxima del grupo. Filtra por número de viajeros. */
   maxPeople: number
@@ -45,6 +64,16 @@ export type Experience = {
   /** Texto de la página de detalle y de la meta description. */
   description: Record<Locale, string>
   highlights: Record<Locale, string[]>
+  /**
+   * Retirada del catálogo público: no sale en la portada, los destinos, el
+   * sitemap ni las búsquedas. Se conserva aquí porque puede haber reservas
+   * y opiniones antiguas que la nombran (panel, área de cliente).
+   */
+  hidden?: boolean
+  /** Tours con transporte privado incluido (recogida en hotel). Sustituye a «Guía local» en la tarjeta. */
+  transportIncluded?: boolean
+  /** Si está oculta, a qué experiencia lleva su ficha antigua. */
+  replacedBy?: string
 }
 
 export type Destination = {
@@ -130,19 +159,184 @@ export const categories: Category[] = [
 /* Experiencias                                                        */
 /* ------------------------------------------------------------------ */
 
+/** Todos los días de la semana: los tours nuevos salen a diario mientras no se diga otra cosa. */
+const EVERY_DAY = [0, 1, 2, 3, 4, 5, 6]
+
 export const experiences: Experience[] = [
+  /*
+   * TOURS (noviembre de 2026, documento «Tours y precios»). Son los únicos
+   * que se reservan y pagan en línea. Precio POR PERSONA, grupos de hasta 7,
+   * transporte incluido. Duración y días de salida son una propuesta que
+   * falta confirmar con el cliente; la hora de recogida del amanecer (1:30
+   * a. m., de El Tunco a hoteles de San Salvador) sí está confirmada.
+   * Van primero en la lista: es el orden «recomendado» del catálogo.
+   */
+  {
+    id: 'amanecer-volcan-santa-ana',
+    transportIncluded: true,
+    title: 'Amanecer en el Volcán de Santa Ana',
+    name: { ES: 'Amanecer en el Volcán de Santa Ana', EN: 'Santa Ana Volcano Sunrise' },
+    destination: 'Volcán de Santa Ana',
+    category: 'volcanes',
+    booking: 'online',
+    priceUsd: 85,
+    durationHours: 10,
+    image: '/img/reels/santa-ana.jpg',
+    imageAlt: { ES: 'Laguna turquesa en el cráter del volcán de Santa Ana', EN: 'Turquoise lagoon inside the Santa Ana volcano crater' },
+    tag: { ES: 'Al amanecer', EN: 'At sunrise' },
+    maxPeople: 7,
+    weekdays: EVERY_DAY,
+    description: {
+      ES: 'Sube al cráter del Ilamatepec, el volcán más alto de El Salvador, y ve salir el sol sobre su laguna turquesa. Te recogemos de madrugada —desde la 1:30 a. m. en El Tunco y después en hoteles de San Salvador— y el transporte va incluido de ida y vuelta.',
+      EN: 'Climb to the crater of Ilamatepec, the highest volcano in El Salvador, and watch the sun rise over its turquoise lagoon. We pick you up before dawn —from 1:30 a.m. in El Tunco and then at hotels in San Salvador— and round-trip transport is included.',
+    },
+    highlights: {
+      ES: ['Amanecer en el cráter', 'Recogida desde la 1:30 a. m. en El Tunco y San Salvador', 'Transporte incluido · hasta 7 personas'],
+      EN: ['Sunrise at the crater', 'Pickup from 1:30 a.m. in El Tunco and San Salvador', 'Transport included · up to 7 people'],
+    },
+  },
+  {
+    id: 'santa-ana-playa-los-almendros',
+    transportIncluded: true,
+    title: 'Volcán de Santa Ana + Playa Los Almendros',
+    name: { ES: 'Volcán de Santa Ana + Playa Los Almendros', EN: 'Santa Ana Volcano + Los Almendros Beach' },
+    destination: 'Volcán de Santa Ana',
+    category: 'volcanes',
+    booking: 'online',
+    priceUsd: 150,
+    durationHours: 12,
+    image: '/img/categoria-volcanes.jpg',
+    imageAlt: { ES: 'Complejo Los Volcanes: Izalco, Cerro Verde y Santa Ana', EN: 'Los Volcanes complex: Izalco, Cerro Verde and Santa Ana' },
+    tag: { ES: 'Volcán y playa', EN: 'Volcano & beach' },
+    maxPeople: 7,
+    weekdays: EVERY_DAY,
+    description: {
+      ES: 'Del volcán al mar en un solo día: por la mañana, caminata al cráter del Volcán de Santa Ana; por la tarde, picnic frente al Pacífico en la playa Los Almendros. Transporte incluido durante todo el día.',
+      EN: 'From the volcano to the sea in a single day: in the morning, a hike to the Santa Ana volcano crater; in the afternoon, a picnic by the Pacific at Los Almendros beach. Transport included all day.',
+    },
+    highlights: {
+      ES: ['Caminata al cráter del Santa Ana', 'Picnic en la playa Los Almendros', 'Transporte incluido · hasta 7 personas'],
+      EN: ['Hike to the Santa Ana crater', 'Picnic at Los Almendros beach', 'Transport included · up to 7 people'],
+    },
+  },
+  {
+    id: 'santa-ana-coatepeque-jetsky',
+    transportIncluded: true,
+    title: 'Volcán de Santa Ana + Lago de Coatepeque en jetsky',
+    name: { ES: 'Volcán de Santa Ana + Lago de Coatepeque en jetsky', EN: 'Santa Ana Volcano + Lake Coatepeque by Jet Ski' },
+    destination: 'Lago de Coatepeque',
+    category: 'aventura',
+    // Sin precio en el documento: se publica «a consultar» y se cotiza.
+    booking: 'quote',
+    priceUsd: null,
+    durationHours: 10,
+    image: '/img/reels/coatepeque.jpg',
+    imageAlt: { ES: 'Lago de Coatepeque visto desde lo alto de la caldera', EN: 'Lake Coatepeque seen from the caldera rim' },
+    tag: { ES: 'Aventura', EN: 'Adventure' },
+    maxPeople: 7,
+    weekdays: EVERY_DAY,
+    description: {
+      ES: 'Caminata al cráter del Volcán de Santa Ana y, después, el Lago de Coatepeque desde el agua: un paseo en jetsky por el lago dentro de la caldera. Transporte incluido. Escríbenos y te damos el precio para tu grupo.',
+      EN: 'A hike to the Santa Ana volcano crater followed by Lake Coatepeque from the water: a jet ski ride on the lake inside the caldera. Transport included. Write to us and we will quote your group.',
+    },
+    highlights: {
+      ES: ['Caminata al cráter del Santa Ana', 'Jetsky en el Lago de Coatepeque', 'Transporte incluido · hasta 7 personas'],
+      EN: ['Hike to the Santa Ana crater', 'Jet ski on Lake Coatepeque', 'Transport included · up to 7 people'],
+    },
+  },
+  {
+    id: 'ruta-de-las-flores-4x4',
+    transportIncluded: true,
+    title: 'Ruta de las Flores en 4x4',
+    name: { ES: 'Ruta de las Flores en 4x4', EN: 'Ruta de las Flores 4x4 Tour' },
+    destination: 'Ruta de las Flores',
+    category: 'cultura',
+    booking: 'online',
+    priceUsd: 175,
+    durationHours: 10,
+    image: '/img/experiences/ruta-de-las-flores.jpg',
+    imageAlt: { ES: 'Pueblo de la Ruta de las Flores entre montañas', EN: 'A Ruta de las Flores town among the mountains' },
+    tag: { ES: 'Café y cascadas', EN: 'Coffee & waterfalls' },
+    maxPeople: 7,
+    weekdays: EVERY_DAY,
+    description: {
+      ES: 'La Ruta de las Flores en 4x4: las calles de murales de Concepción de Ataco, un café en Albania Café, en Apaneca, y las Cascadas de San Juan. Transporte incluido durante todo el recorrido.',
+      EN: 'The Ruta de las Flores by 4x4: the mural-lined streets of Concepción de Ataco, a coffee at Albania Café in Apaneca and the San Juan waterfalls. Transport included for the whole route.',
+    },
+    highlights: {
+      ES: ['Ruta en 4x4 por Ataco', 'Albania Café, en Apaneca', 'Cascadas de San Juan'],
+      EN: ['4x4 route through Ataco', 'Albania Café in Apaneca', 'San Juan waterfalls'],
+    },
+  },
+  {
+    id: 'boqueron-centro-historico',
+    transportIncluded: true,
+    title: 'El Boquerón + Tobogán Picnic Steak House + Centro Histórico',
+    name: { ES: 'El Boquerón + Centro Histórico', EN: 'El Boquerón + Historic Center' },
+    destination: 'San Salvador',
+    category: 'volcanes',
+    booking: 'online',
+    priceUsd: 70,
+    durationHours: 7,
+    image: '/img/experiences/boqueron-crater.jpg',
+    imageAlt: { ES: 'Cráter de El Boquerón, en el volcán de San Salvador', EN: 'El Boquerón crater on the San Salvador volcano' },
+    tag: { ES: 'Cerca de la capital', EN: 'Near the capital' },
+    maxPeople: 7,
+    weekdays: EVERY_DAY,
+    description: {
+      ES: 'Asómate al cráter del volcán de San Salvador en el Parque Nacional El Boquerón, haz una parada en Tobogán Picnic Steak House y termina paseando por el Centro Histórico de la capital: Catedral, Palacio Nacional y Teatro Nacional. Transporte incluido.',
+      EN: 'Look into the crater of the San Salvador volcano at El Boquerón National Park, stop at Tobogán Picnic Steak House and finish with a walk through the capital’s Historic Center: Cathedral, National Palace and National Theatre. Transport included.',
+    },
+    highlights: {
+      ES: ['Cráter de El Boquerón', 'Parada en Tobogán Picnic Steak House', 'Centro Histórico de San Salvador'],
+      EN: ['El Boquerón crater', 'Stop at Tobogán Picnic Steak House', 'San Salvador Historic Center'],
+    },
+  },
+  {
+    id: 'centro-historico-puerta-del-diablo',
+    transportIncluded: true,
+    title: 'Centro Histórico + Puerta del Diablo',
+    name: { ES: 'Centro Histórico + Puerta del Diablo', EN: 'Historic Center + Puerta del Diablo' },
+    destination: 'Puerta del Diablo',
+    category: 'cultura',
+    booking: 'online',
+    priceUsd: 65,
+    durationHours: 6,
+    image: '/img/experiences/puerta-del-diablo.jpg',
+    imageAlt: { ES: 'Las peñas de la Puerta del Diablo, Panchimalco', EN: 'The Puerta del Diablo rocks, Panchimalco' },
+    tag: { ES: 'Ciudad y miradores', EN: 'City & viewpoints' },
+    maxPeople: 7,
+    weekdays: EVERY_DAY,
+    description: {
+      ES: 'La capital en un día: recorrido por el Centro Histórico de San Salvador y subida a la Puerta del Diablo, en Panchimalco, con vistas a la ciudad, al lago de Ilopango y al Pacífico. Transporte incluido.',
+      EN: 'The capital in one day: a walk through the Historic Center of San Salvador and a trip up to Puerta del Diablo, in Panchimalco, with views of the city, Lake Ilopango and the Pacific. Transport included.',
+    },
+    highlights: {
+      ES: ['Centro Histórico de San Salvador', 'Miradores de la Puerta del Diablo', 'Transporte incluido · hasta 7 personas'],
+      EN: ['San Salvador Historic Center', 'Puerta del Diablo viewpoints', 'Transport included · up to 7 people'],
+    },
+  },
+
+  /*
+   * EXPERIENCIAS PARA COTIZAR. El precio es una referencia por persona; la
+   * reserva se confirma por WhatsApp o correo. Las marcadas `hidden` se
+   * parecían a un tour nuevo y salieron del catálogo público.
+   */
   {
     id: 'volcan-santa-ana',
+    hidden: true,
+    replacedBy: 'amanecer-volcan-santa-ana',
     title: 'Volcán de Santa Ana',
     name: { ES: 'Volcán de Santa Ana', EN: 'Santa Ana Volcano Hike' },
     destination: 'Volcán de Santa Ana',
     category: 'volcanes',
+    booking: 'quote',
     priceUsd: 45,
     durationHours: 8,
     image: '/img/reels/thumbs/santa-ana.jpg',
     imageAlt: { ES: 'Laguna turquesa en el cráter del volcán de Santa Ana', EN: 'Turquoise lagoon inside the Santa Ana volcano crater' },
     tag: { ES: 'Más reservado', EN: 'Most booked' },
-    maxPeople: 12,
+    maxPeople: 7,
     weekdays: [0, 3, 6],
     description: {
       ES: 'Sube al cráter del Ilamatepec, el volcán más alto de El Salvador, y asómate a su laguna de color turquesa. El sendero cruza fincas de café y bosque de pino dentro del Parque Nacional Los Volcanes.',
@@ -159,12 +353,13 @@ export const experiences: Experience[] = [
     name: { ES: 'Atardecer en El Tunco', EN: 'Sunset at El Tunco' },
     destination: 'El Tunco',
     category: 'playas',
+    booking: 'quote',
     priceUsd: 38,
     durationHours: 4,
     image: '/img/reels/thumbs/el-tunco.jpg',
     imageAlt: { ES: 'La roca de El Tunco frente a la playa', EN: 'El Tunco rock off the beach' },
     tag: { ES: 'Favorito local', EN: 'Local favorite' },
-    maxPeople: 15,
+    maxPeople: 7,
     weekdays: [0, 1, 2, 3, 4, 5, 6],
     description: {
       ES: 'Mira caer el sol detrás de la roca de El Tunco, uno de los rincones más fotografiados de la costa salvadoreña. Pasea por la playa de arena oscura, mira a los surfistas en las olas de la tarde y quédate al ambiente del pueblo.',
@@ -177,16 +372,19 @@ export const experiences: Experience[] = [
   },
   {
     id: 'ruta-de-las-flores',
+    hidden: true,
+    replacedBy: 'ruta-de-las-flores-4x4',
     title: 'Ruta de las Flores',
     name: { ES: 'Ruta de las Flores', EN: 'Ruta de las Flores Day Trip' },
     destination: 'Ruta de las Flores',
     category: 'cultura',
+    booking: 'quote',
     priceUsd: 52,
     durationHours: 10,
     image: '/img/experiences/ruta-de-las-flores.jpg',
     imageAlt: { ES: 'Iglesia de Juayúa, en la Ruta de las Flores', EN: 'Juayúa church on the Ruta de las Flores' },
     tag: { ES: 'Escapada', EN: 'Getaway' },
-    maxPeople: 14,
+    maxPeople: 7,
     weekdays: [0, 6],
     description: {
       ES: 'Un día por los pueblos de colores de la Ruta de las Flores —Nahuizalco, Salcoatitán, Juayúa, Apaneca y Ataco— entre murales, mercados de artesanías, fincas de café y miradores de montaña.',
@@ -199,16 +397,19 @@ export const experiences: Experience[] = [
   },
   {
     id: 'kayak-coatepeque',
+    hidden: true,
+    replacedBy: 'santa-ana-coatepeque-jetsky',
     title: 'Kayak en el Lago de Coatepeque',
     name: { ES: 'Kayak en el Lago de Coatepeque', EN: 'Kayaking on Lake Coatepeque' },
     destination: 'Lago de Coatepeque',
     category: 'aventura',
+    booking: 'quote',
     priceUsd: 42,
     durationHours: 6,
     image: '/img/reels/thumbs/coatepeque.jpg',
     imageAlt: { ES: 'Vista del lago de Coatepeque', EN: 'View over Lake Coatepeque' },
     tag: { ES: 'Naturaleza', EN: 'Nature' },
-    maxPeople: 10,
+    maxPeople: 7,
     weekdays: [0, 5, 6],
     description: {
       ES: 'Rema por el lago de Coatepeque, una caldera volcánica famosa por sus tonos de azul, con el volcán de Santa Ana en el horizonte. Apto para principiantes: el guía marca el ritmo.',
@@ -225,6 +426,7 @@ export const experiences: Experience[] = [
     name: { ES: 'Clases de surf en El Zonte', EN: 'Surf Lessons in El Zonte' },
     destination: 'El Zonte',
     category: 'playas',
+    booking: 'quote',
     priceUsd: 35,
     durationHours: 2,
     image: '/img/experiences/surf-el-zonte.jpg',
@@ -234,7 +436,7 @@ export const experiences: Experience[] = [
       ES: 'Surfistas con sus tablas entrando al mar al atardecer',
       EN: 'Surfers carrying their boards into the sea at sunset',
     },
-    maxPeople: 8,
+    maxPeople: 7,
     weekdays: [0, 1, 2, 3, 4, 5, 6],
     description: {
       ES: 'Aprende a surfear en El Zonte, un pueblo de playa tranquilo con olas constantes. Clase para principiantes con instructor local: seguridad, remada y tus primeras puestas de pie.',
@@ -247,10 +449,13 @@ export const experiences: Experience[] = [
   },
   {
     id: 'centro-historico-san-salvador',
+    hidden: true,
+    replacedBy: 'boqueron-centro-historico',
     title: 'Centro histórico de San Salvador',
     name: { ES: 'Centro histórico de San Salvador', EN: 'San Salvador Historic Center' },
     destination: 'San Salvador',
     category: 'cultura',
+    booking: 'quote',
     priceUsd: 28,
     durationHours: 3,
     image: '/img/experiences/centro-historico.jpg',
@@ -259,7 +464,7 @@ export const experiences: Experience[] = [
       EN: 'National Palace in the historic center of San Salvador',
     },
     tag: { ES: 'Patrimonio', EN: 'Heritage' },
-    maxPeople: 20,
+    maxPeople: 7,
     weekdays: [2, 4, 6],
     description: {
       ES: 'Recorre el centro histórico de San Salvador: el Palacio Nacional, la Catedral Metropolitana, el Teatro Nacional y la Plaza Libertad, con las historias que los rodean contadas por un guía local.',
@@ -276,6 +481,7 @@ export const experiences: Experience[] = [
     name: { ES: 'Bosque nuboso y senderos', EN: 'Cloud Forest Trails' },
     destination: 'Santa Ana',
     category: 'aventura',
+    booking: 'quote',
     priceUsd: 40,
     durationHours: 5,
     image: '/img/experiences/bosque-montecristo.jpg',
@@ -283,8 +489,7 @@ export const experiences: Experience[] = [
       ES: 'Interior del bosque nuboso de Montecristo',
       EN: 'Inside the Montecristo cloud forest',
     },
-    tag: { ES: 'Nuevo', EN: 'New' },
-    maxPeople: 12,
+    maxPeople: 7,
     weekdays: [0, 6],
     description: {
       ES: 'Senderos por el bosque nuboso del Parque Nacional Montecristo, al norte de Santa Ana, donde se unen El Salvador, Guatemala y Honduras. Robles y pinos cubiertos de musgo, orquídeas y bromelias.',
@@ -301,11 +506,12 @@ export const experiences: Experience[] = [
     name: { ES: 'Suchitoto colonial y lago Suchitlán', EN: 'Colonial Suchitoto & Lake Suchitlán' },
     destination: 'Suchitoto',
     category: 'cultura',
+    booking: 'quote',
     priceUsd: 48,
     durationHours: 7,
     image: '/img/reels/thumbs/suchitoto.jpg',
     imageAlt: { ES: 'Calle empedrada de Suchitoto', EN: 'Cobblestone street in Suchitoto' },
-    maxPeople: 16,
+    maxPeople: 7,
     weekdays: [0, 3, 6],
     description: {
       ES: 'Calles empedradas, la blanca iglesia de Santa Lucía y galerías de arte en Suchitoto, y después la vista sobre el lago Suchitlán.',
@@ -322,11 +528,12 @@ export const experiences: Experience[] = [
     name: { ES: 'Surf City: ruta de playas', EN: 'Surf City Beach Route' },
     destination: 'Surf City',
     category: 'playas',
+    booking: 'quote',
     priceUsd: 32,
     durationHours: 5,
     image: '/img/experiences/surf-city-el-sunzal.jpg',
     imageAlt: { ES: 'Palmeras y ola en la playa El Sunzal, Surf City', EN: 'Palms and a breaking wave at El Sunzal beach, Surf City' },
-    maxPeople: 18,
+    maxPeople: 7,
     weekdays: [0, 1, 2, 3, 4, 5, 6],
     description: {
       ES: 'Una ruta por Surf City con paradas en las playas de la costa de La Libertad, como El Tunco y El Sunzal, para ver sus rompientes y el litoral del Pacífico.',
@@ -343,11 +550,12 @@ export const experiences: Experience[] = [
     name: { ES: 'Volcán de Izalco desde Cerro Verde', EN: 'Izalco Volcano from Cerro Verde' },
     destination: 'Santa Ana',
     category: 'volcanes',
+    booking: 'quote',
     priceUsd: 50,
     durationHours: 9,
     image: '/img/experiences/volcan-izalco.jpg',
     imageAlt: { ES: 'Volcán de Izalco visto desde el mirador de Cerro Verde', EN: 'Izalco volcano seen from the Cerro Verde viewpoint' },
-    maxPeople: 12,
+    maxPeople: 7,
     weekdays: [0, 6],
     description: {
       ES: 'Desde Cerro Verde, la ruta baja y sube el cono del Izalco, al que llamaron «Faro del Pacífico» por sus erupciones constantes. Un recorrido exigente, con paisajes de roca volcánica y vistas amplias.',
@@ -364,11 +572,12 @@ export const experiences: Experience[] = [
     name: { ES: 'Malecón de La Libertad y mariscos', EN: 'La Libertad Waterfront & Seafood' },
     destination: 'La Libertad',
     category: 'cultura',
+    booking: 'quote',
     priceUsd: 30,
     durationHours: 4,
     image: '/img/experiences/malecon-la-libertad.jpg',
     imageAlt: { ES: 'Malecón y muelle del Puerto de La Libertad al atardecer', EN: 'Waterfront and pier of Puerto de La Libertad at sunset' },
-    maxPeople: 20,
+    maxPeople: 7,
     weekdays: [0, 1, 2, 3, 4, 5, 6],
     description: {
       ES: 'Pasea por el malecón y el muelle de La Libertad, mira llegar las lanchas de los pescadores y prueba mariscos frescos en el mercado del puerto.',
@@ -385,6 +594,7 @@ export const experiences: Experience[] = [
     name: { ES: 'Cascadas de Tamanique', EN: 'Tamanique Waterfalls Hike' },
     destination: 'Tamanique',
     category: 'aventura',
+    booking: 'quote',
     priceUsd: 35,
     durationHours: 5,
     image: '/img/experiences/cascadas-tamanique.jpg',
@@ -392,8 +602,7 @@ export const experiences: Experience[] = [
       ES: 'Cascada de Tamanique cayendo sobre una poza entre paredes de roca',
       EN: 'Tamanique waterfall dropping into a pool between rock walls',
     },
-    tag: { ES: 'Nuevo', EN: 'New' },
-    maxPeople: 10,
+    maxPeople: 7,
     weekdays: [0, 3, 5, 6],
     description: {
       ES: 'Baja desde el pueblo de Tamanique, en la cordillera del Bálsamo, por un sendero de unos 2 km hasta las cascadas escondidas en un cañón de roca. Nada en sus pozas de agua fresca y, si te animas, salta desde las rocas con el guía. A 35 minutos de El Tunco.',
@@ -406,10 +615,13 @@ export const experiences: Experience[] = [
   },
   {
     id: 'puerta-del-diablo',
+    hidden: true,
+    replacedBy: 'centro-historico-puerta-del-diablo',
     title: 'Parque Natural Puerta del Diablo',
     name: { ES: 'Parque Natural Puerta del Diablo', EN: 'Puerta del Diablo Natural Park' },
     destination: 'Puerta del Diablo',
     category: 'aventura',
+    booking: 'quote',
     priceUsd: 30,
     durationHours: 4,
     image: '/img/experiences/puerta-del-diablo.jpg',
@@ -418,7 +630,7 @@ export const experiences: Experience[] = [
       EN: 'The Puerta del Diablo rocks above the green ridge of Panchimalco',
     },
     tag: { ES: 'Miradores', EN: 'Viewpoints' },
-    maxPeople: 14,
+    maxPeople: 7,
     weekdays: [0, 3, 6],
     description: {
       ES: 'Sube a las peñas de la Puerta del Diablo, dos enormes rocas partidas que dan nombre a una leyenda, en Panchimalco, a unos 40 minutos de San Salvador. Desde la cima se ven la capital, el lago de Ilopango, el volcán de San Vicente y el océano Pacífico. Cierra con una parada en el pueblo de Panchimalco.',
@@ -435,6 +647,7 @@ export const experiences: Experience[] = [
     name: { ES: 'Amanecer en el volcán de Conchagua', EN: 'Sunrise on Conchagua Volcano' },
     destination: 'Volcán de Conchagua',
     category: 'volcanes',
+    booking: 'quote',
     priceUsd: 55,
     durationHours: 7,
     image: '/img/experiences/volcan-conchagua.jpg',
@@ -443,7 +656,7 @@ export const experiences: Experience[] = [
       EN: 'The Gulf of Fonseca and its islands seen from Conchagua volcano',
     },
     tag: { ES: 'Amanecer', EN: 'Sunrise' },
-    maxPeople: 12,
+    maxPeople: 7,
     weekdays: [0, 6],
     description: {
       ES: 'Sube en 4x4 al mirador Espíritu de la Montaña, a más de 1 200 metros sobre el Golfo de Fonseca, y mira salir el sol sobre las montañas de Honduras y Nicaragua. Abajo, las islas Meanguera, Conchagüita y Zacatillo. Desayuno en la montaña y caminata por el Parque Natural Conchagua.',
@@ -546,12 +759,24 @@ export function matchesCriteria(experience: Experience, criteria: SearchCriteria
   return true
 }
 
+/**
+ * Catálogo PÚBLICO: lo que se lista en la portada, los destinos, el sitemap
+ * y las búsquedas. `experiences` sigue teniendo también las ocultas, para
+ * nombrar reservas y opiniones antiguas.
+ */
+export const catalog: Experience[] = experiences.filter((experience) => !experience.hidden)
+
+/** ¿Se reserva y paga en línea? Si no, se cotiza por WhatsApp o correo. */
+export function isBookableOnline(experience: Pick<Experience, 'booking' | 'priceUsd'>): experience is Pick<Experience, 'booking'> & { priceUsd: number } {
+  return experience.booking === 'online' && experience.priceUsd !== null
+}
+
 /** Aplica criterios de búsqueda y filtro de categoría a la vez. */
 export function filterExperiences(
   criteria: SearchCriteria,
   category: CategoryId | null,
 ): Experience[] {
-  return experiences.filter((experience) => {
+  return catalog.filter((experience) => {
     if (category && experience.category !== category) return false
     return matchesCriteria(experience, criteria)
   })

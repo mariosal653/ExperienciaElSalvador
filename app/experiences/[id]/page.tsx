@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import { experiences } from '@/lib/data'
+import { notFound, permanentRedirect } from 'next/navigation'
+import { catalog, experiences } from '@/lib/data'
 import { getExperienceDetails } from '@/lib/experience-details'
 import { availablePaymentMethods } from '@/lib/payments/config'
 import { getSiteUrl } from '@/lib/site'
@@ -46,6 +46,11 @@ export default async function ExperiencePage({ params }: Params) {
   const { id } = await params
   const experience = experiences.find((item) => item.id === id)
   if (!experience) notFound()
+  // Retirada del catálogo: su enlace antiguo (Google, WhatsApp) lleva al tour que la sustituye.
+  if (experience.hidden) {
+    if (experience.replacedBy) permanentRedirect(`/experiences/${experience.replacedBy}`)
+    notFound()
+  }
 
   const site = getSiteUrl()
   const image = experience.image.startsWith('http') ? experience.image : `${site}${experience.image}`
@@ -61,19 +66,24 @@ export default async function ExperiencePage({ params }: Params) {
     image,
     touristType: experience.category,
     itinerary: { '@type': 'Place', name: experience.destination, address: { '@type': 'PostalAddress', addressCountry: 'SV' } },
-    provider: { '@type': 'Organization', name: 'Experiences El Salvador', url: site },
-    offers: {
-      '@type': 'Offer',
-      price: experience.priceUsd.toFixed(2),
-      priceCurrency: 'USD',
-      availability: 'https://schema.org/InStock',
-      url: `${site}/experiences/${experience.id}`,
-    },
+    provider: { '@type': 'Organization', name: 'Experiences in El Salvador', url: site },
+    // La oferta solo se marca con un precio publicado: «a consultar» no lleva cifra.
+    ...(experience.priceUsd === null
+      ? {}
+      : {
+          offers: {
+            '@type': 'Offer',
+            price: experience.priceUsd.toFixed(2),
+            priceCurrency: 'USD',
+            availability: 'https://schema.org/InStock',
+            url: `${site}/experiences/${experience.id}`,
+          },
+        }),
   }
 
   // Primero las de la misma categoría; si no llegan a tres, se completa con
   // otras del mismo destino y luego con el resto.
-  const others = experiences.filter((item) => item.id !== experience.id)
+  const others = catalog.filter((item) => item.id !== experience.id)
   const related = [
     ...others.filter((item) => item.category === experience.category),
     ...others.filter((item) => item.category !== experience.category && item.destination === experience.destination),

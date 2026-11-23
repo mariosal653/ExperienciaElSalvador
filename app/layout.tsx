@@ -9,7 +9,7 @@ import { WhatsAppWidget } from '@/components/whatsapp/whatsapp-widget'
 import { getSiteUrl } from '@/lib/site'
 import './globals.css'
 
-const SITE_NAME = 'Experiences El Salvador'
+const SITE_NAME = 'Experiences in El Salvador'
 
 /**
  * Las dos fuentes del sitio, autoalojadas por next/font: no hay petición a

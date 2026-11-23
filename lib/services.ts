@@ -1,32 +1,24 @@
 import type { Locale } from './data'
 
 /**
- * Servicios de transporte con conductor.
+ * Servicio de transporte con conductor: Personal Driver.
  *
- * Son la oferta que el sitio debe vender primero (acuerdo 01: «dar mayor
- * visibilidad a Driver by Tour / Personal Driver»), así que viven en su
- * propio archivo y no mezclados con el catálogo de experiencias: una
- * experiencia se reserva y se paga; un servicio de conductor se cotiza.
+ * Es la oferta que el sitio debe vender primero (acuerdo 01: «dar mayor
+ * visibilidad» al transporte), así que vive en su propio archivo y no
+ * mezclado con el catálogo de experiencias: una experiencia se reserva y se
+ * paga; el servicio de conductor se cotiza.
  *
- * SOLO EXISTEN DOS. El documento de acuerdos hablaba también de «Driver
- * privado»; quedó confirmado que era otro nombre para la misma oferta, no
- * un tercer servicio. Añadir tarjetas aquí es desplazar estas dos de la
- * parte principal de la portada, que es precisamente lo que el acuerdo
- * pide evitar.
+ * SOLO EXISTE UNO. Hasta noviembre de 2026 había también «Driver by Tour»
+ * (conductor para una ruta, cobrado por kilómetro más espera); el cliente lo
+ * retiró y su página redirige a Personal Driver (next.config.mjs).
  *
- * Diferencia entre los dos, para que los textos no se solapen:
- *   Driver by Tour   el conductor cubre una ruta o tour concreto → se
- *                    cotiza por recorrido.
- *   Personal Driver  el vehículo con conductor queda a disposición del
- *                    cliente, que arma su propio itinerario → por hora.
- *
- * Confirmado con el cliente: capacidad de 6 personas, mínimo de 3 horas,
- * guía bilingüe a US$75 por día, US$1.50 por kilómetro (Driver by Tour),
- * US$20 por hora (Personal Driver) y US$5 por hora de espera, esta última con la excepción que se explica en
- * WAITING_PER_HOUR_USD. Ya no queda ninguna tarifa sin confirmar.
+ * Condiciones confirmadas con el cliente (documento «Tours y precios»,
+ * noviembre de 2026): US$30 por hora, SIN mínimo de horas, gasolina y
+ * tiempo de espera incluidos, hasta 7 personas y guía turístico bilingüe
+ * opcional por US$75 por día.
  */
 
-export type ServiceId = 'driver-by-tour' | 'personal-driver'
+export type ServiceId = 'personal-driver'
 
 type Text = Record<Locale, string>
 type List = Record<Locale, string[]>
@@ -35,34 +27,17 @@ type List = Record<Locale, string[]>
 /* Condiciones comerciales                                             */
 /* ------------------------------------------------------------------ */
 
-/** Horas mínimas contratables del Personal Driver. */
-export const MIN_HOURS = 3
-
-/** Tarifa por hora del Personal Driver, en dólares. */
-export const HOURLY_USD = 20
+/** Tarifa por hora del Personal Driver, en dólares. Gasolina y espera incluidas. */
+export const HOURLY_USD = 30
 
 /** Guía turístico bilingüe como complemento, por DÍA de servicio. */
 export const GUIDE_PER_DAY_USD = 75
 
 /** Capacidad comercial del vehículo: una sola cifra en todo el sitio. */
-export const VEHICLE_SEATS = 6
-
-/** Recorrido del Driver by Tour: dólares por kilómetro. */
-export const PER_KM_USD = 1.5
+export const VEHICLE_SEATS = 7
 
 /**
- * Tiempo de espera, por hora. Se suma al recorrido cuando el conductor
- * espera al cliente en una parada.
- *
- * EXCEPCIÓN confirmada: en las rutas que recogen en varios puntos y
- * terminan en uno solo —un traslado, no un recorrido con paradas— no se
- * cobra espera, solo el viaje. El cotizador automático tendrá que
- * distinguir los dos casos antes de sumar nada por este concepto.
- */
-export const WAITING_PER_HOUR_USD = 5
-
-/**
- * Cifra en dólares para mostrar: entera sin decimales ($20) y con centavos
+ * Cifra en dólares para mostrar: entera sin decimales ($30) y con centavos
  * siempre a dos cifras ($1.50, nunca $1.5).
  */
 export function formatUsd(value: number): string {
@@ -92,8 +67,8 @@ export const vehicle = {
   image: {
     src: '/img/servicios/microbus-n400.png',
     alt: {
-      ES: 'Microbús Chevrolet N400 para seis pasajeros',
-      EN: 'Chevrolet N400 minibus for six passengers',
+      ES: 'Microbús Chevrolet N400 para siete pasajeros',
+      EN: 'Chevrolet N400 minibus for seven passengers',
     } satisfies Text,
   },
   features: {
@@ -103,16 +78,16 @@ export const vehicle = {
 } as const
 
 /* ------------------------------------------------------------------ */
-/* Servicios                                                           */
+/* Servicio                                                            */
 /* ------------------------------------------------------------------ */
 
 export type Service = {
   id: ServiceId
   /** Nombre comercial. NO se traduce: es el nombre de la oferta. */
   name: string
-  /** Frase corta bajo el nombre, en la tarjeta. */
+  /** Frase corta bajo el nombre. */
   tagline: Text
-  /** Una línea en la tarjeta de la portada. */
+  /** Una línea de presentación en la portada. */
   summary: Text
   /** Texto de la página de detalle y de la meta description. */
   description: Text
@@ -123,15 +98,12 @@ export type Service = {
   priceFromUsd: number | null
   /** Unidad del precio, o la etiqueta de cotización cuando no hay cifra. */
   priceUnit: Text
-  /**
-   * La misma unidad en el catálogo UN/CEFACT, para los datos
-   * estructurados: HUR (hora) o KMT (kilómetro).
-   */
-  priceUnitCode: 'HUR' | 'KMT'
-  /** Condición que acompaña al precio (mínimo de horas, exclusiones…). */
+  /** La misma unidad en el catálogo UN/CEFACT, para los datos estructurados: HUR (hora). */
+  priceUnitCode: 'HUR'
+  /** Condición que acompaña al precio. */
   priceNote: Text | null
   /** Clave del icono, resuelta en el componente. */
-  icon: 'route' | 'car'
+  icon: 'car'
   highlights: List
   includes: List
   excludes: List
@@ -139,115 +111,79 @@ export type Service = {
   notes: List
 }
 
-export const services: Service[] = [
-  {
-    id: 'driver-by-tour',
-    name: 'Driver by Tour',
-    tagline: {
-      ES: 'Conductor para un tour concreto',
-      EN: 'A driver for one specific tour',
-    },
-    summary: {
-      ES: 'Nos encargamos del traslado completo de tu tour: te recogemos, te llevamos y te devolvemos.',
-      EN: 'We handle the full ride for your tour: we pick you up, take you there and bring you back.',
-    },
-    description: {
-      ES: 'Conductor y vehículo para una ruta concreta: el volcán de Santa Ana, la Ruta de las Flores, Suchitoto, la costa de La Libertad o el itinerario que ya tengas en mente. Te recogemos en tu hotel o alojamiento, te acompañamos durante el recorrido y te devolvemos al punto de partida. Se cotiza por ruta, así que el precio se ajusta a la distancia real y no a un paquete cerrado.',
-      EN: 'Driver and vehicle for one specific route: the Santa Ana volcano, the Ruta de las Flores, Suchitoto, the La Libertad coast or whatever itinerary you already have in mind. We pick you up at your hotel or rental, stay with you along the way and bring you back to the starting point. It is quoted per route, so the price follows the real distance instead of a fixed package.',
-    },
-    priceFromUsd: PER_KM_USD,
-    // «por km», no «por kilómetro»: con la palabra entera, en el móvil la
-    // línea del precio se parte y las dos tarjetas dejan de ir a la par.
-    priceUnit: { ES: 'por km', EN: 'per km' },
-    priceUnitCode: 'KMT',
-    priceNote: {
-      ES: `Más $${WAITING_PER_HOUR_USD} por hora de espera · te damos el total antes de que decidas`,
-      EN: `Plus $${WAITING_PER_HOUR_USD} per hour of waiting · you get the total before you decide`,
-    },
-    icon: 'route',
-    highlights: {
-      ES: ['Recogida en tu hotel o alojamiento', 'Ruta y paradas acordadas contigo', 'Conductor que conoce el camino'],
-      EN: ['Pickup at your hotel or rental', 'Route and stops agreed with you', 'A driver who knows the road'],
-    },
-    includes: {
-      ES: [`Microbús ${vehicle.model} con aire acondicionado`, 'Conductor durante todo el recorrido', `Hasta ${VEHICLE_SEATS} pasajeros`, 'Ida y vuelta al punto de recogida'],
-      EN: [`${vehicle.model} minibus with air conditioning`, 'Driver for the whole route', `Up to ${VEHICLE_SEATS} passengers`, 'Round trip to the pickup point'],
-    },
-    excludes: {
-      ES: ['Entradas a parques o miradores', 'Comidas y bebidas', 'Guía turístico bilingüe (complemento aparte)', 'Propinas'],
-      EN: ['Park or viewpoint entrance fees', 'Food and drinks', 'Bilingual tour guide (separate add-on)', 'Tips'],
-    },
-    notes: {
-      ES: [
-        `El total sale de la distancia del recorrido, a $${formatUsd(PER_KM_USD)} por kilómetro, más $${WAITING_PER_HOUR_USD} por cada hora que el conductor te espere en una parada.`,
-        'Si solo necesitas que te llevemos de un sitio a otro, aunque recojamos en varios puntos, no se cobra espera: pagas únicamente el viaje.',
-        'Para rutas de madrugada, como el amanecer en el volcán de Santa Ana, conviene avisar con un día de antelación.',
-      ],
-      EN: [
-        `The total comes from the distance of the route, at $${formatUsd(PER_KM_USD)} per kilometre, plus $${WAITING_PER_HOUR_USD} for every hour the driver waits for you at a stop.`,
-        'If you only need to get from one place to another, even with several pickup points, there is no waiting charge: you pay for the ride alone.',
-        'For early-morning routes, such as sunrise on the Santa Ana volcano, it is best to ask a day ahead.',
-      ],
-    },
+export const personalDriver: Service = {
+  id: 'personal-driver',
+  name: 'Personal Driver',
+  tagline: {
+    ES: 'Tu propio itinerario, por horas',
+    EN: 'Your own itinerary, by the hour',
   },
-  {
-    id: 'personal-driver',
-    name: 'Personal Driver',
-    tagline: {
-      ES: 'Tu propio itinerario, por horas',
-      EN: 'Your own itinerary, by the hour',
-    },
-    summary: {
-      ES: 'Vehículo con conductor a tu disposición: decides a dónde vas y cuánto te quedas en cada sitio.',
-      EN: 'A vehicle with driver at your disposal: you decide where to go and how long to stay.',
-    },
-    description: {
-      ES: 'Alquilas el microbús con conductor por horas y organizas tu propio recorrido por El Salvador. Sin itinerario fijo: paras donde quieras, cambias de plan a mitad del día y el conductor te espera. Es la opción de quien ya sabe qué quiere ver, viaja en familia o en grupo pequeño, o necesita moverse varios días seguidos.',
-      EN: 'You hire the minibus with a driver by the hour and plan your own route around El Salvador. No fixed itinerary: stop wherever you want, change plans halfway through the day and the driver waits for you. It suits travellers who already know what they want to see, families and small groups, or anyone who needs to move around for several days.',
-    },
-    priceFromUsd: HOURLY_USD,
-    priceUnit: { ES: 'por hora', EN: 'per hour' },
-    priceUnitCode: 'HUR',
-    priceNote: {
-      ES: `Mínimo ${MIN_HOURS} horas · gasolina no incluida`,
-      EN: `${MIN_HOURS}-hour minimum · fuel not included`,
-    },
-    icon: 'car',
-    highlights: {
-      ES: [`Desde ${MIN_HOURS} horas`, 'Las paradas y los horarios los decides tú', 'El conductor te espera'],
-      EN: [`From ${MIN_HOURS} hours`, 'You set the stops and the timing', 'The driver waits for you'],
-    },
-    includes: {
-      ES: [`Microbús ${vehicle.model} con aire acondicionado`, 'Conductor por las horas contratadas', `Hasta ${VEHICLE_SEATS} pasajeros`, 'Itinerario libre dentro del horario'],
-      EN: [`${vehicle.model} minibus with air conditioning`, 'Driver for the hours booked', `Up to ${VEHICLE_SEATS} passengers`, 'Free itinerary within the agreed hours'],
-    },
-    excludes: {
-      ES: ['Gasolina', 'Entradas, comidas y bebidas', 'Guía turístico bilingüe (complemento aparte)', 'Propinas'],
-      EN: ['Fuel', 'Entrance fees, food and drinks', 'Bilingual tour guide (separate add-on)', 'Tips'],
-    },
-    notes: {
-      ES: [
-        `El servicio se contrata por un mínimo de ${MIN_HOURS} horas.`,
-        'La gasolina no está incluida en la tarifa por hora.',
-        'Para varios días seguidos, escríbenos: ajustamos el horario y el total.',
-      ],
-      EN: [
-        `The service is booked for a minimum of ${MIN_HOURS} hours.`,
-        'Fuel is not included in the hourly rate.',
-        'For several days in a row, write to us: we adjust the schedule and the total.',
-      ],
-    },
+  summary: {
+    ES: 'Vehículo con conductor a tu disposición: decides a dónde vas y cuánto te quedas en cada sitio. Gasolina y espera incluidas.',
+    EN: 'A vehicle with driver at your disposal: you decide where to go and how long to stay. Fuel and waiting included.',
   },
-]
+  description: {
+    ES: 'Contratas el microbús con conductor por horas y organizas tu propio recorrido por El Salvador. Sin itinerario fijo: paras donde quieras, cambias de plan a mitad del día y el conductor te espera. La tarifa ya incluye la gasolina y el tiempo de espera, así que el total es simplemente las horas por $30. Es la opción de quien ya sabe qué quiere ver, viaja en familia o en grupo pequeño, o necesita moverse varios días seguidos.',
+    EN: 'You hire the minibus with a driver by the hour and plan your own route around El Salvador. No fixed itinerary: stop wherever you want, change plans halfway through the day and the driver waits for you. The rate already includes fuel and waiting time, so the total is simply the hours times $30. It suits travellers who already know what they want to see, families and small groups, or anyone who needs to move around for several days.',
+  },
+  priceFromUsd: HOURLY_USD,
+  priceUnit: { ES: 'por hora', EN: 'per hour' },
+  priceUnitCode: 'HUR',
+  priceNote: {
+    ES: 'Gasolina y espera incluidas · sin mínimo de horas',
+    EN: 'Fuel and waiting included · no minimum hours',
+  },
+  icon: 'car',
+  highlights: {
+    ES: ['Gasolina y espera incluidas', 'Las paradas y los horarios los decides tú', `Hasta ${VEHICLE_SEATS} personas`],
+    EN: ['Fuel and waiting included', 'You set the stops and the timing', `Up to ${VEHICLE_SEATS} people`],
+  },
+  includes: {
+    ES: [
+      `Microbús ${vehicle.model} con aire acondicionado`,
+      'Conductor por las horas contratadas',
+      'Gasolina',
+      'Tiempo de espera en cada parada',
+      `Hasta ${VEHICLE_SEATS} pasajeros`,
+      'Itinerario libre dentro del horario',
+    ],
+    EN: [
+      `${vehicle.model} minibus with air conditioning`,
+      'Driver for the hours booked',
+      'Fuel',
+      'Waiting time at every stop',
+      `Up to ${VEHICLE_SEATS} passengers`,
+      'Free itinerary within the agreed hours',
+    ],
+  },
+  excludes: {
+    ES: ['Entradas, comidas y bebidas', 'Guía turístico bilingüe (complemento aparte)', 'Propinas'],
+    EN: ['Entrance fees, food and drinks', 'Bilingual tour guide (separate add-on)', 'Tips'],
+  },
+  notes: {
+    ES: [
+      'Se cobra por hora, sin mínimo: pagas solo el tiempo que uses.',
+      'La gasolina y el tiempo que el conductor te espera ya están incluidos en la tarifa.',
+      'Para varios días seguidos o rutas de madrugada, escríbenos con antelación: ajustamos el horario y el total.',
+    ],
+    EN: [
+      'Charged by the hour, with no minimum: you only pay for the time you use.',
+      'Fuel and the time the driver waits for you are already included in the rate.',
+      'For several days in a row or early-morning routes, write to us ahead of time: we adjust the schedule and the total.',
+    ],
+  },
+}
+
+/** Lista de servicios (hoy, uno). Se mantiene como lista para el sitemap y las rutas. */
+export const services: Service[] = [personalDriver]
 
 /* ------------------------------------------------------------------ */
 /* Complemento                                                         */
 /* ------------------------------------------------------------------ */
 
 /**
- * Guía turístico bilingüe. Es un COMPLEMENTO de los dos servicios, no un
- * tercer servicio: se muestra dentro de la sección, nunca como tarjeta
- * propia.
+ * Guía turístico bilingüe. Es un COMPLEMENTO del Personal Driver, no otro
+ * servicio: se muestra dentro de su bloque, nunca como tarjeta propia.
  *
  * El conductor es salvadoreño y conoce las rutas; el guía bilingüe es
  * quien explica los lugares en inglés. Son dos cosas distintas y el texto
@@ -258,8 +194,8 @@ export const guideAddOn = {
   name: { ES: 'Guía turístico bilingüe', EN: 'Bilingual tour guide' } satisfies Text,
   unit: { ES: 'por día', EN: 'per day' } satisfies Text,
   description: {
-    ES: 'Súmalo a cualquiera de los dos servicios y alguien te cuenta, en inglés o en español, lo que estás viendo.',
-    EN: 'Add it to either service and someone tells you what you are seeing, in English or Spanish.',
+    ES: 'Súmalo a tu Personal Driver y alguien te cuenta, en inglés o en español, lo que estás viendo.',
+    EN: 'Add it to your Personal Driver and someone tells you what you are seeing, in English or Spanish.',
   } satisfies Text,
 } as const
 

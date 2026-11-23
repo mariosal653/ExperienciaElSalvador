@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { experiences } from '@/lib/data'
+import { catalog as experiences } from '@/lib/data'
 import { destinationPages } from '@/lib/destination-details'
 import { LEGAL_SLUGS } from '@/lib/legal'
 import { services } from '@/lib/services'

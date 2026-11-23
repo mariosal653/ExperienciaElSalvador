@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { HomeView } from '@/components/home/home-view'
-import { experiences } from '@/lib/data'
+import { catalog as experiences } from '@/lib/data'
 import { getSiteUrl } from '@/lib/site'
 import { CONTACT_EMAIL, GOOGLE_PROFILE_URL, SOCIAL_LINKS } from '@/lib/contact'
 import { whatsappConfig } from '@/lib/whatsapp'
@@ -49,7 +49,7 @@ export default function HomePage() {
       {
         '@type': 'TravelAgency',
         '@id': `${site}/#organization`,
-        name: 'Experiences El Salvador',
+        name: 'Experiences in El Salvador',
         url: site,
         image: `${site}/img/hero/cerro-verde-izalco-1920.jpg`,
         logo: `${site}/icon.svg`,
@@ -69,8 +69,8 @@ export default function HomePage() {
         currenciesAccepted: 'USD',
         /*
           Notación simbólica en vez de un rango en dólares: las experiencias
-          van de 28 a 55 USD por persona, pero los servicios de conductor se
-          cobran por kilómetro y por hora. Un rango concreto describiría solo
+          van de 28 a 55 USD por persona, pero el Personal Driver se
+          cobra por hora. Un rango concreto describiría solo
           una parte del catálogo y dejaría fuera la oferta principal.
         */
         priceRange: '$$',

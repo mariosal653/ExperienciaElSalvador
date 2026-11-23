@@ -3,7 +3,8 @@
 import { useState, type FormEvent } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
-import { Eye, EyeOff, Loader2, Lock, ShieldCheck } from 'lucide-react'
+import { Eye, EyeOff, Loader2, Lock } from 'lucide-react'
+import { LogoMark } from '@/components/brand/logo-mark'
 
 /**
  * Entrada al panel de administración.
@@ -74,11 +75,9 @@ export function AdminLoginForm() {
   return (
     <div className="w-full max-w-md rounded-2xl bg-white p-7 shadow-float md:p-9">
       <div className="mb-7 flex items-center gap-2.5">
-        <span className="grid h-9 w-9 place-items-center rounded-full bg-brand text-gold">
-          <ShieldCheck size={20} strokeWidth={2.5} />
-        </span>
+        <LogoMark className="h-9 w-9 shrink-0 rounded-[28%] ring-1 ring-black/5" />
         <span className="text-lg font-bold tracking-tight text-brand">
-          Experiences <span className="text-accent">El Salvador</span>
+          Experiences in <span className="text-accent">El Salvador</span>
         </span>
       </div>
 

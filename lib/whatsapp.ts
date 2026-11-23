@@ -20,12 +20,23 @@ export const whatsappConfig = {
 
   /** Mensaje cuando el visitante no ha elegido nada todavía. */
   defaultMessage: {
-    ES: 'Hola 👋, estoy visitando Experiences El Salvador y quisiera recibir más información sobre las experiencias disponibles.',
-    EN: 'Hi 👋, I am browsing Experiences El Salvador and would like more information about the available experiences.',
+    ES: 'Hola 👋, estoy visitando Experiences in El Salvador y quisiera recibir más información sobre las experiencias disponibles.',
+    EN: 'Hi 👋, I am browsing Experiences in El Salvador and would like more information about the available experiences.',
   } satisfies Record<Locale, string>,
 
   /** Segundos antes de mostrar la burbuja de ayuda. */
   bubbleDelaySeconds: 8,
+
+  /**
+   * Segundos que la burbuja se queda en pantalla antes de retirarse sola.
+   *
+   * Mide 240 px y vive sobre la esquina inferior derecha: ahí es donde
+   * caen el «Reservar» de la última columna del catálogo y la insignia de
+   * Google de las opiniones. Quedándose hasta que la cerraran a mano,
+   * tapaba justo el botón que da de comer. Tiempo de sobra para leer dos
+   * renglones y seguir.
+   */
+  bubbleVisibleSeconds: 9,
 } as const
 
 /**
@@ -61,6 +72,8 @@ export type WhatsAppLead = {
    * botón de un servicio quiere hablar de ese servicio.
    */
   service?: string | null
+  /** Qué se cotiza: el servicio de transporte (por defecto) o una experiencia. */
+  kind?: 'service' | 'experience'
   /**
    * Resumen ya montado de la cotización (ruta, distancia, total), si viene
    * del cotizador. Solo se usa junto con `service`.
@@ -87,16 +100,27 @@ export function buildMessage(lead: WhatsAppLead): string {
   const lang = lead.lang
 
   if (lead.service) {
+    const what = lead.kind === 'experience'
+      ? (lang === 'ES' ? `la experiencia ${lead.service}` : `the ${lead.service} experience`)
+      : (lang === 'ES' ? `el servicio ${lead.service}` : `the ${lead.service} service`)
     // Con cotización hecha, el mensaje la lleva entera: el equipo recibe
-    // la ruta y el total en lugar de «hola, ¿cuánto cuesta?».
+    // los datos y el precio de referencia en lugar de «hola, ¿cuánto cuesta?».
     if (lead.details) {
       return lang === 'ES'
-        ? `Hola 👋, quisiera cotizar el servicio ${lead.service}.\n\n${lead.details}\n\n¿Me confirman el total?`
-        : `Hi 👋, I would like a quote for the ${lead.service} service.\n\n${lead.details}\n\nCould you confirm the total?`
+        ? `Hola 👋, quisiera cotizar ${what}.
+
+${lead.details}
+
+¿Me confirman el total?`
+        : `Hi 👋, I would like a quote for ${what}.
+
+${lead.details}
+
+Could you confirm the total?`
     }
     return lang === 'ES'
-      ? `Hola 👋, quisiera cotizar el servicio ${lead.service}. ¿Podrían darme más información?`
-      : `Hi 👋, I would like a quote for the ${lead.service} service. Could you send me more information?`
+      ? `Hola 👋, quisiera cotizar ${what}. ¿Podrían darme más información?`
+      : `Hi 👋, I would like a quote for ${what}. Could you send me more information?`
   }
 
   if (lead.experience) {

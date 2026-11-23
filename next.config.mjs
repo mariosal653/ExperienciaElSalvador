@@ -36,6 +36,14 @@ const nextConfig = {
     unoptimized: true,
   },
   poweredByHeader: false,
+  async redirects() {
+    return [
+      // Driver by Tour se retiró en noviembre de 2026: su página y los
+      // enlaces que ya circulen (Google, WhatsApp) llevan al único servicio
+      // de conductor que queda.
+      { source: '/servicios/driver-by-tour', destination: '/servicios/personal-driver', permanent: true },
+    ]
+  },
   async headers() {
     return [
       { source: '/:path*', headers: SECURITY_HEADERS },

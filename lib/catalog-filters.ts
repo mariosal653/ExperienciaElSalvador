@@ -34,7 +34,7 @@ export function applyRefinements(list: Experience[], refine: Refinements): Exper
   return list.filter((item) => {
     if (refine.duration === 'half' && item.durationHours > HALF_DAY_MAX_HOURS) return false
     if (refine.duration === 'full' && item.durationHours <= HALF_DAY_MAX_HOURS) return false
-    if (refine.maxPrice !== null && item.priceUsd > refine.maxPrice) return false
+    if (refine.maxPrice !== null && (item.priceUsd === null || item.priceUsd > refine.maxPrice)) return false
     const details = getExperienceDetails(item.id)
     if (refine.family && (!details || details.minAge > FAMILY_MAX_AGE)) return false
     if (refine.easy && details?.difficulty !== 'easy') return false
@@ -51,9 +51,9 @@ export function sortExperiences(list: Experience[], sort: SortKey, stats: Review
   const sorted = [...list]
   switch (sort) {
     case 'priceAsc':
-      return sorted.sort((a, b) => a.priceUsd - b.priceUsd)
+      return sorted.sort((a, b) => (a.priceUsd ?? Infinity) - (b.priceUsd ?? Infinity))
     case 'priceDesc':
-      return sorted.sort((a, b) => b.priceUsd - a.priceUsd)
+      return sorted.sort((a, b) => (b.priceUsd ?? -Infinity) - (a.priceUsd ?? -Infinity))
     case 'duration':
       return sorted.sort((a, b) => a.durationHours - b.durationHours)
     case 'rating':

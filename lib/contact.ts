@@ -12,10 +12,10 @@
  */
 
 /** Correo público, para consultas y ejercicio de derechos sobre los datos. */
-export const CONTACT_EMAIL = 'discover@experiencesinelsalvador.com'
+export const CONTACT_EMAIL = 'experiencesinelsalvador@gmail.com'
 
 /** Nombre del negocio, tal y como aparece en el Perfil de Empresa. */
-export const BUSINESS_NAME = 'Experiences El Salvador'
+export const BUSINESS_NAME = 'Experiences in El Salvador'
 
 /**
  * Ficha del negocio en Google Maps, en la forma canónica por `cid`: es la
@@ -55,7 +55,7 @@ export const SOCIAL_LINKS: Array<{ network: 'instagram' | 'facebook'; label: str
     network: 'facebook',
     label: 'Facebook',
     handle: 'Experiences in El Salvador',
-    // Pendiente: el cliente dio el nombre de la página, no su URL.
-    url: null,
+    // Enlace del perfil sin los parámetros de rastreo del botón «compartir».
+    url: 'https://www.facebook.com/profile.php?id=61564708962821',
   },
 ]

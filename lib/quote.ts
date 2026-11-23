@@ -1,4 +1,5 @@
 import type { Locale } from './data'
+import { CONTACT_EMAIL } from './contact'
 
 /**
  * Cotización por correo electrónico.
@@ -13,18 +14,27 @@ import type { Locale } from './data'
  * endpoint, una base y un antispam de más; cuando se construya el
  * cotizador, este archivo es el único punto que cambia.
  *
- * SIN CORREO CONFIGURADO no se muestra el botón: un `mailto:` vacío abre
- * el cliente de correo sin destinatario y el visitante no vuelve.
- * Configurar NEXT_PUBLIC_QUOTE_EMAIL para activarlo (ver .env.example).
+ * El destinatario es el CORREO OFICIAL del negocio, el mismo que está en el
+ * Perfil de Empresa y en el pie del sitio (lib/contact.ts). Antes esto
+ * dependía solo de NEXT_PUBLIC_QUOTE_EMAIL y, como esa variable nunca se
+ * puso en Netlify, el botón de «Cotizar por correo» no se llegó a ver
+ * nunca en producción: de las dos vías del acuerdo 02 solo funcionaba una.
+ *
+ * La variable sigue mandando cuando existe, para poder desviar las
+ * cotizaciones a otro buzón (ventas, un CRM) sin tocar el repositorio ni
+ * mover el correo de contacto, que tiene que seguir coincidiendo con el
+ * Perfil de Empresa.
  */
 
-/** Correo público al que llegan las cotizaciones, o null si no se configuró. */
-export const quoteEmail: string | null = process.env.NEXT_PUBLIC_QUOTE_EMAIL?.trim() || null
+/** Correo al que llegan las cotizaciones. Siempre hay uno. */
+export const quoteEmail: string = process.env.NEXT_PUBLIC_QUOTE_EMAIL?.trim() || CONTACT_EMAIL
 
 export type QuoteLead = {
   lang: Locale
-  /** Nombre del servicio que se está cotizando. */
+  /** Nombre del servicio (o de la experiencia) que se está cotizando. */
   service: string
+  /** Qué se cotiza: el servicio de transporte (por defecto) o una experiencia. */
+  kind?: 'service' | 'experience'
   /**
    * Resumen de la cotización (ruta, distancia, total) cuando viene del
    * cotizador automático. Sustituye a las preguntas que ya ha respondido.
@@ -43,11 +53,12 @@ export function quoteSubject({ lang, service }: QuoteLead): string {
  * Cuerpo del correo: las preguntas cuya respuesta hace falta para cotizar,
  * ya escritas, para que el visitante solo rellene.
  */
-export function quoteBody({ lang, service, details }: QuoteLead): string {
+export function quoteBody({ lang, service, details, kind }: QuoteLead): string {
   const es = lang === 'ES'
-  const intro = es
-    ? `Hola, quisiera cotizar el servicio ${service}.`
-    : `Hello, I would like a quote for the ${service} service.`
+  const what = kind === 'experience'
+    ? (es ? `la experiencia ${service}` : `the ${service} experience`)
+    : (es ? `el servicio ${service}` : `the ${service} service`)
+  const intro = es ? `Hola, quisiera cotizar ${what}.` : `Hello, I would like a quote for ${what}.`
 
   // Con la ruta ya montada en el cotizador, se manda esa y solo se
   // pregunta lo que falta: volver a pedir la ruta sería hacerla dos veces.
@@ -65,14 +76,12 @@ export function quoteBody({ lang, service, details }: QuoteLead): string {
 }
 
 /**
- * Enlace `mailto:` con asunto y cuerpo codificados, o null si no hay
- * correo configurado.
+ * Enlace `mailto:` con asunto y cuerpo codificados.
  *
  * Los saltos de línea van como %0A (encodeURIComponent los deja así), que
  * es lo que entienden los clientes de correo.
  */
-export function buildQuoteMailto(lead: QuoteLead): string | null {
-  if (!quoteEmail) return null
+export function buildQuoteMailto(lead: QuoteLead): string {
   const subject = encodeURIComponent(quoteSubject(lead))
   const body = encodeURIComponent(quoteBody(lead))
   return `mailto:${quoteEmail}?subject=${subject}&body=${body}`

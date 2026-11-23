@@ -15,6 +15,16 @@
     400,
     500
   ],
+  "/img/experiences/apaneca.jpg": [
+    400,
+    800,
+    1280
+  ],
+  "/img/experiences/boqueron-crater.jpg": [
+    400,
+    800,
+    1280
+  ],
   "/img/experiences/bosque-montecristo.jpg": [
     400,
     800,
@@ -29,6 +39,11 @@
     400,
     800,
     960
+  ],
+  "/img/experiences/concepcion-de-ataco.jpg": [
+    400,
+    800,
+    1000
   ],
   "/img/experiences/conchagua-playa.jpg": [
     400,

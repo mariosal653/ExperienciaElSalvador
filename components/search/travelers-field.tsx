@@ -4,7 +4,7 @@ import { Minus, Plus, Users } from 'lucide-react'
 import type { Locale } from '@/lib/data'
 
 const MIN_PEOPLE = 1
-const MAX_PEOPLE = 20
+const MAX_PEOPLE = 7
 
 type Props = {
   value: number

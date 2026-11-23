@@ -47,7 +47,7 @@ export const reels: Reel[] = [
     location: 'Santa Ana',
     thumbnail: '/img/reels/thumbs/santa-ana.jpg',
     poster: '/img/reels/santa-ana.jpg',
-    experienceId: 'volcan-santa-ana',
+    experienceId: 'amanecer-volcan-santa-ana',
     credit: credits.santaAna,
   }),
   photoReel({
@@ -67,7 +67,7 @@ export const reels: Reel[] = [
     location: 'Juayúa',
     thumbnail: '/img/reels/thumbs/ruta-de-las-flores.jpg',
     poster: '/img/reels/ruta-de-las-flores.jpg',
-    experienceId: 'ruta-de-las-flores',
+    experienceId: 'ruta-de-las-flores-4x4',
     credit: credits.juayua,
   }),
   photoReel({
@@ -76,7 +76,7 @@ export const reels: Reel[] = [
     location: 'Santa Ana',
     thumbnail: '/img/reels/thumbs/coatepeque.jpg',
     poster: '/img/reels/coatepeque.jpg',
-    experienceId: 'kayak-coatepeque',
+    experienceId: 'santa-ana-coatepeque-jetsky',
     credit: credits.coatepeque,
   }),
   photoReel({

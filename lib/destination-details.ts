@@ -1,4 +1,4 @@
-import { destinations, experiences, type Destination, type Experience, type Locale } from './data'
+import { catalog as experiences, destinations, type Destination, type Experience, type Locale } from './data'
 
 /**
  * Páginas de destino (/destinos/<id>): texto de presentación y la lista de

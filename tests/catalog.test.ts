@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { experiences } from '../lib/data'
+import { catalog as experiences, experiences as allExperiences, isBookableOnline } from '../lib/data'
 import { applyRefinements, emptyRefinements, sortExperiences } from '../lib/catalog-filters'
 import { destinationPages, destinationIdByName } from '../lib/destination-details'
 import { experienceDetails } from '../lib/experience-details'
@@ -19,7 +19,7 @@ describe('filtros del catálogo', () => {
   })
 
   it('precio máximo, familias y dificultad', () => {
-    expect(applyRefinements(experiences, { ...emptyRefinements, maxPrice: 30 }).every((item) => item.priceUsd <= 30)).toBe(true)
+    expect(applyRefinements(experiences, { ...emptyRefinements, maxPrice: 30 }).every((item) => item.priceUsd !== null && item.priceUsd <= 30)).toBe(true)
     const family = applyRefinements(experiences, { ...emptyRefinements, family: true })
     expect(family.map((item) => item.id)).not.toContain('volcan-izalco')
     const easy = applyRefinements(experiences, { ...emptyRefinements, easy: true })
@@ -31,17 +31,20 @@ describe('orden', () => {
   it('por precio, sin modificar la lista original', () => {
     const before = experiences.map((item) => item.id)
     const sorted = sortExperiences(experiences, 'priceAsc', null)
-    expect(sorted[0].priceUsd).toBe(Math.min(...experiences.map((item) => item.priceUsd)))
+    const prices = experiences.flatMap((item) => (item.priceUsd === null ? [] : [item.priceUsd]))
+    expect(sorted[0].priceUsd).toBe(Math.min(...prices))
+    // «Precio a consultar» va al final.
+    expect(sorted.at(-1)?.priceUsd).toBeNull()
     expect(experiences.map((item) => item.id)).toEqual(before)
   })
 
   it('mejor valoradas: las que no tienen opiniones van al final', () => {
     const stats = {
-      'kayak-coatepeque': { average: 4, count: 1, breakdown: [0, 0, 0, 1, 0] as [number, number, number, number, number] },
-      'volcan-santa-ana': { average: 5, count: 3, breakdown: [0, 0, 0, 0, 3] as [number, number, number, number, number] },
+      'suchitoto-colonial': { average: 4, count: 1, breakdown: [0, 0, 0, 1, 0] as [number, number, number, number, number] },
+      'amanecer-volcan-santa-ana': { average: 5, count: 3, breakdown: [0, 0, 0, 0, 3] as [number, number, number, number, number] },
     }
     const sorted = sortExperiences(experiences, 'rating', stats)
-    expect(sorted.slice(0, 2).map((item) => item.id)).toEqual(['volcan-santa-ana', 'kayak-coatepeque'])
+    expect(sorted.slice(0, 2).map((item) => item.id)).toEqual(['amanecer-volcan-santa-ana', 'suchitoto-colonial'])
   })
 })
 
@@ -58,5 +61,34 @@ describe('destinos', () => {
     for (const experience of experiences) {
       expect(experienceDetails[experience.id], experience.id).toBeDefined()
     }
+  })
+})
+
+describe('tours en línea y experiencias para cotizar', () => {
+  const tours = ['amanecer-volcan-santa-ana', 'santa-ana-playa-los-almendros', 'ruta-de-las-flores-4x4', 'boqueron-centro-historico', 'centro-historico-puerta-del-diablo']
+
+  it('solo los cinco tours con precio se reservan en línea, a precio por persona', () => {
+    expect(experiences.filter(isBookableOnline).map((item) => item.id).sort()).toEqual([...tours].sort())
+    const price = Object.fromEntries(experiences.map((item) => [item.id, item.priceUsd]))
+    expect([85, 150, 175, 70, 65]).toEqual(tours.map((id) => price[id]))
+  })
+
+  it('el tour del jetsky va «a consultar» y se cotiza', () => {
+    const jetsky = experiences.find((item) => item.id === 'santa-ana-coatepeque-jetsky')
+    expect(jetsky?.priceUsd).toBeNull()
+    expect(jetsky?.booking).toBe('quote')
+  })
+
+  it('las repetidas salen del catálogo público y apuntan a su tour', () => {
+    const hidden = allExperiences.filter((item) => item.hidden)
+    expect(hidden.map((item) => item.id).sort()).toEqual(['centro-historico-san-salvador', 'kayak-coatepeque', 'puerta-del-diablo', 'ruta-de-las-flores', 'volcan-santa-ana'])
+    for (const item of hidden) {
+      expect(experiences.some((visible) => visible.id === item.id)).toBe(false)
+      expect(experiences.some((visible) => visible.id === item.replacedBy)).toBe(true)
+    }
+  })
+
+  it('todas tienen grupo de hasta 7', () => {
+    expect(allExperiences.every((item) => item.maxPeople === 7)).toBe(true)
   })
 })

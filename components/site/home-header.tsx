@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ArrowUp, Compass, Menu, Search, X } from 'lucide-react'
+import { ArrowUp, Menu, Search, X } from 'lucide-react'
 import { useLanguage } from '@/components/i18n/language-provider'
 import { LanguageSwitch } from '@/components/i18n/language-switch'
 import { SessionNav } from '@/components/auth/session-nav'
 import type { Locale } from '@/lib/data'
+import { LogoMark } from '@/components/brand/logo-mark'
 
 type Section = { id: string; label: Record<Locale, string> }
 
@@ -17,7 +18,7 @@ type Section = { id: string; label: Record<Locale, string> }
  * saber qué sección se está leyendo hace falta el orden real: DOCUMENT_ORDER.
  */
 const SECTIONS: Section[] = [
-  { id: 'servicios', label: { ES: 'Servicios', EN: 'Services' } },
+  { id: 'servicios', label: { ES: 'Personal Driver', EN: 'Personal Driver' } },
   { id: 'experiencias', label: { ES: 'Explorar', EN: 'Explore' } },
   { id: 'destinos', label: { ES: 'Destinos', EN: 'Destinations' } },
   { id: 'opiniones', label: { ES: 'Opiniones', EN: 'Reviews' } },
@@ -54,21 +55,38 @@ export function HomeHeader() {
   const [active, setActive] = useState<string | null>(null)
 
   /**
-   * ¿Se pasó ya el héroe? Se observa el propio héroe en vez de añadir un
-   * centinela: con el margen superior recortado a la altura de la barra,
-   * deja de cruzarse justo cuando su borde inferior pasa por debajo de
-   * ella. Sin escuchar el scroll, que dispararía en cada píxel.
+   * ¿Se empezó a bajar? Entonces la cápsula pasa del cristal claro
+   * (`liquid-glass`) al tintado (`liquid-glass-tinted`), que sostiene el
+   * texto blanco sobre cualquier fondo.
+   *
+   * Antes la condición era «¿se pasó ya el héroe?», con un observador
+   * sobre el propio héroe. Era correcta para lo que preguntaba, pero el
+   * héroe mide 620 px —más de 1 500 en móvil— y la barra es `fixed`: en
+   * todo ese recorrido el titular y el subtítulo pasaban POR DEBAJO de una
+   * barra sin fondo y se dibujaban encima del logotipo. Dos textos en los
+   * mismos píxeles: ilegibles los dos. El velo del estado transparente
+   * atenúa, pero no evita el choque; lo único que lo evita es que la barra
+   * deje de ser transparente en cuanto el contenido empieza a pasar bajo
+   * ella.
+   *
+   * El umbral es la altura de la barra: en reposo, con el héroe entero a
+   * la vista, sigue transparente y la foto se ve completa, que es para lo
+   * que está. Al primer gesto, tintada.
+   *
+   * Se escucha el scroll, no se observa un elemento: la pregunta ya no es
+   * «¿dónde está el héroe?» sino «¿cuánto se ha bajado?», y el estado solo
+   * cambia dos veces en toda la página. El trabajo por evento es leer
+   * `scrollY` y comparar, que es justo lo que hace el navegador al
+   * calcular un `rootMargin`.
    */
   useEffect(() => {
-    const hero = document.getElementById('inicio')
-    if (!hero) return
+    const THRESHOLD = 72
 
-    const observer = new IntersectionObserver(
-      ([entry]) => setScrolled(!entry.isIntersecting),
-      { rootMargin: '-72px 0px 0px 0px', threshold: 0 },
-    )
-    observer.observe(hero)
-    return () => observer.disconnect()
+    const read = () => setScrolled(window.scrollY > THRESHOLD)
+
+    read()
+    window.addEventListener('scroll', read, { passive: true })
+    return () => window.removeEventListener('scroll', read)
   }, [])
 
   /**
@@ -124,9 +142,9 @@ export function HomeHeader() {
           scrolled ? 'liquid-glass-tinted' : 'liquid-glass'
         }`}
       >
-        <a href="#inicio" className="flex shrink-0 items-center gap-2 sm:gap-2.5" aria-label="Experiences El Salvador · Inicio">
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-gold text-brand"><Compass size={21} strokeWidth={2.5} /></span>
-          <span className="whitespace-nowrap text-base font-bold sm:text-lg tracking-tight">Experiences <span className="text-gold">El Salvador</span></span>
+        <a href="#inicio" className="flex shrink-0 items-center gap-2 sm:gap-2.5" aria-label="Experiences in El Salvador · Inicio">
+          <LogoMark className="h-9 w-9 shrink-0 rounded-[28%] ring-1 ring-white/30" />
+          <span className="whitespace-nowrap text-base font-bold sm:text-lg tracking-tight">Experiences in <span className="text-gold">El Salvador</span></span>
         </a>
 
         {/*
@@ -140,10 +158,12 @@ export function HomeHeader() {
               key={section.id}
               href={`#${section.id}`}
               aria-current={scrolled && active === section.id ? 'true' : undefined}
-              // «Cómo funciona» es el menos buscado y además se alcanza
-              // bajando: en la franja de 1024 a 1280 px cede su sitio al
-              // idioma, la cuenta y el botón de buscar. El menú lo lleva.
-              className={`${linkClass(section.id)} ${section.id === 'como-funciona' ? 'hidden xl:inline-block' : ''}`}
+              // «Cómo funciona» y «Opiniones» son los menos buscados y se
+              // alcanzan bajando: de 1024 a 1536 px ceden su
+              // sitio al idioma, la cuenta y el botón de buscar. Con la
+              // cápsula de cristal (que lleva su propio margen interior),
+              // dejar «Opiniones» desbordaba la barra 56 px a 1024.
+              className={`${linkClass(section.id)} ${section.id === 'como-funciona' || section.id === 'opiniones' ? 'hidden 2xl:inline-block' : ''}`}
             >
               {section.label[lang]}
             </a>

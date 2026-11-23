@@ -37,3 +37,14 @@ prisma/test.db*
 
 # Bases sueltas de pruebas
 no-existe-*.db
+
+# Material de otros proyectos que vive en esta carpeta: nunca al repositorio.
+# Las colecciones de Postman llevan client_secret y tokens.
+postman/
+.postman/
+docs/qa/
+docs/defensa-omnicanal/
+
+# Archivos sueltos sin contenido
+sdfsdf
+Nuevo Documento de texto.txt

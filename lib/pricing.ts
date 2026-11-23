@@ -50,7 +50,8 @@ export function calculatePrice(
 /** Precio del catálogo, en centavos. `null` si la experiencia no existe. */
 export function getExperiencePriceCents(experienceId: string): number | null {
   const experience = experiences.find((item) => item.id === experienceId)
-  if (!experience) return null
+  // Las que son para cotizar no tienen precio cobrable en la web.
+  if (!experience || experience.booking !== 'online' || experience.priceUsd === null) return null
   return Math.round(experience.priceUsd * 100)
 }
 

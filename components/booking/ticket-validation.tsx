@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { AlertTriangle, BadgeCheck, Ban, CircleSlash, Compass, KeyRound, Loader2, TicketCheck } from 'lucide-react'
+import { AlertTriangle, BadgeCheck, Ban, CircleSlash, KeyRound, Loader2, TicketCheck } from 'lucide-react'
 import { useLanguage } from '@/components/i18n/language-provider'
 import { LanguageSwitch } from '@/components/i18n/language-switch'
 import { parseLocalDate } from '@/lib/data'
 import type { TicketValidity } from '@/lib/tickets'
+import { LogoMark } from '@/components/brand/logo-mark'
 
 type TicketInfo = {
   code: string
@@ -113,10 +114,8 @@ export function TicketValidation({
       <div className="mx-auto max-w-md">
         <div className="mb-5 flex items-center justify-between gap-3">
           <span className="flex items-center gap-2 font-bold">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-gold text-brand">
-              <Compass size={18} strokeWidth={2.5} />
-            </span>
-            Experiences <span className="text-accent">El Salvador</span>
+            <LogoMark className="h-8 w-8 shrink-0 rounded-[28%] ring-1 ring-black/5" />
+            Experiences in <span className="text-accent">El Salvador</span>
           </span>
           <div className="rounded-full bg-brand p-0.5">
             <LanguageSwitch lang={lang} onChange={setLang} />

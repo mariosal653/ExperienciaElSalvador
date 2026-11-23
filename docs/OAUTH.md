@@ -8,19 +8,54 @@ un botón que lleva a un error.
 
 ## Google — listo, solo faltan credenciales
 
-Código completo en `lib/auth.ts`. Se activa solo al definir las variables.
+Código completo en `lib/auth.ts` y botón en `components/auth/auth-form.tsx`,
+tanto en /login como en /register: con las variables definidas, el mismo
+botón **crea la cuenta** la primera vez y **da acceso** las siguientes. La
+cuenta nueva recibe su 25 % de bienvenida igual que una creada con
+contraseña (el beneficio nace en `events.createUser`, que también se dispara
+con Google).
+
+Las credenciales salen de una cuenta de Google que no es de nadie más que
+del negocio: **este paso lo tiene que dar una persona**, no se puede
+automatizar desde el repositorio.
 
 1. [Google Cloud Console](https://console.cloud.google.com/) → crear proyecto
 2. *APIs y servicios → Pantalla de consentimiento OAuth* → tipo **Externo**
+   - Mientras la pantalla esté en *Modo de prueba*, solo entran los correos
+     que figuren en **Usuarios de prueba**. Para abrirlo a cualquiera hay
+     que pulsar **Publicar aplicación**.
+   - Con los ámbitos básicos (`email`, `profile`, `openid`) Google **no**
+     pide verificación: la publicación es inmediata.
 3. *Credenciales → Crear credenciales → ID de cliente de OAuth* → **Aplicación web**
-4. URIs de redirección autorizados:
-   - `http://localhost:3111/api/auth/callback/google` (desarrollo)
-   - `https://TU-DOMINIO/api/auth/callback/google` (producción)
+4. URIs de redirección autorizados — tienen que coincidir **carácter por
+   carácter**, o Google responde `redirect_uri_mismatch`:
+   - `http://localhost:3000/api/auth/callback/google` (desarrollo: `next dev`
+     levanta en el 3000)
+   - `https://experiencesinelsalvador.com/api/auth/callback/google` (producción)
+5. Las dos variables, en `.env` para desarrollo y en *Site settings → Environment
+   variables* de Netlify para producción:
 
 ```bash
 AUTH_GOOGLE_ID=...
 AUTH_GOOGLE_SECRET=...
 ```
+
+6. Volver a desplegar. Netlify no reconstruye solo al cambiar una variable,
+   y sin reconstruir el botón no aparece.
+
+### Quien ya tenía cuenta con contraseña
+
+Un visitante que se registró con su Gmail **y contraseña** y después pulsa
+«Continuar con Google» NO entra: Auth.js no enlaza las dos cuentas por su
+cuenta, porque `allowDangerousEmailAccountLinking` está en `false`. Devuelve
+a `/login?error=OAuthAccountNotLinked`, y el formulario explica qué hacer
+(entrar con la contraseña).
+
+Poner esa opción en `true` haría que Google entrase directamente a la cuenta
+que ya existe. Google verifica los correos, así que la práctica está
+extendida, pero significa que **quien controle ese Gmail entra en la cuenta
+del sitio**, sin la contraseña. Es una decisión del negocio, no del código:
+mientras siga en `false`, cada persona entra por donde se registró.
 
 ---
 

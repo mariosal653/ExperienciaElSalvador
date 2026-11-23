@@ -40,7 +40,7 @@ de contacto público y de vía para ejercer derechos sobre los datos.
 | Dato | Valor | Dónde vive en el código |
 | --- | --- | --- |
 | Nombre | Experiences El Salvador | `lib/contact.ts` |
-| Correo | discover@experiencesinelsalvador.com | `lib/contact.ts` (solo en el sitio) |
+| Correo | experiencesinelsalvador@gmail.com | `lib/contact.ts` (solo en el sitio) |
 | Teléfono | +503 7230 8067 | `lib/whatsapp.ts` |
 | Web | https://experiencesinelsalvador.com | `SITE_URL` en Netlify |
 

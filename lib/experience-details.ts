@@ -109,6 +109,49 @@ const IMG = {
     src: '/img/experiences/conchagua-playa.jpg',
     alt: { ES: 'El volcán de Conchagua visto desde la playa', EN: 'Conchagua volcano seen from the beach' },
   },
+  coatepeque: {
+    src: '/img/reels/coatepeque.jpg',
+    alt: { ES: 'Lago de Coatepeque dentro de la caldera', EN: 'Lake Coatepeque inside the caldera' },
+  },
+  juayua: {
+    src: '/img/reels/ruta-de-las-flores.jpg',
+    alt: { ES: 'Juayúa, en la Ruta de las Flores', EN: 'Juayúa, on the Ruta de las Flores' },
+  },
+  ataco: {
+    src: '/img/experiences/concepcion-de-ataco.jpg',
+    alt: { ES: 'Calle de Concepción de Ataco', EN: 'A street in Concepción de Ataco' },
+  },
+  apaneca: {
+    src: '/img/experiences/apaneca.jpg',
+    alt: { ES: 'Apaneca entre cafetales', EN: 'Apaneca among coffee farms' },
+  },
+  boqueron: {
+    src: '/img/experiences/boqueron-crater.jpg',
+    alt: { ES: 'Cráter de El Boquerón', EN: 'El Boquerón crater' },
+  },
+  centroHistorico: {
+    src: '/img/experiences/centro-historico.jpg',
+    alt: { ES: 'Centro Histórico de San Salvador', EN: 'San Salvador Historic Center' },
+  },
+}
+
+/*
+ * Recogida de los TOURS. Solo la del amanecer está confirmada (1:30 a. m.
+ * desde El Tunco, luego hoteles de San Salvador). En el resto, el punto y
+ * la hora se coordinan al reservar: la tarjeta «Puntos de encuentro» de
+ * Trello sigue abierta.
+ */
+const TOUR_PICKUP = {
+  name: {
+    ES: 'Recogida en tu hotel (zona de playa o San Salvador). Te confirmamos la hora por WhatsApp',
+    EN: 'Pickup at your hotel (beach area or San Salvador). We confirm the time by WhatsApp',
+  },
+  mapQuery: 'San Salvador, El Salvador',
+}
+
+const TOUR_INCLUDES: List = {
+  ES: ['Transporte privado ida y vuelta', 'Conductor local', 'Grupo de hasta 7 personas', 'Agua embotellada'],
+  EN: ['Private round-trip transport', 'Local driver', 'Group of up to 7 people', 'Bottled water'],
 }
 
 const ID_DOC: List = {
@@ -117,6 +160,148 @@ const ID_DOC: List = {
 }
 
 export const experienceDetails: Record<string, ExperienceDetails> = {
+  /*
+   * TOURS (noviembre de 2026). Los horarios son una PROPUESTA coherente con
+   * la duración; falta que el cliente los confirme. Confirmado: recogida del
+   * amanecer a la 1:30 a. m. desde El Tunco.
+   */
+  'amanecer-volcan-santa-ana': {
+    gallery: [IMG.losVolcanes, IMG.cerroVerdeIzalco],
+    itinerary: [
+      { time: '1:30', text: { ES: 'Recogida en El Tunco y después en hoteles de San Salvador', EN: 'Pickup in El Tunco, then at hotels in San Salvador' } },
+      { time: '4:00', text: { ES: 'Llegada al Parque Nacional Los Volcanes e inicio de la subida', EN: 'Arrive at Los Volcanes National Park and start the climb' } },
+      { time: '5:45', text: { ES: 'Amanecer en el cráter, sobre la laguna turquesa', EN: 'Sunrise at the crater, above the turquoise lagoon' } },
+      { time: '7:30', text: { ES: 'Descenso con vistas al lago de Coatepeque y al Izalco', EN: 'Descent with views of Lake Coatepeque and Izalco' } },
+      { time: '11:30', text: { ES: 'Regreso a tu hotel', EN: 'Back at your hotel' } },
+    ],
+    includes: { ES: [...TOUR_INCLUDES.ES, 'Entrada al parque y al sendero'], EN: [...TOUR_INCLUDES.EN, 'Park and trail entry'] },
+    excludes: { ES: ['Desayuno', 'Propinas'], EN: ['Breakfast', 'Tips'] },
+    bring: {
+      ES: ['Chaqueta abrigada: de madrugada en la cima hace frío', 'Linterna o frontal', 'Zapatos con buen agarre', 'Agua y algo de comer', ...ID_DOC.ES],
+      EN: ['A warm jacket: it is cold at the top before dawn', 'A flashlight or headlamp', 'Shoes with good grip', 'Water and a snack', ...ID_DOC.EN],
+    },
+    notes: {
+      ES: ['La recogida empieza a la 1:30 a. m. en El Tunco y sigue por hoteles de San Salvador.', 'El amanecer depende del clima: con niebla, la vista puede ser parcial.'],
+      EN: ['Pickup starts at 1:30 a.m. in El Tunco and continues at hotels in San Salvador.', 'The sunrise depends on the weather: with fog, the view may be partial.'],
+    },
+    meetingPoint: {
+      name: { ES: 'Recogida desde la 1:30 a. m. en El Tunco y hoteles de San Salvador', EN: 'Pickup from 1:30 a.m. in El Tunco and San Salvador hotels' },
+      mapQuery: 'El Tunco, La Libertad, El Salvador',
+    },
+    difficulty: 'moderate',
+    minAge: 8,
+    languages: ['ES', 'EN'],
+  },
+
+  'santa-ana-playa-los-almendros': {
+    gallery: [IMG.santaAnaCrater, IMG.sunzal],
+    itinerary: [
+      { time: '5:30', text: { ES: 'Recogida en tu hotel', EN: 'Pickup at your hotel' } },
+      { time: '7:30', text: { ES: 'Caminata al cráter del Volcán de Santa Ana', EN: 'Hike to the Santa Ana volcano crater' } },
+      { time: '11:30', text: { ES: 'Bajada y traslado a la costa', EN: 'Descent and transfer to the coast' } },
+      { time: '13:30', text: { ES: 'Picnic y tarde de playa en Los Almendros', EN: 'Picnic and an afternoon on Los Almendros beach' } },
+      { time: '17:30', text: { ES: 'Regreso a tu hotel', EN: 'Back at your hotel' } },
+    ],
+    includes: { ES: [...TOUR_INCLUDES.ES, 'Entrada al parque y al sendero', 'Picnic en la playa'], EN: [...TOUR_INCLUDES.EN, 'Park and trail entry', 'Beach picnic'] },
+    excludes: { ES: ['Bebidas alcohólicas', 'Propinas'], EN: ['Alcoholic drinks', 'Tips'] },
+    bring: {
+      ES: ['Zapatos con buen agarre', 'Traje de baño y toalla', 'Bloqueador y gorra', 'Chaqueta ligera para la cima', ...ID_DOC.ES],
+      EN: ['Shoes with good grip', 'Swimsuit and towel', 'Sunscreen and a hat', 'A light jacket for the summit', ...ID_DOC.EN],
+    },
+    meetingPoint: TOUR_PICKUP,
+    difficulty: 'moderate',
+    minAge: 8,
+    languages: ['ES', 'EN'],
+  },
+
+  'santa-ana-coatepeque-jetsky': {
+    gallery: [IMG.santaAnaCrater, IMG.coatepeque],
+    itinerary: [
+      { time: '5:30', text: { ES: 'Recogida en tu hotel', EN: 'Pickup at your hotel' } },
+      { time: '7:30', text: { ES: 'Caminata al cráter del Volcán de Santa Ana', EN: 'Hike to the Santa Ana volcano crater' } },
+      { time: '12:00', text: { ES: 'Traslado al Lago de Coatepeque', EN: 'Transfer to Lake Coatepeque' } },
+      { time: '13:00', text: { ES: 'Paseo en jetsky por el lago', EN: 'Jet ski ride on the lake' } },
+      { time: '15:30', text: { ES: 'Regreso a tu hotel', EN: 'Back at your hotel' } },
+    ],
+    includes: { ES: [...TOUR_INCLUDES.ES, 'Entrada al parque y al sendero'], EN: [...TOUR_INCLUDES.EN, 'Park and trail entry'] },
+    excludes: { ES: ['Comidas', 'Propinas'], EN: ['Meals', 'Tips'] },
+    bring: {
+      ES: ['Zapatos con buen agarre', 'Traje de baño y ropa de cambio', 'Bloqueador y gorra', ...ID_DOC.ES],
+      EN: ['Shoes with good grip', 'Swimsuit and a change of clothes', 'Sunscreen and a hat', ...ID_DOC.EN],
+    },
+    notes: {
+      ES: ['El precio se confirma por WhatsApp o correo según el número de personas.'],
+      EN: ['The price is confirmed by WhatsApp or email depending on the number of people.'],
+    },
+    meetingPoint: TOUR_PICKUP,
+    difficulty: 'moderate',
+    minAge: 12,
+    languages: ['ES', 'EN'],
+  },
+
+  'ruta-de-las-flores-4x4': {
+    gallery: [IMG.ataco, IMG.apaneca, IMG.juayua],
+    itinerary: [
+      { time: '7:00', text: { ES: 'Recogida en tu hotel', EN: 'Pickup at your hotel' } },
+      { time: '9:30', text: { ES: 'Concepción de Ataco: ruta en 4x4 y calles de murales', EN: 'Concepción de Ataco: 4x4 route and mural-lined streets' } },
+      { time: '12:00', text: { ES: 'Café en Albania Café, Apaneca', EN: 'Coffee at Albania Café, Apaneca' } },
+      { time: '14:00', text: { ES: 'Cascadas de San Juan', EN: 'San Juan waterfalls' } },
+      { time: '17:00', text: { ES: 'Regreso a tu hotel', EN: 'Back at your hotel' } },
+    ],
+    includes: { ES: [...TOUR_INCLUDES.ES, 'Recorrido en 4x4'], EN: [...TOUR_INCLUDES.EN, '4x4 ride'] },
+    excludes: { ES: ['Comidas y bebidas', 'Compras en los pueblos', 'Propinas'], EN: ['Food and drinks', 'Shopping in the towns', 'Tips'] },
+    bring: {
+      ES: ['Ropa cómoda y zapatos que se puedan mojar', 'Traje de baño para las cascadas', 'Suéter ligero: en la montaña refresca', ...ID_DOC.ES],
+      EN: ['Comfortable clothes and shoes that can get wet', 'Swimsuit for the waterfalls', 'A light sweater: it gets cool in the mountains', ...ID_DOC.EN],
+    },
+    meetingPoint: TOUR_PICKUP,
+    difficulty: 'easy',
+    minAge: 6,
+    languages: ['ES', 'EN'],
+  },
+
+  'boqueron-centro-historico': {
+    gallery: [IMG.centroHistorico],
+    itinerary: [
+      { time: '8:00', text: { ES: 'Recogida en tu hotel', EN: 'Pickup at your hotel' } },
+      { time: '9:00', text: { ES: 'Parque Nacional El Boquerón: sendero al mirador del cráter', EN: 'El Boquerón National Park: trail to the crater viewpoint' } },
+      { time: '11:30', text: { ES: 'Parada en Tobogán Picnic Steak House', EN: 'Stop at Tobogán Picnic Steak House' } },
+      { time: '13:30', text: { ES: 'Centro Histórico: Catedral, Palacio Nacional y Teatro Nacional', EN: 'Historic Center: Cathedral, National Palace and National Theatre' } },
+      { time: '15:00', text: { ES: 'Regreso a tu hotel', EN: 'Back at your hotel' } },
+    ],
+    includes: { ES: [...TOUR_INCLUDES.ES, 'Entrada al Parque Nacional El Boquerón'], EN: [...TOUR_INCLUDES.EN, 'El Boquerón National Park entry'] },
+    excludes: { ES: ['Comida en Tobogán', 'Propinas'], EN: ['Meal at Tobogán', 'Tips'] },
+    bring: {
+      ES: ['Zapatos cómodos', 'Suéter ligero: en el volcán refresca', 'Bloqueador', ...ID_DOC.ES],
+      EN: ['Comfortable shoes', 'A light sweater: it gets cool on the volcano', 'Sunscreen', ...ID_DOC.EN],
+    },
+    meetingPoint: TOUR_PICKUP,
+    difficulty: 'easy',
+    minAge: 0,
+    languages: ['ES', 'EN'],
+  },
+
+  'centro-historico-puerta-del-diablo': {
+    gallery: [IMG.centroHistorico, IMG.puertaDelDiabloPenas, IMG.panchimalcoValle],
+    itinerary: [
+      { time: '8:00', text: { ES: 'Recogida en tu hotel', EN: 'Pickup at your hotel' } },
+      { time: '8:45', text: { ES: 'Recorrido por el Centro Histórico de San Salvador', EN: 'Walk through the San Salvador Historic Center' } },
+      { time: '11:00', text: { ES: 'Subida a la Puerta del Diablo, en Panchimalco', EN: 'Trip up to Puerta del Diablo, in Panchimalco' } },
+      { time: '11:30', text: { ES: 'Miradores sobre la ciudad, el lago de Ilopango y el Pacífico', EN: 'Viewpoints over the city, Lake Ilopango and the Pacific' } },
+      { time: '14:00', text: { ES: 'Regreso a tu hotel', EN: 'Back at your hotel' } },
+    ],
+    includes: { ES: [...TOUR_INCLUDES.ES, 'Entrada al parque Puerta del Diablo'], EN: [...TOUR_INCLUDES.EN, 'Puerta del Diablo park entry'] },
+    excludes: { ES: ['Comidas', 'Propinas'], EN: ['Meals', 'Tips'] },
+    bring: {
+      ES: ['Zapatos cómodos con buen agarre', 'Bloqueador y gorra', 'Agua', ...ID_DOC.ES],
+      EN: ['Comfortable shoes with good grip', 'Sunscreen and a hat', 'Water', ...ID_DOC.EN],
+    },
+    meetingPoint: TOUR_PICKUP,
+    difficulty: 'easy',
+    minAge: 6,
+    languages: ['ES', 'EN'],
+  },
+
   'volcan-santa-ana': {
     gallery: [IMG.losVolcanes, IMG.cerroVerdeIzalco],
     itinerary: [

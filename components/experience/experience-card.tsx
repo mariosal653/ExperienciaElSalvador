@@ -2,11 +2,12 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { CalendarCheck, Clock, Heart, MapPin, ShieldCheck } from 'lucide-react'
+import { CalendarCheck, Clock, Heart, MapPin, MessageCircle, ShieldCheck } from 'lucide-react'
 import { Picture } from '@/components/ui/picture'
 import { SharedName, SharedPhoto } from '@/components/ui/shared-transition'
 import { RatingBadge } from '@/components/reviews/rating-badge'
-import { experienceName, type Experience, type Locale } from '@/lib/data'
+import { experienceName, isBookableOnline, type Experience, type Locale } from '@/lib/data'
+import { experienceQuoteWhatsApp } from '@/lib/experience-quote'
 import { departureLabel, nextDepartures } from '@/lib/departures'
 import { FREE_CANCELLATION_HOURS } from '@/lib/experience-details'
 import type { ReviewStats } from '@/lib/reviews/types'
@@ -45,6 +46,8 @@ export function ExperienceCard({
   const next = now ? nextDepartures(item.weekdays, 1, now)[0] : undefined
   const detailHref = `/experiences/${item.id}`
   const bookHref = `/checkout/${item.id}${bookQuery ? `?${bookQuery}` : ''}`
+  /** Los seis tours se reservan aquí; el resto se cotiza por WhatsApp o correo. */
+  const online = isBookableOnline(item)
   /**
    * Al pulsar, la foto y el nombre vuelan hasta la galería y el título del
    * detalle. Solo la tarjeta pulsada recibe nombre de transición: ver
@@ -115,18 +118,37 @@ export function ExperienceCard({
             {item.durationHours} {es ? 'horas' : 'hours'}
           </li>
           <li className="flex items-center gap-1 rounded-full bg-surface-soft px-2 py-1 text-muted">
-            {es ? 'Guía local' : 'Local guide'}
+            {item.transportIncluded ? (es ? 'Transporte incluido' : 'Transport included') : es ? 'Guía local' : 'Local guide'}
           </li>
-          <li className="flex items-center gap-1 rounded-full bg-success-soft px-2 py-1 text-success">
-            <ShieldCheck size={12} aria-hidden="true" />
-            {es ? `Cancela gratis ${FREE_CANCELLATION_HOURS} h antes` : `Free cancellation ${FREE_CANCELLATION_HOURS} h before`}
-          </li>
+          {online ? (
+            <li className="flex items-center gap-1 rounded-full bg-success-soft px-2 py-1 text-success">
+              <ShieldCheck size={12} aria-hidden="true" />
+              {es ? `Cancela gratis ${FREE_CANCELLATION_HOURS} h antes` : `Free cancellation ${FREE_CANCELLATION_HOURS} h before`}
+            </li>
+          ) : (
+            <li className="flex items-center gap-1 rounded-full bg-gold-pale px-2 py-1 font-semibold text-gold-ink">
+              <MessageCircle size={12} aria-hidden="true" />
+              {es ? 'Bajo cotización' : 'On request'}
+            </li>
+          )}
         </ul>
 
-        {/* Lo que más mueve a reservar: cuándo sale la próxima. Va solo. */}
-        <p className="mt-2.5 flex min-h-4 items-center gap-1.5 text-xs text-muted">
+        {/*
+          Lo que más mueve a reservar: cuándo sale la próxima. Va solo.
+
+          `mb-auto` es lo que alinea la cuadrícula. La tarjeta ya se estira a
+          la altura de su fila, pero el hueco sobrante se quedaba AQUÍ
+          repartido por los márgenes fijos y el pie flotaba a media altura:
+          en una misma fila, los precios y los botones bailaban hasta 32 px
+          según si el nombre ocupaba uno o dos renglones, o si la fila de
+          chips se partía en dos. Con el hueco absorbido en este punto, el
+          pie se apoya en el fondo con su ritmo intacto (mt-4 + pt-3).
+        */}
+        <p className="mb-auto mt-2.5 flex min-h-4 items-center gap-1.5 text-xs text-muted">
           <CalendarCheck size={13} className="text-faint" aria-hidden="true" />
-          {next ? (
+          {!online ? (
+            <span>{es ? 'Fecha y precio se confirman por WhatsApp o correo' : 'Date and price confirmed by WhatsApp or email'}</span>
+          ) : next ? (
             <span>{es ? 'Próxima salida: ' : 'Next departure: '}<strong className="font-semibold text-brand">{departureLabel(next, lang, now ?? undefined)}</strong></span>
           ) : (
             <span className="h-3 w-24 animate-pulse rounded-full bg-surface-mint" aria-hidden="true" />
@@ -134,17 +156,36 @@ export function ExperienceCard({
         </p>
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-line-soft pt-3">
-          <span className="flex items-baseline gap-1">
-            <span className="text-[11px] text-muted">{es ? 'Desde' : 'From'}</span>
-            <strong className="text-xl font-extrabold leading-none text-brand">${item.priceUsd}</strong>
-            <span className="text-[11px] text-muted">{es ? '/ persona' : '/ person'}</span>
-          </span>
-          <a
-            href={bookHref}
-            className="rounded-full bg-accent px-3.5 py-1.5 text-xs font-bold text-white transition hover:bg-accent-dark"
-          >
-            {es ? 'Reservar' : 'Book Now'}
-          </a>
+          {item.priceUsd === null ? (
+            <strong className="text-sm font-bold text-brand">{es ? 'Precio a consultar' : 'Price on request'}</strong>
+          ) : (
+            <span className="flex items-baseline gap-1">
+              <span className="text-[11px] text-muted">{es ? 'Desde' : 'From'}</span>
+              <strong className="text-xl font-extrabold leading-none text-brand">${item.priceUsd}</strong>
+              <span className="text-[11px] text-muted">
+                {es ? '/ persona' : '/ person'}
+                {!online && (es ? ' · por confirmar' : ' · to be confirmed')}
+              </span>
+            </span>
+          )}
+          {online ? (
+            <a
+              href={bookHref}
+              className="rounded-full bg-accent px-3.5 py-1.5 text-xs font-bold text-white transition hover:bg-accent-dark"
+            >
+              {es ? 'Reservar' : 'Book Now'}
+            </a>
+          ) : (
+            <a
+              href={experienceQuoteWhatsApp(item, lang)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full border border-accent px-3.5 py-1.5 text-xs font-bold text-accent transition hover:bg-accent hover:text-white"
+            >
+              <MessageCircle size={13} aria-hidden="true" />
+              {es ? 'Cotizar' : 'Get a quote'}
+            </a>
+          )}
         </div>
       </div>
     </article>

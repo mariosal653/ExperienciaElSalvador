@@ -48,7 +48,14 @@ export function WhatsAppWidget() {
     return () => cancelAnimationFrame(raf)
   }, [])
 
-  // La burbuja aparece una vez por navegación y no vuelve si se cierra.
+  /**
+   * La burbuja aparece una vez por navegación, se retira sola y no vuelve.
+   *
+   * Lo de «se retira sola» es lo importante: tapa la esquina inferior
+   * derecha, que es donde está el «Reservar» de la última columna del
+   * catálogo. Antes se quedaba hasta que la cerraran a mano, así que en la
+   * práctica se quedaba para siempre encima del botón.
+   */
   useEffect(() => {
     let dismissed = false
     try {
@@ -58,11 +65,19 @@ export function WhatsAppWidget() {
     }
     if (dismissed) return
 
-    const timer = setTimeout(
-      () => setShowBubble(true),
-      whatsappConfig.bubbleDelaySeconds * 1000,
-    )
-    return () => clearTimeout(timer)
+    let hide: ReturnType<typeof setTimeout>
+
+    const show = setTimeout(() => {
+      setShowBubble(true)
+      // Se marca como vista al retirarse: ya cumplió su papel y no tiene
+      // por qué reaparecer en cada página que visite.
+      hide = setTimeout(dismissBubble, whatsappConfig.bubbleVisibleSeconds * 1000)
+    }, whatsappConfig.bubbleDelaySeconds * 1000)
+
+    return () => {
+      clearTimeout(show)
+      clearTimeout(hide)
+    }
   }, [])
 
   function dismissBubble() {

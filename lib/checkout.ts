@@ -97,6 +97,11 @@ export async function createPendingBooking(
 ): Promise<{ ok: true; booking: CreatedBooking } | { ok: false; failure: CheckoutFailure }> {
   const experience = findExperience(input.experienceId)
   if (!experience) return { ok: false, failure: { code: 'experienceNotFound', status: 404 } }
+  // Las experiencias para cotizar (y las retiradas) no se venden en línea:
+  // se cortan aquí, antes de tocar la base, aunque alguien llame a la API a mano.
+  if (experience.booking !== 'online' || experience.priceUsd === null || experience.hidden) {
+    return { ok: false, failure: { code: 'experienceNotFound', status: 404 } }
+  }
 
   const customer = {
     name: sanitizeText(input.customer.name, 80),

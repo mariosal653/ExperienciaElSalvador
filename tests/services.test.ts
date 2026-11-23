@@ -1,39 +1,26 @@
 import { describe, it, expect } from 'vitest'
-import {
-  GUIDE_PER_DAY_USD,
-  HOURLY_USD,
-  MIN_HOURS,
-  PER_KM_USD,
-  VEHICLE_SEATS,
-  WAITING_PER_HOUR_USD,
-  getService,
-  services,
-  vehicle,
-} from '../lib/services'
+import { GUIDE_PER_DAY_USD, HOURLY_USD, VEHICLE_SEATS, getService, services, vehicle } from '../lib/services'
 import { quoteBody, quoteSubject } from '../lib/quote'
 import { buildMessage } from '../lib/whatsapp'
 
 /**
- * Servicios de conductor y cotización. Sin base de datos.
+ * Servicio de conductor y cotización. Sin base de datos.
  *
  * Lo que se protege aquí no es el diseño, sino las condiciones
- * comerciales: que no aparezca un tercer servicio en la portada, que la
- * capacidad y el mínimo de horas sean una sola cifra en todo el sitio y
- * que ningún precio se publique sin estar confirmado.
+ * comerciales: que solo exista Personal Driver, que la capacidad sea una
+ * sola cifra en todo el sitio y que la tarifa publicada sea la confirmada.
  */
 
-describe('servicios de conductor', () => {
-  it('son exactamente dos: Driver by Tour y Personal Driver', () => {
-    expect(services.map((service) => service.name)).toEqual(['Driver by Tour', 'Personal Driver'])
+describe('servicio de conductor', () => {
+  it('solo queda Personal Driver (Driver by Tour se retiró)', () => {
+    expect(services.map((service) => service.name)).toEqual(['Personal Driver'])
+    expect(getService('driver-by-tour')).toBeUndefined()
   })
 
   it('las condiciones acordadas son las publicadas', () => {
-    expect(VEHICLE_SEATS).toBe(6)
-    expect(MIN_HOURS).toBe(3)
-    expect(HOURLY_USD).toBe(20)
+    expect(VEHICLE_SEATS).toBe(7)
+    expect(HOURLY_USD).toBe(30)
     expect(GUIDE_PER_DAY_USD).toBe(75)
-    expect(PER_KM_USD).toBe(1.5)
-    expect(WAITING_PER_HOUR_USD).toBe(5)
     expect(vehicle.model).toBe('Chevrolet N400')
   })
 
@@ -42,27 +29,23 @@ describe('servicios de conductor', () => {
     expect(vehicle.image.src).toMatch(/\.(png|jpe?g)$/)
   })
 
-  it('Personal Driver publica la tarifa por hora con su mínimo', () => {
+  it('Personal Driver publica la tarifa por hora, sin mínimo', () => {
     const service = getService('personal-driver')
     expect(service?.priceFromUsd).toBe(HOURLY_USD)
-    expect(service?.priceNote?.ES).toContain(`${MIN_HOURS} horas`)
+    expect(service?.priceUnitCode).toBe('HUR')
+    expect(service?.priceNote?.ES).toMatch(/sin mínimo/i)
+    expect(service?.priceNote?.EN).toMatch(/no minimum/i)
   })
 
-  it('Driver by Tour publica el kilómetro y avisa de la espera', () => {
-    const service = getService('driver-by-tour')
-    expect(service?.priceFromUsd).toBe(PER_KM_USD)
-    expect(service?.priceUnitCode).toBe('KMT')
-    expect(service?.priceNote?.ES).toContain(`$${WAITING_PER_HOUR_USD}`)
+  it('la gasolina y la espera van incluidas, no excluidas', () => {
+    const service = getService('personal-driver')!
+    expect(service.includes.ES).toContain('Gasolina')
+    expect(service.includes.EN).toContain('Fuel')
+    expect(service.includes.ES.some((item) => /espera/i.test(item))).toBe(true)
+    expect(service.excludes.ES).not.toContain('Gasolina')
   })
 
-  it('la excepción de la espera está escrita en la página del servicio', () => {
-    // Traslado de varios puntos a uno: se cobra el viaje, no la espera.
-    const notes = getService('driver-by-tour')?.notes
-    expect(notes?.ES.some((note) => /no se cobra espera/i.test(note))).toBe(true)
-    expect(notes?.EN.some((note) => /no waiting charge/i.test(note))).toBe(true)
-  })
-
-  it('cada servicio tiene texto en los dos idiomas', () => {
+  it('el servicio tiene texto en los dos idiomas', () => {
     for (const service of services) {
       for (const field of [service.tagline, service.summary, service.description, service.priceUnit]) {
         expect(field.ES.length).toBeGreaterThan(0)
@@ -72,10 +55,6 @@ describe('servicios de conductor', () => {
         expect(list.ES.length).toBe(list.EN.length)
       }
     }
-  })
-
-  it('la gasolina queda fuera del Personal Driver', () => {
-    expect(getService('personal-driver')?.excludes.ES).toContain('Gasolina')
   })
 })
 
@@ -87,8 +66,8 @@ describe('cotización', () => {
   })
 
   it('el correo lleva el servicio en el asunto y las preguntas en el cuerpo', () => {
-    const lead = { lang: 'EN' as const, service: 'Driver by Tour' }
-    expect(quoteSubject(lead)).toContain('Driver by Tour')
+    const lead = { lang: 'EN' as const, service: 'Personal Driver' }
+    expect(quoteSubject(lead)).toContain('Personal Driver')
     expect(quoteBody(lead)).toContain('Number of passengers:')
   })
 })

@@ -19,7 +19,7 @@ import { CONTACT_EMAIL } from '@/lib/contact'
  */
 
 
-type Section = { heading: string; body: string[] }
+type Section = { heading: string; body: string[]; link?: { href: string; label: string } }
 type Doc = { title: string; updated: string; sections: Section[] }
 
 const UPDATED = { ES: 'Última actualización: 10 de septiembre de 2026', EN: 'Last updated: September 10, 2026' }
@@ -30,10 +30,15 @@ const DOCS: Record<LegalSlug, Record<Locale, Doc>> = {
       title: 'Términos y condiciones',
       updated: UPDATED.ES,
       sections: [
-        { heading: 'Quiénes somos', body: ['Experiences El Salvador es una plataforma para descubrir y reservar experiencias turísticas en El Salvador operadas por guías y anfitriones locales.'] },
-        { heading: 'Reservas y pago', body: ['Puedes reservar sin crear una cuenta. La reserva se confirma solo cuando la pasarela de pago Wompi aprueba el cobro; hasta entonces las plazas se guardan durante 30 minutos.', 'Los precios se muestran en dólares estadounidenses (USD) por persona. El importe final se calcula en nuestro servidor y es el que verás en la página de pago.', 'Los datos de tu tarjeta se introducen en la página segura de Wompi. Experiences El Salvador no ve ni almacena esos datos.'] },
+        { heading: 'Quiénes somos', body: ['Experiences in El Salvador es una plataforma para descubrir y reservar experiencias turísticas en El Salvador operadas por guías y anfitriones locales.'] },
+        { heading: 'Reservas y pago', body: ['Puedes reservar sin crear una cuenta. La reserva se confirma solo cuando la pasarela de pago Wompi aprueba el cobro; hasta entonces las plazas se guardan durante 30 minutos.', 'Los precios se muestran en dólares estadounidenses (USD) por persona. El importe final se calcula en nuestro servidor y es el que verás en la página de pago.', 'Los datos de tu tarjeta se introducen en la página segura de Wompi. Experiences in El Salvador no ve ni almacena esos datos.'] },
         { heading: 'Entradas', body: ['Recibirás una entrada digital con código QR por cada viajero. Cada entrada es válida para una persona, en la fecha reservada, y solo puede usarse una vez.', 'Guarda el enlace de tu reserva: es tu acceso a las entradas. No lo compartas públicamente.'] },
         { heading: 'Responsabilidades del viajero', body: ['Llega puntual al punto de encuentro, sigue las indicaciones del guía y valora con honestidad tu condición física para cada actividad. Algunas experiencias pueden modificarse por clima o por seguridad.'] },
+        {
+          heading: 'Fotografías',
+          body: ['Algunas fotos del sitio son de autores externos y se usan con licencia Creative Commons, que pide citar al autor, la licencia y el origen de cada una.'],
+          link: { href: '/credits', label: 'Ver los créditos de las fotos' },
+        },
         { heading: 'Contacto', body: [`Para cualquier consulta sobre tu reserva, escríbenos por WhatsApp desde el botón del sitio o a ${CONTACT_EMAIL}, indicando tu número de reserva.`] },
       ],
     },
@@ -41,10 +46,15 @@ const DOCS: Record<LegalSlug, Record<Locale, Doc>> = {
       title: 'Terms and Conditions',
       updated: UPDATED.EN,
       sections: [
-        { heading: 'Who we are', body: ['Experiences El Salvador is a platform to discover and book tourism experiences in El Salvador run by local guides and hosts.'] },
-        { heading: 'Bookings and payment', body: ['You can book without creating an account. A booking is confirmed only when the Wompi payment gateway approves the charge; until then your spots are held for 30 minutes.', 'Prices are shown in US dollars (USD) per person. The final amount is calculated on our server and is the amount you will see on the payment page.', "Your card details are entered on Wompi's secure page. Experiences El Salvador never sees or stores them."] },
+        { heading: 'Who we are', body: ['Experiences in El Salvador is a platform to discover and book tourism experiences in El Salvador run by local guides and hosts.'] },
+        { heading: 'Bookings and payment', body: ['You can book without creating an account. A booking is confirmed only when the Wompi payment gateway approves the charge; until then your spots are held for 30 minutes.', 'Prices are shown in US dollars (USD) per person. The final amount is calculated on our server and is the amount you will see on the payment page.', "Your card details are entered on Wompi's secure page. Experiences in El Salvador never sees or stores them."] },
         { heading: 'Tickets', body: ['You will receive one digital ticket with a QR code per traveler. Each ticket is valid for one person, on the booked date, and can be used only once.', 'Keep your booking link safe: it is your access to the tickets. Do not share it publicly.'] },
         { heading: 'Traveler responsibilities', body: ['Arrive on time at the meeting point, follow your guide’s instructions and honestly assess your fitness for each activity. Some experiences may change due to weather or safety.'] },
+        {
+          heading: 'Photos',
+          body: ['Some photos on this site are by outside authors and are used under Creative Commons licenses, which require crediting the author, license and source of each one.'],
+          link: { href: '/credits', label: 'See the photo credits' },
+        },
         { heading: 'Contact', body: [`For any question about your booking, message us on WhatsApp from the button on the site or write to ${CONTACT_EMAIL}, including your booking number.`] },
       ],
     },
@@ -124,6 +134,11 @@ export function LegalPage({ slug }: { slug: LegalSlug }) {
             {section.body.map((paragraph) => (
               <p key={paragraph} className="mt-2 leading-relaxed text-muted">{paragraph}</p>
             ))}
+            {section.link && (
+              <Link href={section.link.href} className="mt-2 inline-block font-semibold text-accent underline-offset-4 hover:underline">
+                {section.link.label}
+              </Link>
+            )}
           </section>
         ))}
       </main>

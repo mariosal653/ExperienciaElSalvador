@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from 'react'
 import Link from 'next/link'
-import { CarFront, Compass, Search, Route } from 'lucide-react'
+import { CarFront, Compass, Search } from 'lucide-react'
 import { DestinationField } from './destination-field'
 import { DateField } from './date-field'
 import { TravelersField } from './travelers-field'
@@ -19,13 +19,12 @@ type Props = {
 /**
  * Pestañas del buscador: qué se está buscando.
  *
- * La primera es el buscador de experiencias que vive aquí mismo; las otras
- * dos llevan a la página del servicio, que tiene su propio cotizador. Es la
- * misma idea que usan los buscadores de viaje (vuelos / hoteles / autos):
- * desde el primer vistazo se ve que la casa vende tres cosas, no una.
+ * La primera es el buscador de experiencias que vive aquí mismo; la otra
+ * lleva a la página del Personal Driver. Es la misma idea que usan los
+ * buscadores de viaje (vuelos / hoteles / autos): desde el primer vistazo
+ * se ve que la casa vende tours y transporte, no solo una cosa.
  */
 const TABS = [
-  { id: 'driver-by-tour', label: 'Driver by Tour', icon: Route },
   { id: 'personal-driver', label: 'Personal Driver', icon: CarFront },
 ] as const
 
@@ -53,9 +52,17 @@ export function SearchPanel({ applied, onSearch, lang }: Props) {
         traslúcida con borde claro: sin fondo propio el texto blanco se
         pierde en las zonas claras de la imagen.
       */}
+      {/*
+        Se PARTE en varias filas, no se desplaza en horizontal. Las tres
+        píldoras miden ~480 px juntas: en un teléfono de 375 px, «Personal
+        Driver» se quedaba fuera de la pantalla con solo su icono asomando
+        y sin ninguna señal de que hubiera más a la derecha. Parecía roto,
+        no desplazable, y era la tercera oferta de la casa la que
+        desaparecía. Partiéndolas se ven siempre las tres.
+      */}
       <nav
         aria-label={es ? 'Qué quieres reservar' : 'What do you want to book'}
-        className="-mx-1 mb-3 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]"
+        className="mb-3 flex flex-wrap gap-2"
       >
         <span
           aria-current="page"

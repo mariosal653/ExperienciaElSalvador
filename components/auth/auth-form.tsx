@@ -3,11 +3,40 @@
 import { useState, type FormEvent } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
-import { Compass, Loader2, Eye, EyeOff } from 'lucide-react'
+import { Loader2, Eye, EyeOff } from 'lucide-react'
 import { GoogleIcon, FacebookIcon } from '@/components/reviews/platform-icons'
 import { useLanguage } from '@/components/i18n/language-provider'
+import { LogoMark } from '@/components/brand/logo-mark'
 
 type Mode = 'login' | 'register'
+
+/**
+ * Traduce el `?error=` con el que vuelve Auth.js a una clave del
+ * diccionario de arriba.
+ *
+ * Auth.js no enseña errores por su cuenta: redirige a la página indicada en
+ * `pages.error` (aquí /login) con el motivo en la URL. Si nadie lee ese
+ * parámetro —que es lo que pasaba— el visitante vuelve de Google a un
+ * formulario en blanco, sin una sola palabra sobre por qué no entró.
+ *
+ * El caso que de verdad ocurre es OAuthAccountNotLinked: alguien que se
+ * registró con su Gmail y contraseña y más tarde pulsa «Continuar con
+ * Google». Auth.js NO enlaza las dos cuentas solas —`lib/auth.ts` lo
+ * decide con `allowDangerousEmailAccountLinking: false`— y rechaza la
+ * entrada. Sin explicación, parece que la cuenta no existe.
+ *
+ * Los demás códigos del proveedor (OAuthSignin, OAuthCallback,
+ * OAuthCreateAccount, Callback…) son fallos de ida o vuelta con Google y
+ * para el visitante significan lo mismo: no se pudo, inténtalo de otra
+ * forma. Se agrupan en un solo mensaje en vez de traducir una lista que
+ * cambia con cada versión de Auth.js.
+ */
+function oauthErrorKey(code: string): string {
+  if (code === 'OAuthAccountNotLinked') return 'OAuthAccountNotLinked'
+  if (code === 'AccessDenied') return 'AccessDenied'
+  if (code === 'Configuration') return 'Configuration'
+  return 'oauthFailed'
+}
 
 const COPY = {
   ES: {
@@ -42,6 +71,11 @@ const COPY = {
       validationError: 'Revisa los campos marcados.',
       createdButNotSignedIn: 'Tu cuenta se creó correctamente, pero no pudimos iniciar sesión automáticamente. Entra desde la pantalla de inicio de sesión.',
       internalError: 'Error inesperado del servidor. Vuelve a intentarlo en un momento.',
+      // Vuelta de Google o Facebook cuando algo sale mal. Ver oauthErrorKey.
+      OAuthAccountNotLinked: 'Ya tienes una cuenta con ese correo, creada con contraseña. Entra con tu contraseña aquí abajo; después podrás usar Google desde tu cuenta.',
+      AccessDenied: 'No diste permiso a Experiences in El Salvador para usar tu cuenta de Google. Vuelve a intentarlo y acepta para continuar.',
+      Configuration: 'El acceso con Google todavía no está configurado en el servidor. Entra con tu correo y contraseña.',
+      oauthFailed: 'No pudimos completar el acceso con Google. Intenta de nuevo o entra con tu correo y contraseña.',
     } as Record<string, string>,
     hint: 'Mínimo 8 caracteres, con letras y números.',
   },
@@ -77,6 +111,11 @@ const COPY = {
       validationError: 'Check the highlighted fields.',
       createdButNotSignedIn: 'Your account was created, but we could not sign you in automatically. Please use the sign-in screen.',
       internalError: 'Unexpected server error. Please try again shortly.',
+      // Coming back from Google or Facebook when something went wrong.
+      OAuthAccountNotLinked: 'You already have an account with that email, created with a password. Sign in with your password below; you can use Google from your account afterwards.',
+      AccessDenied: 'You did not grant Experiences in El Salvador access to your Google account. Try again and accept to continue.',
+      Configuration: 'Google sign-in is not configured on the server yet. Please sign in with your email and password.',
+      oauthFailed: 'We could not complete the Google sign-in. Try again or sign in with your email and password.',
     } as Record<string, string>,
     hint: 'At least 8 characters, with letters and numbers.',
   },
@@ -94,10 +133,25 @@ export function AuthForm({ mode, socialProviders }: { mode: Mode; socialProvider
   const [formError, setFormError] = useState<string | null>(null)
   const [fields, setFields] = useState<Record<string, string>>({})
 
+  /**
+   * Motivo con el que Auth.js devolvió al visitante desde Google.
+   *
+   * Se lee UNA vez, al montar, y no directamente de la URL en cada
+   * dibujado: en cuanto el visitante hace algo —enviar el formulario o
+   * volver a pulsar Google— el aviso sobra, y si se leyera de la URL
+   * reaparecería al limpiarlo, porque el parámetro sigue ahí.
+   */
+  const [authError, setAuthError] = useState<string | null>(() => params.get('error'))
+
+  // El mensaje del formulario manda sobre el de la vuelta de Google: es
+  // más reciente y responde a lo último que hizo el visitante.
+  const shownError = formError ?? (authError ? t.errors[oauthErrorKey(authError)] : null)
+
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setLoading(true)
     setFormError(null)
+    setAuthError(null)
     setFields({})
 
     const data = new FormData(event.currentTarget)
@@ -163,11 +217,9 @@ export function AuthForm({ mode, socialProviders }: { mode: Mode; socialProvider
   return (
     <div className="w-full max-w-md rounded-2xl bg-white p-7 shadow-float md:p-9">
       <div className="mb-7 flex items-center gap-2.5">
-        <span className="grid h-9 w-9 place-items-center rounded-full bg-gold text-brand">
-          <Compass size={20} strokeWidth={2.5} />
-        </span>
+        <LogoMark className="h-9 w-9 shrink-0 rounded-[28%] ring-1 ring-black/5" />
         <span className="text-lg font-bold tracking-tight text-brand">
-          Experiences <span className="text-accent">El Salvador</span>
+          Experiences in <span className="text-accent">El Salvador</span>
         </span>
       </div>
 
@@ -219,9 +271,9 @@ export function AuthForm({ mode, socialProviders }: { mode: Mode; socialProvider
           )}
         </div>
 
-        {formError && (
+        {shownError && (
           <p role="alert" className="rounded-xl bg-accent-soft px-4 py-3 text-sm font-medium text-accent-deep">
-            {formError}
+            {shownError}
           </p>
         )}
 

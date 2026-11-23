@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "experiences-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "port": 3000
+    },
+    {
+      "name": "experiences-dev-sin-base",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "next",
+        "dev"
+      ],
+      "port": 3000
+    }
+  ]
+}

@@ -18,6 +18,7 @@ import {
   Heart,
   Languages,
   MapPin,
+  MessageCircle,
   QrCode,
   ShieldCheck,
   Users,
@@ -35,7 +36,9 @@ import { ExperienceReviews } from '@/components/reviews/experience-reviews'
 import { useReviewStats } from '@/components/reviews/use-review-stats'
 import { useFavorites } from '@/components/favorites/use-favorites'
 import { destinationIdByName } from '@/lib/destination-details'
-import { experienceName, type Experience, type Locale } from '@/lib/data'
+import { experienceName, isBookableOnline, type Experience, type Locale } from '@/lib/data'
+import { quoteDetails, experienceQuoteWhatsApp } from '@/lib/experience-quote'
+import { QuoteActions } from '@/components/services/quote-actions'
 import { trackViewItem } from '@/lib/analytics'
 import { departureLabel, formatDeparture, nextDepartures } from '@/lib/departures'
 import {
@@ -87,6 +90,8 @@ export function ExperienceDetail({
   const { ids: favorites, toggle: toggleFavorite } = useFavorites()
   const saved = favorites.includes(experience.id)
   const destinationId = destinationIdByName(experience.destination)
+  /** Los seis tours se reservan aquí; el resto se cotiza por WhatsApp o correo. */
+  const online = isBookableOnline(experience)
 
   const { setLead } = useWhatsAppLead()
   useEffect(() => {
@@ -95,7 +100,7 @@ export function ExperienceDetail({
 
   // Analítica: una vista por experiencia (no se repite al cambiar de idioma).
   useEffect(() => {
-    trackViewItem({ id: experience.id, name: experience.title, priceUsd: experience.priceUsd, destination: experience.destination })
+    trackViewItem({ id: experience.id, name: experience.title, priceUsd: experience.priceUsd ?? 0, destination: experience.destination })
   }, [experience.id, experience.title, experience.priceUsd, experience.destination])
 
   // Fechas calculadas solo en el navegador (ver la nota en app/page.tsx).
@@ -114,7 +119,11 @@ export function ExperienceDetail({
   const facts = [
     { icon: Clock, label: es ? 'Duración' : 'Duration', value: `${experience.durationHours} ${es ? 'horas' : 'hours'}` },
     { icon: Users, label: es ? 'Grupo' : 'Group size', value: `${es ? 'Hasta' : 'Up to'} ${experience.maxPeople}` },
-    { icon: CalendarDays, label: es ? 'Salidas' : 'Departures', value: schedule },
+    {
+      icon: CalendarDays,
+      label: es ? 'Salidas' : 'Departures',
+      value: online ? schedule : es ? 'A coordinar por WhatsApp o correo' : 'Arranged by WhatsApp or email',
+    },
     ...(details
       ? [
           { icon: Gauge, label: es ? 'Dificultad' : 'Difficulty', value: DIFFICULTY_LABEL[details.difficulty][lang] },
@@ -220,21 +229,29 @@ export function ExperienceDetail({
 
             <p className="mt-5 leading-relaxed text-muted">{experience.description[lang]}</p>
 
-            <ul className="mt-5 flex flex-wrap gap-2 text-xs font-semibold">
-              <li className="flex items-center gap-1.5 rounded-full bg-success-soft px-3 py-1.5 text-success-dark">
-                <ShieldCheck size={14} aria-hidden="true" />
-                {es ? `Cancelación gratis hasta ${FREE_CANCELLATION_HOURS} h antes` : `Free cancellation up to ${FREE_CANCELLATION_HOURS} h before`}
-              </li>
-              <li className="flex items-center gap-1.5 rounded-full bg-surface-mint px-3 py-1.5 text-brand">
-                <Zap size={14} aria-hidden="true" />
-                {es ? 'Confirmación inmediata' : 'Instant confirmation'}
-              </li>
-              <li className="flex items-center gap-1.5 rounded-full bg-surface-mint px-3 py-1.5 text-brand">
-                <QrCode size={14} aria-hidden="true" />
-                {es ? 'Entrada digital con QR' : 'Digital QR ticket'}
-              </li>
-            </ul>
+            {online ? (
+              <ul className="mt-5 flex flex-wrap gap-2 text-xs font-semibold">
+                <li className="flex items-center gap-1.5 rounded-full bg-success-soft px-3 py-1.5 text-success-dark">
+                  <ShieldCheck size={14} aria-hidden="true" />
+                  {es ? `Cancelación gratis hasta ${FREE_CANCELLATION_HOURS} h antes` : `Free cancellation up to ${FREE_CANCELLATION_HOURS} h before`}
+                </li>
+                <li className="flex items-center gap-1.5 rounded-full bg-surface-mint px-3 py-1.5 text-brand">
+                  <Zap size={14} aria-hidden="true" />
+                  {es ? 'Confirmación inmediata' : 'Instant confirmation'}
+                </li>
+                <li className="flex items-center gap-1.5 rounded-full bg-surface-mint px-3 py-1.5 text-brand">
+                  <QrCode size={14} aria-hidden="true" />
+                  {es ? 'Entrada digital con QR' : 'Digital QR ticket'}
+                </li>
+              </ul>
+            ) : (
+              <p className="mt-5 flex w-fit items-center gap-1.5 rounded-full bg-gold-pale px-3 py-1.5 text-xs font-semibold text-gold-ink">
+                <MessageCircle size={14} aria-hidden="true" />
+                {es ? 'Bajo cotización: precio y fecha se confirman por WhatsApp o correo' : 'On request: price and date are confirmed by WhatsApp or email'}
+              </p>
+            )}
 
+{online ? (
             <div ref={bookingCardRef} id="reservar" className="mt-6 scroll-mt-24 rounded-2xl bg-white p-5 shadow-card">
               <p>
                 <span className="text-xs text-muted">{es ? 'Desde' : 'From'}</span>{' '}
@@ -278,6 +295,27 @@ export function ExperienceDetail({
                   : `No account needed · Secure payment${paymentText ? ` by ${paymentText}` : ''} · WhatsApp support`}
               </p>
             </div>
+            ) : (
+            <div ref={bookingCardRef} id="reservar" className="mt-6 scroll-mt-24 rounded-2xl bg-white p-5 shadow-card">
+              {experience.priceUsd === null ? (
+                <p className="text-2xl font-bold">{es ? 'Precio a consultar' : 'Price on request'}</p>
+              ) : (
+                <p>
+                  <span className="text-xs text-muted">{es ? 'Desde' : 'From'}</span>{' '}
+                  <strong className="text-3xl">${experience.priceUsd}</strong>{' '}
+                  <span className="text-sm text-muted">{es ? '/ persona · precio de referencia' : '/ person · reference price'}</span>
+                </p>
+              )}
+              <p className="mt-3 text-sm leading-relaxed text-muted">
+                {es
+                  ? 'Esta experiencia se reserva bajo cotización. Escríbenos con la fecha y el número de personas y te confirmamos precio y disponibilidad.'
+                  : 'This experience is booked on request. Write to us with the date and number of people and we will confirm price and availability.'}
+              </p>
+              <div className="mt-4">
+                <QuoteActions service={name} kind="experience" details={quoteDetails(experience, lang)} lang={lang} source="experiencia" size="lg" />
+              </div>
+            </div>
+            )}
           </div>
         </div>
 
@@ -410,6 +448,7 @@ export function ExperienceDetail({
               </section>
             )}
 
+            {online && (
             <section aria-labelledby="cancellation-title" className="rounded-2xl bg-surface-mint p-5">
               <h2 id="cancellation-title" className="flex items-center gap-2 text-lg font-semibold">
                 <ShieldCheck size={20} className="text-success-dark" /> {es ? 'Política de cancelación' : 'Cancellation policy'}
@@ -435,11 +474,16 @@ export function ExperienceDetail({
                 </Link>
               </p>
             </section>
+            )}
 
             <section aria-labelledby="how-title">
               <h2 id="how-title" className="text-xl font-semibold">{es ? 'Cómo funciona' : 'How it works'}</h2>
               <ol className="mt-4 grid gap-2.5 text-sm text-muted">
-                {(es
+                {(!online
+                  ? es
+                    ? ['Escríbenos por WhatsApp o correo con la fecha y el número de personas.', 'Te confirmamos el precio y la disponibilidad.', 'Coordinamos contigo la recogida y el pago.']
+                    : ['Write to us by WhatsApp or email with the date and number of people.', 'We confirm the price and availability.', 'We arrange the pickup and payment with you.']
+                  : es
                   ? ['Elige fecha y número de viajeros.', 'Deja tus datos de contacto: no hace falta cuenta.', `Paga en la página segura${paymentText ? ` (${paymentText})` : ''}.`, 'Recibe tu confirmación y una entrada con QR por viajero.']
                   : ['Pick a date and the number of travelers.', 'Leave your contact details — no account needed.', `Pay on the secure page${paymentText ? ` (${paymentText})` : ''}.`, 'Get your confirmation and one QR ticket per traveler.']
                 ).map((step, index) => (
@@ -477,7 +521,19 @@ export function ExperienceDetail({
                     <SharedName name={`experiencia-nombre-${item.id}`} enabled={leavingTo === item.id}>
                       <p className="mt-1 font-semibold">{experienceName(item, lang)}</p>
                     </SharedName>
-                    <p className="mt-2 text-sm"><strong>${item.priceUsd}</strong> <span className="text-xs text-muted">{es ? '/ persona' : '/ person'}</span></p>
+                    <p className="mt-2 text-sm">
+                      {item.priceUsd === null ? (
+                        <strong>{es ? 'Precio a consultar' : 'Price on request'}</strong>
+                      ) : (
+                        <>
+                          <strong>${item.priceUsd}</strong>{' '}
+                          <span className="text-xs text-muted">
+                            {es ? '/ persona' : '/ person'}
+                            {!isBookableOnline(item) && (es ? ' · por confirmar' : ' · to be confirmed')}
+                          </span>
+                        </>
+                      )}
+                    </p>
                   </div>
                 </Link>
               ))}
@@ -494,21 +550,42 @@ export function ExperienceDetail({
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
           <div className="min-w-0">
             <p className="text-sm">
-              <span className="text-xs text-muted">{es ? 'Desde' : 'From'}</span>{' '}
-              <strong className="text-lg">${experience.priceUsd}</strong>{' '}
-              <span className="text-xs text-muted">{es ? '/ persona' : '/ person'}</span>
+              {experience.priceUsd === null ? (
+                <strong className="text-base">{es ? 'Precio a consultar' : 'Price on request'}</strong>
+              ) : (
+                <>
+                  <span className="text-xs text-muted">{es ? 'Desde' : 'From'}</span>{' '}
+                  <strong className="text-lg">${experience.priceUsd}</strong>{' '}
+                  <span className="text-xs text-muted">{es ? '/ persona' : '/ person'}</span>
+                </>
+              )}
             </p>
-            <p className="truncate text-[11px] font-semibold text-success-dark">
-              {es ? `Cancelación gratis hasta ${FREE_CANCELLATION_HOURS} h antes` : `Free cancellation up to ${FREE_CANCELLATION_HOURS} h before`}
+            <p className={`truncate text-[11px] font-semibold ${online ? 'text-success-dark' : 'text-gold-ink'}`}>
+              {online
+                ? es ? `Cancelación gratis hasta ${FREE_CANCELLATION_HOURS} h antes` : `Free cancellation up to ${FREE_CANCELLATION_HOURS} h before`
+                : es ? 'Precio por confirmar' : 'Price to be confirmed'}
             </p>
           </div>
-          <Link
-            href={bookHref}
-            tabIndex={showBar ? 0 : -1}
-            className="shrink-0 rounded-full bg-accent px-5 py-3 text-sm font-bold text-white transition hover:bg-accent-dark"
-          >
-            {es ? 'Ver fechas' : 'Check dates'}
-          </Link>
+          {online ? (
+            <Link
+              href={bookHref}
+              tabIndex={showBar ? 0 : -1}
+              className="shrink-0 rounded-full bg-accent px-5 py-3 text-sm font-bold text-white transition hover:bg-accent-dark"
+            >
+              {es ? 'Ver fechas' : 'Check dates'}
+            </Link>
+          ) : (
+            <a
+              href={experienceQuoteWhatsApp(experience, lang)}
+              target="_blank"
+              rel="noopener noreferrer"
+              tabIndex={showBar ? 0 : -1}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-accent px-5 py-3 text-sm font-bold text-white transition hover:bg-accent-dark"
+            >
+              <MessageCircle size={16} aria-hidden="true" />
+              {es ? 'Cotizar' : 'Get a quote'}
+            </a>
+          )}
         </div>
       </div>
 

@@ -43,7 +43,15 @@ export default async function SavedPage() {
                   <p className="flex items-center gap-1 text-xs text-muted"><MapPin size={13} />{item.destination}</p>
                   <p className="mt-1 font-semibold text-brand">{item.name.ES}</p>
                   <p className="mt-2 text-sm text-brand">
-                    <strong>${item.priceUsd}</strong> <span className="text-xs text-muted">/ persona · {item.durationHours} h</span>
+                    {item.priceUsd === null ? (
+                      <strong>Precio a consultar</strong>
+                    ) : (
+                      <>
+                        <strong>${item.priceUsd}</strong>{' '}
+                        <span className="text-xs text-muted">/ persona{item.booking === 'quote' ? ' · por confirmar' : ''}</span>
+                      </>
+                    )}{' '}
+                    <span className="text-xs text-muted">· {item.durationHours} h</span>
                   </p>
                 </div>
               </Link>

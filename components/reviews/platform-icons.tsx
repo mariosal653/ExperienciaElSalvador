@@ -61,7 +61,7 @@ export function SourceIcon({ source, className }: { source: ReviewSource; classN
 }
 
 export const SOURCE_LABEL: Record<ReviewSource, string> = {
-  local: 'Experiences El Salvador',
+  local: 'Experiences in El Salvador',
   google: 'Google',
   facebook: 'Facebook',
   tiktok: 'TikTok',

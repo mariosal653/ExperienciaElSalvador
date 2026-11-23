@@ -397,7 +397,7 @@ export async function getDashboard(filters: AdminFilters): Promise<AdminDashboar
         destino: acc.destino,
         fecha: acc.fecha,
         durationHours: catalogo?.durationHours ?? null,
-        precioUnitarioCents: catalogo ? Math.round(catalogo.priceUsd * 100) : null,
+        precioUnitarioCents: catalogo && catalogo.priceUsd !== null ? Math.round(catalogo.priceUsd * 100) : null,
         capacidad,
         personas: acc.personas,
         cuposDisponibles: capacidad === null ? null : Math.max(0, capacidad - acc.personas),

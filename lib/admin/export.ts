@@ -18,7 +18,7 @@ import { PAYMENT_PROVIDER_LABEL, type AdminDashboard, type ReservaRow } from './
  * hoja— y al PDF ya formateados.
  */
 
-const MARCA = 'Experiences El Salvador'
+const MARCA = 'Experiences in El Salvador'
 
 function nombreMes(iso: string): string {
   return new Date(`${iso}T00:00:00`).toLocaleDateString('es-SV', {

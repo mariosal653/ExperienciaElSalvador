@@ -425,7 +425,7 @@ export function BookingView({
                 {tickets.map((ticket) => (
                   <li key={ticket.code} className="print-ticket overflow-hidden rounded-3xl border border-line bg-white">
                     <div className="flex items-center justify-between gap-3 bg-brand px-5 py-3 text-white">
-                      <span className="text-sm font-bold">Experiences <span className="text-gold">El Salvador</span></span>
+                      <span className="text-sm font-bold">Experiences in <span className="text-gold">El Salvador</span></span>
                       <TicketStatus status={ticket.status} es={es} />
                     </div>
                     <div className="grid gap-4 p-5 min-[420px]:grid-cols-[auto_1fr] min-[420px]:items-center">

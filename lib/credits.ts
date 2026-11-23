@@ -3,7 +3,7 @@
  *
  * Las licencias Creative Commons BY y BY-SA permiten usarlas en un sitio
  * comercial SIEMPRE QUE se cite autor, licencia y origen. Esta lista
- * alimenta la página /credits (enlazada desde el pie) y los créditos que
+ * alimenta la página /credits (enlazada desde Términos) y los créditos que
  * muestra el visor de reels.
  *
  * Al añadir una imagen nueva de Commons, añadirla aquí.
@@ -230,6 +230,28 @@ export const credits = {
     author: 'MMckein',
     license: 'Licencia de contenido de Pixabay',
     source: 'https://pixabay.com/es/photos/surf-playa-beach-arena-deportes-2363367/',
+  },
+  // Tours de noviembre de 2026 (documento «Tours y precios»).
+  boqueron: {
+    file: '/img/experiences/boqueron-crater.jpg',
+    title: 'Cráter de El Boquerón, volcán de San Salvador',
+    author: 'Jpyle490',
+    license: 'CC BY-SA 3.0',
+    source: `${COMMONS}Boquer%C3%B3n_crater.jpg`,
+  },
+  ataco: {
+    file: '/img/experiences/concepcion-de-ataco.jpg',
+    title: 'Calle en Concepción de Ataco',
+    author: 'Martin Haeusler',
+    license: 'CC BY-SA 3.0',
+    source: `${COMMONS}Calle_en_Concepci%C3%B3n_de_Ataco_(12.2010)_-_panoramio.jpg`,
+  },
+  apaneca: {
+    file: '/img/experiences/apaneca.jpg',
+    title: 'Apaneca a la vista',
+    author: 'JMRAFFi',
+    license: 'CC BY 4.0',
+    source: `${COMMONS}Apaneca_a_la_Vista.jpg`,
   },
 } satisfies Record<string, Credit>
 

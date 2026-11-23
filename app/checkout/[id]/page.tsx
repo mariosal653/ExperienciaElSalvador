@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import { experiences } from '@/lib/data'
+import { notFound, redirect } from 'next/navigation'
+import { experiences, isBookableOnline } from '@/lib/data'
 import { getUser } from '@/lib/session'
 import { prisma } from '@/lib/db'
 import { getUsableWelcomeBenefit, releaseStaleReservation } from '@/lib/benefits'
@@ -34,6 +34,8 @@ export default async function CheckoutPage({ params, searchParams }: Props) {
 
   const experience = experiences.find((item) => item.id === id)
   if (!experience) notFound()
+  // Las que son para cotizar no tienen checkout: su ficha ofrece WhatsApp y correo.
+  if (!isBookableOnline(experience)) redirect(`/experiences/${experience.id}`)
 
   const user = await getUser()
 

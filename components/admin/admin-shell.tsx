@@ -7,11 +7,11 @@ import {
   History,
   KanbanSquare,
   LayoutDashboard,
-  ShieldCheck,
   Ticket,
 } from 'lucide-react'
 import { SignOutButton } from '@/components/account/sign-out-button'
 import type { AdminUser } from '@/lib/admin/session'
+import { LogoMark } from '@/components/brand/logo-mark'
 
 /**
  * Marco del panel: barra lateral blanca + zona de trabajo, en el estilo
@@ -61,11 +61,9 @@ export function AdminShell({ admin, children }: { admin: AdminUser; children: Re
       {/* Barra lateral (escritorio) ------------------------------------ */}
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-[#e8e8e3] bg-white px-5 py-6 lg:flex">
         <Link href="/admin" className="flex items-center gap-2.5 px-3" aria-label="Panel de administración">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#17181a] text-white">
-            <ShieldCheck size={17} strokeWidth={2.4} />
-          </span>
+          <LogoMark className="h-8 w-8 shrink-0 rounded-[28%] ring-1 ring-black/5" />
           <span className="leading-tight">
-            <span className="block text-[15px] font-bold tracking-tight">Experiences SV</span>
+            <span className="block text-[15px] font-bold tracking-tight">Experiences in El Salvador</span>
             <span className="block text-[11px] text-[#17181a]/50">Administración</span>
           </span>
         </Link>
@@ -114,10 +112,8 @@ export function AdminShell({ admin, children }: { admin: AdminUser; children: Re
       <header className="sticky top-0 z-20 border-b border-[#e8e8e3] bg-white lg:hidden">
         <div className="flex items-center justify-between gap-3 px-4 py-3">
           <Link href="/admin" className="flex items-center gap-2" aria-label="Panel de administración">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#17181a] text-white">
-              <ShieldCheck size={16} strokeWidth={2.4} />
-            </span>
-            <span className="text-[15px] font-bold tracking-tight">Experiences SV</span>
+            <LogoMark className="h-8 w-8 shrink-0 rounded-[28%] ring-1 ring-black/5" />
+            <span className="text-[15px] font-bold tracking-tight">Experiences in El Salvador</span>
           </Link>
           <SignOutButton
             redirectTo="/admin/login"
