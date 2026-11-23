@@ -90,7 +90,7 @@ export function ExperienceDetail({
   const { ids: favorites, toggle: toggleFavorite } = useFavorites()
   const saved = favorites.includes(experience.id)
   const destinationId = destinationIdByName(experience.destination)
-  /** Los seis tours se reservan aquí; el resto se cotiza por WhatsApp o correo. */
+  /** Los dos tours del Volcán de Santa Ana se reservan aquí; el resto se cotiza por WhatsApp o correo. */
   const online = isBookableOnline(experience)
 
   const { setLead } = useWhatsAppLead()

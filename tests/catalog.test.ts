@@ -65,12 +65,19 @@ describe('destinos', () => {
 })
 
 describe('tours en línea y experiencias para cotizar', () => {
-  const tours = ['amanecer-volcan-santa-ana', 'santa-ana-playa-los-almendros', 'ruta-de-las-flores-4x4', 'boqueron-centro-historico', 'centro-historico-puerta-del-diablo']
+  const tours = ['amanecer-volcan-santa-ana', 'santa-ana-playa-los-almendros']
+  const quotedTours = ['ruta-de-las-flores-4x4', 'boqueron-centro-historico', 'centro-historico-puerta-del-diablo']
 
-  it('solo los cinco tours con precio se reservan en línea, a precio por persona', () => {
+  it('solo los dos tours del Volcán de Santa Ana se reservan en línea, a precio por persona', () => {
     expect(experiences.filter(isBookableOnline).map((item) => item.id).sort()).toEqual([...tours].sort())
     const price = Object.fromEntries(experiences.map((item) => [item.id, item.priceUsd]))
-    expect([85, 150, 175, 70, 65]).toEqual(tours.map((id) => price[id]))
+    expect([85, 150]).toEqual(tours.map((id) => price[id]))
+  })
+
+  it('los demás tours se cotizan y conservan su precio de referencia', () => {
+    const byId = Object.fromEntries(experiences.map((item) => [item.id, item]))
+    expect(quotedTours.map((id) => byId[id]?.booking)).toEqual(['quote', 'quote', 'quote'])
+    expect(quotedTours.map((id) => byId[id]?.priceUsd)).toEqual([175, 70, 65])
   })
 
   it('el tour del jetsky va «a consultar» y se cotiza', () => {

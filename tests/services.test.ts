@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { GUIDE_PER_DAY_USD, HOURLY_USD, VEHICLE_SEATS, getService, services, vehicle } from '../lib/services'
+import { GUIDE_PER_DAY_USD, HOURLY_USD, MIN_HOURS, VEHICLE_SEATS, getService, services, vehicle } from '../lib/services'
 import { quoteBody, quoteSubject } from '../lib/quote'
 import { buildMessage } from '../lib/whatsapp'
 
@@ -29,12 +29,14 @@ describe('servicio de conductor', () => {
     expect(vehicle.image.src).toMatch(/\.(png|jpe?g)$/)
   })
 
-  it('Personal Driver publica la tarifa por hora, sin mínimo', () => {
+  it('Personal Driver publica la tarifa por hora, con mínimo de 5 horas', () => {
     const service = getService('personal-driver')
     expect(service?.priceFromUsd).toBe(HOURLY_USD)
     expect(service?.priceUnitCode).toBe('HUR')
-    expect(service?.priceNote?.ES).toMatch(/sin mínimo/i)
-    expect(service?.priceNote?.EN).toMatch(/no minimum/i)
+    expect(MIN_HOURS).toBe(5)
+    expect(service?.priceNote?.ES).toMatch(/mínimo 5 horas/i)
+    expect(service?.priceNote?.EN).toMatch(/5-hour minimum/i)
+    expect(service?.notes.ES.join(' ')).not.toMatch(/sin mínimo/i)
   })
 
   it('la gasolina y la espera van incluidas, no excluidas', () => {

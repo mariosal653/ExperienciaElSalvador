@@ -16,7 +16,7 @@ export const whatsappConfig = {
    * Número del negocio. Se puede escribir de forma legible, con «+» y
    * espacios: se normaliza automáticamente antes de construir el enlace.
    */
-  phone: '+503 7230 8067',
+  phone: '+503 7566 0969',
 
   /** Mensaje cuando el visitante no ha elegido nada todavía. */
   defaultMessage: {
@@ -41,7 +41,7 @@ export const whatsappConfig = {
 
 /**
  * Deja el número como lo exige wa.me: solo dígitos, sin «+», espacios ni
- * guiones. Para El Salvador, «+503 7230 8067» queda en «50372308067».
+ * guiones. Para El Salvador, «+503 7566 0969» queda en «50375660969».
  */
 export function sanitizePhone(phone: string): string {
   return phone.replace(/\D/g, '')

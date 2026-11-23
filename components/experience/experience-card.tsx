@@ -46,7 +46,7 @@ export function ExperienceCard({
   const next = now ? nextDepartures(item.weekdays, 1, now)[0] : undefined
   const detailHref = `/experiences/${item.id}`
   const bookHref = `/checkout/${item.id}${bookQuery ? `?${bookQuery}` : ''}`
-  /** Los seis tours se reservan aquí; el resto se cotiza por WhatsApp o correo. */
+  /** Los dos tours del Volcán de Santa Ana se reservan aquí; el resto se cotiza por WhatsApp o correo. */
   const online = isBookableOnline(item)
   /**
    * Al pulsar, la foto y el nombre vuelan hasta la galería y el título del

@@ -5,7 +5,7 @@ import { ArrowRight, Check, Clock, Fuel, Hourglass, Languages, Snowflake, Users 
 import { Picture } from '@/components/ui/picture'
 import { QuoteActions } from '@/components/services/quote-actions'
 import { useLanguage } from '@/components/i18n/language-provider'
-import { formatUsd, guideAddOn, personalDriver, vehicle } from '@/lib/services'
+import { formatUsd, guideAddOn, MIN_HOURS, personalDriver, vehicle } from '@/lib/services'
 
 /**
  * Personal Driver en la portada: bloque destacado a todo lo ancho.
@@ -30,7 +30,7 @@ export function ServicesSection() {
   const perks = [
     { icon: Fuel, label: es ? 'Gasolina incluida' : 'Fuel included' },
     { icon: Hourglass, label: es ? 'Espera incluida' : 'Waiting included' },
-    { icon: Clock, label: es ? 'Sin mínimo de horas' : 'No minimum hours' },
+    { icon: Clock, label: es ? `Mínimo ${MIN_HOURS} horas` : `${MIN_HOURS}-hour minimum` },
     { icon: Users, label: es ? `Hasta ${vehicle.seats} personas` : `Up to ${vehicle.seats} people` },
     { icon: Snowflake, label: es ? 'Aire acondicionado' : 'Air conditioning' },
   ]

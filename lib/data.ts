@@ -38,8 +38,9 @@ export type Experience = {
    *   'online'  se reserva y se paga en la web (calendario + pasarela).
    *   'quote'   el precio es una REFERENCIA por persona y la reserva se
    *             confirma por WhatsApp o correo. Desde noviembre de 2026
-   *             solo se venden en línea los seis tours del documento
-   *             «Tours y precios»; el resto del catálogo queda para cotizar.
+   *             solo se venden en línea dos tours: «Amanecer en el Volcán
+   *             de Santa Ana» y «Volcán de Santa Ana + Playa Los
+   *             Almendros». El resto del catálogo queda para cotizar.
    */
   booking: 'online' | 'quote'
   /** Precio por persona en USD. `null` = «Precio a consultar» (solo con booking 'quote'). */
@@ -251,7 +252,7 @@ export const experiences: Experience[] = [
     name: { ES: 'Ruta de las Flores en 4x4', EN: 'Ruta de las Flores 4x4 Tour' },
     destination: 'Ruta de las Flores',
     category: 'cultura',
-    booking: 'online',
+    booking: 'quote',
     priceUsd: 175,
     durationHours: 10,
     image: '/img/experiences/ruta-de-las-flores.jpg',
@@ -275,7 +276,7 @@ export const experiences: Experience[] = [
     name: { ES: 'El Boquerón + Centro Histórico', EN: 'El Boquerón + Historic Center' },
     destination: 'San Salvador',
     category: 'volcanes',
-    booking: 'online',
+    booking: 'quote',
     priceUsd: 70,
     durationHours: 7,
     image: '/img/experiences/boqueron-crater.jpg',
@@ -299,7 +300,7 @@ export const experiences: Experience[] = [
     name: { ES: 'Centro Histórico + Puerta del Diablo', EN: 'Historic Center + Puerta del Diablo' },
     destination: 'Puerta del Diablo',
     category: 'cultura',
-    booking: 'online',
+    booking: 'quote',
     priceUsd: 65,
     durationHours: 6,
     image: '/img/experiences/puerta-del-diablo.jpg',

@@ -41,7 +41,7 @@ de contacto público y de vía para ejercer derechos sobre los datos.
 | --- | --- | --- |
 | Nombre | Experiences El Salvador | `lib/contact.ts` |
 | Correo | experiencesinelsalvador@gmail.com | `lib/contact.ts` (solo en el sitio) |
-| Teléfono | +503 7230 8067 | `lib/whatsapp.ts` |
+| Teléfono | +503 7566 0969 | `lib/whatsapp.ts` |
 | Web | https://experiencesinelsalvador.com | `SITE_URL` en Netlify |
 
 El correo sale en el pie de página, en los textos legales (contacto y derechos
@@ -50,7 +50,7 @@ nombre, el teléfono o la web, hay que cambiarlos también en el Perfil de
 Empresa.**
 
 En el perfil, el contacto equivalente es el **usuario de chat**, que debe
-apuntar al mismo número: `https://wa.me/50372308067`.
+apuntar al mismo número: `https://wa.me/50375660969`.
 
 ### El perfil, enlazado desde el sitio
 

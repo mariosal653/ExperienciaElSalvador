@@ -13,7 +13,7 @@ import type { Locale } from './data'
  * retiró y su página redirige a Personal Driver (next.config.mjs).
  *
  * Condiciones confirmadas con el cliente (documento «Tours y precios»,
- * noviembre de 2026): US$30 por hora, SIN mínimo de horas, gasolina y
+ * noviembre de 2026): US$30 por hora con un MÍNIMO de 5 horas, gasolina y
  * tiempo de espera incluidos, hasta 7 personas y guía turístico bilingüe
  * opcional por US$75 por día.
  */
@@ -26,6 +26,9 @@ type List = Record<Locale, string[]>
 /* ------------------------------------------------------------------ */
 /* Condiciones comerciales                                             */
 /* ------------------------------------------------------------------ */
+
+/** Horas mínimas que se contratan del Personal Driver. */
+export const MIN_HOURS = 5
 
 /** Tarifa por hora del Personal Driver, en dólares. Gasolina y espera incluidas. */
 export const HOURLY_USD = 30
@@ -130,8 +133,8 @@ export const personalDriver: Service = {
   priceUnit: { ES: 'por hora', EN: 'per hour' },
   priceUnitCode: 'HUR',
   priceNote: {
-    ES: 'Gasolina y espera incluidas · sin mínimo de horas',
-    EN: 'Fuel and waiting included · no minimum hours',
+    ES: `Gasolina y espera incluidas · mínimo ${MIN_HOURS} horas`,
+    EN: `Fuel and waiting included · ${MIN_HOURS}-hour minimum`,
   },
   icon: 'car',
   highlights: {
@@ -162,12 +165,12 @@ export const personalDriver: Service = {
   },
   notes: {
     ES: [
-      'Se cobra por hora, sin mínimo: pagas solo el tiempo que uses.',
+      `Se cobra por hora, con un mínimo de ${MIN_HOURS} horas (${MIN_HOURS * HOURLY_USD} USD). A partir de ahí, pagas solo las horas que uses.`,
       'La gasolina y el tiempo que el conductor te espera ya están incluidos en la tarifa.',
       'Para varios días seguidos o rutas de madrugada, escríbenos con antelación: ajustamos el horario y el total.',
     ],
     EN: [
-      'Charged by the hour, with no minimum: you only pay for the time you use.',
+      `Charged by the hour, with a ${MIN_HOURS}-hour minimum (${MIN_HOURS * HOURLY_USD} USD). Beyond that, you only pay for the hours you use.`,
       'Fuel and the time the driver waits for you are already included in the rate.',
       'For several days in a row or early-morning routes, write to us ahead of time: we adjust the schedule and the total.',
     ],
