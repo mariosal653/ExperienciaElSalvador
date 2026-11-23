@@ -438,7 +438,7 @@ export function BookingView({
                         dangerouslySetInnerHTML={{ __html: ticket.qrSvg }}
                       />
                       <div className="min-w-0 text-center min-[420px]:text-left">
-                        <p className="text-xs font-bold uppercase tracking-wider text-faint">
+                        <p className="text-xs font-bold uppercase tracking-wider text-muted">
                           {t('Viajero', 'Traveler')} {ticket.number} {t('de', 'of')} {booking.people}
                         </p>
                         <p className="mt-1 font-semibold leading-snug">{booking.experienceTitle}</p>

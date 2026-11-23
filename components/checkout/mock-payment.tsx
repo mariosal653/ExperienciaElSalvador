@@ -57,7 +57,7 @@ export function MockPayment({
         </div>
 
         <div className="p-6">
-          <p className="text-xs font-bold uppercase tracking-[.14em] text-faint">
+          <p className="text-xs font-bold uppercase tracking-[.14em] text-muted">
             {es ? 'Pago simulado' : 'Simulated payment'}
           </p>
           <p className="mt-2 text-4xl font-semibold">{formatCents(amountCents)}</p>

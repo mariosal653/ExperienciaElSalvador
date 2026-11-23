@@ -62,7 +62,7 @@ export function SearchPanel({ applied, onSearch, lang }: Props) {
       */}
       <nav
         aria-label={es ? 'Qué quieres reservar' : 'What do you want to book'}
-        className="mb-3 flex flex-wrap gap-2"
+        className="on-dark mb-3 flex flex-wrap gap-2"
       >
         <span
           aria-current="page"

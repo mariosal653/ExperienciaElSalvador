@@ -212,7 +212,7 @@ function NotConnected({ es, payload }: { es: boolean; payload: ReviewsPayload | 
         configure la integracion.
       */}
       {google && !google.configured && (
-        <p className="mt-4 text-xs text-faint">
+        <p className="mt-4 text-xs text-muted">
           {es ? 'Integración pendiente de credenciales.' : 'Integration pending credentials.'}
         </p>
       )}

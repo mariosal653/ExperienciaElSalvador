@@ -64,7 +64,7 @@ export function DestinationView({ destinationId }: { destinationId: string }) {
     <div className="min-h-screen bg-cream text-brand">
       <SiteHeader />
 
-      <section className="relative flex min-h-[340px] items-end overflow-hidden bg-brand-hero md:min-h-[420px]">
+      <section className="on-dark relative flex min-h-[340px] items-end overflow-hidden bg-brand-hero md:min-h-[420px]">
         <DestinationPhoto id={page.destination.id} className="absolute inset-0">
           <Picture
             src={page.image.src}

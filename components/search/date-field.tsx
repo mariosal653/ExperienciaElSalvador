@@ -87,9 +87,9 @@ export function DateField({ value, onChange, lang }: Props) {
         aria-label={lang === 'ES' ? 'Elegir fecha' : 'Choose date'}
         className="flex w-full items-center gap-3 rounded-xl border-t border-line px-4 py-3.5 text-left md:border-l md:border-t-0"
       >
-        <CalendarDays className="shrink-0 text-accent-light" size={19} aria-hidden="true" />
+        <CalendarDays className="shrink-0 text-accent" size={19} aria-hidden="true" />
         <span>
-          <span className="block text-[11px] font-bold uppercase tracking-wider text-faint">
+          <span className="block text-[11px] font-bold uppercase tracking-wider text-muted">
             {lang === 'ES' ? 'Cuándo' : 'When'}
           </span>
           <span className="text-sm font-semibold text-brand">{summary}</span>
@@ -131,7 +131,7 @@ export function DateField({ value, onChange, lang }: Props) {
               <span
                 key={`${day}-${index}`}
                 aria-hidden="true"
-                className="grid h-8 place-items-center text-[11px] font-bold uppercase text-faint"
+                className="grid h-8 place-items-center text-[11px] font-bold uppercase text-muted"
               >
                 {day}
               </span>

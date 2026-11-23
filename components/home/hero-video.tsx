@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { hasHeroVideo, heroVideo } from '@/lib/hero-video'
-import type { Locale } from '@/lib/data'
 
 /**
  * Vídeo de fondo del héroe. Se dibuja ENCIMA de la fotografía, nunca en su
@@ -20,7 +19,7 @@ import type { Locale } from '@/lib/data'
  * Y si el navegador bloquea la reproducción automática —iOS en modo de
  * bajo consumo, por ejemplo—, el vídeo se retira y queda la foto.
  */
-export function HeroVideo({ lang }: { lang: Locale }) {
+export function HeroVideo() {
   const [play, setPlay] = useState(false)
 
   useEffect(() => {
@@ -44,8 +43,9 @@ export function HeroVideo({ lang }: { lang: Locale }) {
   return (
     <>
       <video
-        // La foto de debajo ya describe la escena; el vídeo es decoración.
-        aria-label={heroVideo.description[lang]}
+        // La foto de debajo ya describe la escena; el vídeo es decoración y
+        // los lectores de pantalla no deben anunciarlo.
+        aria-hidden="true"
         autoPlay
         muted
         loop

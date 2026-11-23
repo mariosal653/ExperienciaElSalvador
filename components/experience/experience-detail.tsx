@@ -259,7 +259,7 @@ export function ExperienceDetail({
                 <span className="text-sm text-muted">{es ? '/ persona · USD, precio final' : '/ person · USD, final price'}</span>
               </p>
 
-              <p className="mt-4 text-xs font-bold uppercase tracking-wider text-faint">
+              <p className="mt-4 text-xs font-bold uppercase tracking-wider text-muted">
                 {es ? 'Próximas salidas' : 'Next departures'}
               </p>
               <ul className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
@@ -324,7 +324,7 @@ export function ExperienceDetail({
             <div key={label} className="flex items-start gap-3 rounded-2xl border border-line bg-white p-3.5">
               <Icon size={18} className="mt-0.5 shrink-0 text-accent" />
               <div className="min-w-0">
-                <dt className="text-[11px] font-bold uppercase tracking-wider text-faint">{label}</dt>
+                <dt className="text-[11px] font-bold uppercase tracking-wider text-muted">{label}</dt>
                 <dd className="mt-0.5 text-sm font-semibold">{value}</dd>
               </div>
             </div>

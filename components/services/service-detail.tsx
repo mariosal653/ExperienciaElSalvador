@@ -175,7 +175,7 @@ export function ServiceDetail({ service }: { service: Service }) {
                   </li>
                 </ul>
                 {vehicle.illustration && (
-                  <p className="mt-3 text-xs text-faint">
+                  <p className="mt-3 text-xs text-muted">
                     {es
                       ? 'Ilustración de referencia del modelo del servicio.'
                       : 'Reference illustration of the service vehicle.'}

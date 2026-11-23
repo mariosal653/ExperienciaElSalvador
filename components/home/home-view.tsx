@@ -6,6 +6,7 @@ import {
   ArrowRight,
   ArrowUpDown,
   Check,
+  ChevronDown,
   Heart,
   MapPin,
   RotateCcw,
@@ -193,7 +194,7 @@ export function HomeView() {
           texto del héroe conserva el mismo contraste con vídeo y sin él.
           Sin vídeo configurado no dibuja nada (ver lib/hero-video.ts).
         */}
-        <HeroVideo lang={language} />
+        <HeroVideo />
         {/*
           El velo. Dos degradados en una sola capa, cada uno con su trabajo:
 
@@ -223,7 +224,7 @@ export function HomeView() {
           <SearchPanel key={formKey} applied={applied} onSearch={setApplied} lang={language} />
 
           {applied && (
-            <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-semibold text-white">
+            <p className="on-dark mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-semibold text-white">
               <span>
                 {results.length}{' '}
                 {es
@@ -243,7 +244,7 @@ export function HomeView() {
         empieza por el lugar, no por la experiencia.
       */}
       <section id="destinos" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-        <div className="rounded-[2rem] bg-brand p-7 text-white md:p-12">
+        <div className="on-dark rounded-[2rem] bg-brand p-7 text-white md:p-12">
           <div>
             <p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-gold-soft">{es ? 'Destinos' : 'Destinations'}</p>
             <h2 className="max-w-xl text-3xl font-semibold tracking-tight md:text-5xl">
@@ -301,7 +302,7 @@ export function HomeView() {
             </h2>
           </div>
           <div className="flex shrink-0 items-center gap-3">
-            <p className="hidden text-sm text-muted sm:block" aria-live="polite">
+            <p className="sr-only text-sm text-muted sm:not-sr-only" aria-live="polite">
               {results.length} {es ? (results.length === 1 ? 'experiencia' : 'experiencias') : results.length === 1 ? 'experience' : 'experiences'}
             </p>
             {favorites.length > 0 && (
@@ -334,12 +335,19 @@ export function HomeView() {
             <button aria-pressed={refine.easy} onClick={() => setRefine((r) => ({ ...r, easy: !r.easy }))} className={chip(refine.easy)}>
               {es ? 'Dificultad fácil' : 'Easy'}
             </button>
-            <label className="shrink-0">
+            {/* `appearance-none` quita la flecha del navegador; se dibuja una
+                propia para que se vea que es un desplegable. */}
+            <label className="relative shrink-0">
               <span className="sr-only">{es ? 'Precio máximo' : 'Maximum price'}</span>
+              <ChevronDown
+                size={14}
+                aria-hidden="true"
+                className={`pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 ${refine.maxPrice !== null ? 'text-white' : 'text-brand'}`}
+              />
               <select
                 value={refine.maxPrice ?? ''}
                 onChange={(event) => setRefine((r) => ({ ...r, maxPrice: event.target.value ? Number(event.target.value) : null }))}
-                className={`${chip(refine.maxPrice !== null)} cursor-pointer appearance-none pr-3.5`}
+                className={`${chip(refine.maxPrice !== null)} cursor-pointer appearance-none pr-8`}
               >
                 <option value="">{es ? 'Cualquier precio' : 'Any price'}</option>
                 {PRICE_STEPS.map((price) => (
@@ -428,7 +436,7 @@ export function HomeView() {
 
       <ReviewsSection />
 
-      <section id="como-funciona" className="bg-surface-mint py-20"><div className="mx-auto max-w-7xl px-5 lg:px-8"><div className="grid items-center gap-12 lg:grid-cols-[.9fr_1.1fr]"><div><p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-accent">{es ? 'Viajar es fácil' : 'Travel made easy'}</p><h2 className="max-w-md text-3xl font-semibold tracking-tight md:text-4xl">{es ? <>Lo local se vive <em className="font-serif font-normal">mejor.</em></> : <>Local is simply <em className="font-serif font-normal">better.</em></>}</h2><p className="mt-5 max-w-md leading-relaxed text-muted">{es ? 'Conectamos tus ganas de explorar con quienes conocen cada rincón de El Salvador. Tú eliges el plan, nosotros cuidamos los detalles.' : 'We connect your urge to explore with the people who know every corner of El Salvador. You pick the plan, we handle the details.'}</p><a href="#experiencias" className="mt-7 inline-flex items-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">{es ? 'Elegir mi experiencia' : 'Choose my experience'} <ArrowRight size={17} /></a></div><div className="grid gap-4 sm:grid-cols-3">{(es ? [['01','Elige','Encuentra el destino o experiencia que te mueve.'],['02','Reserva','Confirma en pocos pasos y recibe todo al instante.'],['03','Disfruta','Vive el momento con anfitriones locales.']] : [['01','Choose','Find the destination or experience that moves you.'],['02','Book','Confirm in a few steps and get everything instantly.'],['03','Enjoy','Live the moment with local hosts.']]).map(([number, title, description]) => <div key={number} className="rounded-2xl bg-white p-5"><span className="text-4xl font-light text-gold">{number}</span><h3 className="mt-8 font-semibold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-muted">{description}</p><Check className="mt-5 text-accent" size={19} /></div>)}</div></div></div></section>
+      <section id="como-funciona" className="bg-surface-mint py-20"><div className="mx-auto max-w-7xl px-5 lg:px-8"><div className="grid items-center gap-12 lg:grid-cols-[.9fr_1.1fr]"><div><p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-accent">{es ? 'Viajar es fácil' : 'Travel made easy'}</p><h2 className="max-w-md text-3xl font-semibold tracking-tight md:text-4xl">{es ? <>Lo local se vive <em className="font-serif font-normal">mejor.</em></> : <>Local is simply <em className="font-serif font-normal">better.</em></>}</h2><p className="mt-5 max-w-md leading-relaxed text-muted">{es ? 'Conectamos tus ganas de explorar con quienes conocen cada rincón de El Salvador. Tú eliges el plan, nosotros cuidamos los detalles.' : 'We connect your urge to explore with the people who know every corner of El Salvador. You pick the plan, we handle the details.'}</p><a href="#experiencias" className="mt-7 inline-flex items-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">{es ? 'Elegir mi experiencia' : 'Choose my experience'} <ArrowRight size={17} /></a></div><div className="grid gap-4 sm:grid-cols-3">{(es ? [['01','Elige','Encuentra el destino o experiencia que te mueve.'],['02','Reserva','Confirma en pocos pasos y recibe todo al instante.'],['03','Disfruta','Vive el momento con anfitriones locales.']] : [['01','Choose','Find the destination or experience that moves you.'],['02','Book','Confirm in a few steps and get everything instantly.'],['03','Enjoy','Live the moment with local hosts.']]).map(([number, title, description]) => <div key={number} className="rounded-2xl bg-white p-5"><span className="text-4xl font-light text-gold-ink">{number}</span><h3 className="mt-8 font-semibold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-muted">{description}</p><Check className="mt-5 text-accent" size={19} /></div>)}</div></div></div></section>
 
       <SiteFooter />
     </main>

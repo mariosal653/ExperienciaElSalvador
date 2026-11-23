@@ -132,26 +132,26 @@ export function TicketValidation({
           {ticket && (
             <dl className="grid gap-3 p-6 text-sm">
               <div>
-                <dt className="text-[11px] font-bold uppercase tracking-wider text-faint">{t('Experiencia', 'Experience')}</dt>
+                <dt className="text-[11px] font-bold uppercase tracking-wider text-muted">{t('Experiencia', 'Experience')}</dt>
                 <dd className="mt-0.5 text-base font-semibold">{ticket.experienceTitle}</dd>
               </div>
               <div>
-                <dt className="text-[11px] font-bold uppercase tracking-wider text-faint">{t('Fecha', 'Date')}</dt>
+                <dt className="text-[11px] font-bold uppercase tracking-wider text-muted">{t('Fecha', 'Date')}</dt>
                 <dd className="mt-0.5 capitalize">{dateLabel}</dd>
               </div>
               <div className="flex flex-wrap justify-between gap-3">
                 <div>
-                  <dt className="text-[11px] font-bold uppercase tracking-wider text-faint">{t('ID de entrada', 'Ticket ID')}</dt>
+                  <dt className="text-[11px] font-bold uppercase tracking-wider text-muted">{t('ID de entrada', 'Ticket ID')}</dt>
                   <dd className="mt-0.5 break-all font-mono">{ticket.code}</dd>
                 </div>
                 <div className="text-right">
-                  <dt className="text-[11px] font-bold uppercase tracking-wider text-faint">{t('Viajero', 'Traveler')}</dt>
+                  <dt className="text-[11px] font-bold uppercase tracking-wider text-muted">{t('Viajero', 'Traveler')}</dt>
                   <dd className="mt-0.5">{ticket.number} / {ticket.people}</dd>
                 </div>
               </div>
               {ticket.usedAt && (
                 <div>
-                  <dt className="text-[11px] font-bold uppercase tracking-wider text-faint">{t('Usada el', 'Used on')}</dt>
+                  <dt className="text-[11px] font-bold uppercase tracking-wider text-muted">{t('Usada el', 'Used on')}</dt>
                   <dd className="mt-0.5">{new Date(ticket.usedAt).toLocaleString(es ? 'es-SV' : 'en-US', { timeZone: 'America/El_Salvador' })}</dd>
                 </div>
               )}

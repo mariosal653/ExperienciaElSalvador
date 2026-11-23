@@ -291,7 +291,7 @@ export function AuthForm({ mode, socialProviders }: { mode: Mode; socialProvider
         <>
           <div className="my-6 flex items-center gap-3">
             <span className="h-px flex-1 bg-line" />
-            <span className="text-xs font-medium text-faint">{t.or}</span>
+            <span className="text-xs font-medium text-muted">{t.or}</span>
             <span className="h-px flex-1 bg-line" />
           </div>
 
@@ -342,7 +342,7 @@ function Field({
   const id = `field-${name}`
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-faint">
+      <label htmlFor={id} className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-muted">
         {label}
       </label>
       <div
@@ -359,7 +359,7 @@ function Field({
           required
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : undefined}
-          className="w-full bg-transparent text-sm font-medium text-brand outline-none placeholder:text-faint disabled:opacity-60"
+          className="w-full bg-transparent text-sm font-medium text-brand outline-none placeholder:text-muted disabled:opacity-60"
         />
         {trailing}
       </div>

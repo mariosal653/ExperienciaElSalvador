@@ -305,7 +305,7 @@ export function CheckoutView({ experience, user, discountPct, methods, range, in
   }
 
   const fieldClass = (field: CustomerField) =>
-    `mt-1.5 w-full rounded-xl border bg-white px-3.5 py-3 text-base text-brand outline-none transition placeholder:text-faint focus:border-brand focus:ring-2 focus:ring-brand/15 sm:text-sm ${
+    `mt-1.5 w-full rounded-xl border bg-white px-3.5 py-3 text-base text-brand outline-none transition placeholder:text-muted focus:border-brand focus:ring-2 focus:ring-brand/15 sm:text-sm ${
       showError(field) ? 'border-accent' : 'border-line'
     }`
 

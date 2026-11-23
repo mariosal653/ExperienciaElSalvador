@@ -110,6 +110,12 @@
   /* Un solo anillo de foco en todo el sitio. Antes cada botón decidía el
      suyo y la mayoría se quedaba con el del navegador. */
   :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: 2px; }
+  /* Sobre fondo oscuro el terracota no se ve (2.2:1 sobre brand). Dentro
+     de un bloque oscuro el anillo pasa a dorado (6.5:1). El anillo se
+     dibuja FUERA del elemento, así que lo que cuenta es el fondo que lo
+     rodea: `on-dark` va en el contenedor oscuro, no en el botón. Las
+     cabeceras de vidrio son siempre oscuras y lo llevan de serie. */
+  :is(.on-dark, .liquid-glass, .liquid-glass-tinted) :focus-visible { outline-color: var(--color-gold); }
   /* Red de seguridad: ningún elemento que se escape (p. ej. un .sr-only absoluto) puede ensanchar la página en móvil. `clip` no rompe position: sticky. */
   html { scroll-behavior: smooth; overflow-x: clip; }
   /* La cabecera de la portada (components/site/home-header) se queda fija

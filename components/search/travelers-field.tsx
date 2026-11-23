@@ -29,9 +29,9 @@ export function TravelersField({ value, onChange, lang }: Props) {
 
   return (
     <div className="flex items-center gap-3 rounded-xl border-t border-line px-4 py-3.5 md:border-l md:border-t-0">
-      <Users className="shrink-0 text-accent-light" size={19} aria-hidden="true" />
+      <Users className="shrink-0 text-accent" size={19} aria-hidden="true" />
       <span className="flex-1">
-        <span className="block text-[11px] font-bold uppercase tracking-wider text-faint">{label}</span>
+        <span className="block text-[11px] font-bold uppercase tracking-wider text-muted">{label}</span>
 
         <span className="flex items-center gap-2.5">
           <button

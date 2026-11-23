@@ -52,6 +52,18 @@ export function HomeHeader() {
   const es = lang === 'ES'
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+
+  // Escape cierra el menú móvil y devuelve el foco al botón que lo abrió.
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      setMenuOpen(false)
+      document.getElementById('home-menu-button')?.focus()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [menuOpen])
   const [active, setActive] = useState<string | null>(null)
 
   /**
@@ -142,7 +154,7 @@ export function HomeHeader() {
           scrolled ? 'liquid-glass-tinted' : 'liquid-glass'
         }`}
       >
-        <a href="#inicio" className="flex shrink-0 items-center gap-2 sm:gap-2.5" aria-label="Experiences in El Salvador · Inicio">
+        <a href="#inicio" className="flex shrink-0 items-center gap-2 sm:gap-2.5" aria-label={`Experiences in El Salvador · ${es ? 'Inicio' : 'Home'}`}>
           <LogoMark className="h-9 w-9 shrink-0 rounded-[28%] ring-1 ring-white/30" />
           <span className="whitespace-nowrap text-base font-bold sm:text-lg tracking-tight">Experiences in <span className="text-gold">El Salvador</span></span>
         </a>
@@ -204,9 +216,11 @@ export function HomeHeader() {
             </a>
           )}
           <button
+            id="home-menu-button"
             onClick={() => setMenuOpen(!menuOpen)}
             className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-white/15"
             aria-expanded={menuOpen}
+            aria-controls="home-mobile-menu"
             aria-label={menuOpen ? (es ? 'Cerrar menú' : 'Close menu') : (es ? 'Abrir menú' : 'Open menu')}
           >
             {menuOpen ? <X /> : <Menu />}
@@ -217,8 +231,8 @@ export function HomeHeader() {
       {menuOpen && (
         // Panel aparte bajo la píldora, siempre teñido: el menú se abre
         // sobre cualquier sección y el texto blanco necesita fondo.
-        <div className="liquid-glass-tinted mx-auto mt-2 max-h-[calc(100dvh-6rem)] max-w-7xl overflow-y-auto rounded-3xl px-5 pb-5 pt-4 lg:hidden">
-          <nav className="flex flex-col gap-4 text-sm">
+        <div id="home-mobile-menu" className="liquid-glass-tinted mx-auto mt-2 max-h-[calc(100dvh-6rem)] max-w-7xl overflow-y-auto rounded-3xl px-5 pb-5 pt-4 lg:hidden">
+          <nav className="flex flex-col gap-4 text-sm" aria-label={es ? 'Navegación principal' : 'Main navigation'}>
             {SECTIONS.map((section) => (
               <a key={section.id} href={`#${section.id}`} onClick={() => setMenuOpen(false)}>
                 {section.label[lang]}

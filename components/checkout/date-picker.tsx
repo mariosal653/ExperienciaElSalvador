@@ -117,7 +117,7 @@ export function DatePicker({
 
       <div className="grid grid-cols-7 gap-1 text-center" role="group" aria-label={es ? 'Fechas disponibles' : 'Available dates'}>
         {WEEKDAYS[lang].map((day, index) => (
-          <span key={`${day}-${index}`} className="py-1 text-[11px] font-bold text-faint" aria-hidden="true">
+          <span key={`${day}-${index}`} className="py-1 text-[11px] font-bold text-muted" aria-hidden="true">
             {day}
           </span>
         ))}

@@ -86,7 +86,7 @@ export function WelcomeModal() {
           <X size={18} />
         </button>
 
-        <div className="bg-brand px-7 py-8 text-center text-white">
+        <div className="on-dark bg-brand px-7 py-8 text-center text-white">
           <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-gold text-brand">
             <Ticket size={26} />
           </span>
@@ -123,7 +123,7 @@ export function WelcomeModal() {
             </button>
           </div>
 
-          <p className="mt-4 text-xs text-faint">
+          <p className="mt-4 text-xs text-muted">
             {es
               ? 'Cerrar esto no consume tu descuento.'
               : 'Closing this does not use up your discount.'}

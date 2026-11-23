@@ -92,9 +92,9 @@ export function DestinationField({ value, onChange, lang }: Props) {
         className="flex items-center gap-3 rounded-xl px-4 py-3.5"
         onClick={() => setOpen(true)}
       >
-        <MapPin className="shrink-0 text-accent-light" size={20} aria-hidden="true" />
+        <MapPin className="shrink-0 text-accent" size={20} aria-hidden="true" />
         <span className="flex-1">
-          <span className="block text-[11px] font-bold uppercase tracking-wider text-faint">
+          <span className="block text-[11px] font-bold uppercase tracking-wider text-muted">
             {lang === 'ES' ? '¿A dónde?' : 'Where to?'}
           </span>
           <input
@@ -134,7 +134,7 @@ export function DestinationField({ value, onChange, lang }: Props) {
           contenido del heroe. Escala completa en app/globals.css. */}
       {open && (
         <div className="absolute left-0 right-0 top-[calc(100%+.5rem)] z-30 max-h-72 overflow-y-auto rounded-2xl border border-line bg-white p-2 shadow-2xl md:min-w-[19rem]">
-          <p className="px-3 pb-1.5 pt-2 text-[11px] font-bold uppercase tracking-wider text-faint">
+          <p className="px-3 pb-1.5 pt-2 text-[11px] font-bold uppercase tracking-wider text-muted">
             {lang === 'ES' ? 'Destinos en El Salvador' : 'Destinations in El Salvador'}
           </p>
 
@@ -149,7 +149,7 @@ export function DestinationField({ value, onChange, lang }: Props) {
                     index === highlighted ? 'bg-surface-mint' : 'hover:bg-surface-soft'
                   }`}
                 >
-                  <MapPin className="shrink-0 text-accent-light" size={16} aria-hidden="true" />
+                  <MapPin className="shrink-0 text-accent" size={16} aria-hidden="true" />
                   <span>
                     <span className="block text-sm font-semibold text-brand">{destination.name}</span>
                     <span className="block text-xs text-muted">{destination.region[lang]}</span>

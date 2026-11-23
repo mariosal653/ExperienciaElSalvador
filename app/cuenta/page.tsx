@@ -36,7 +36,7 @@ export default async function AccountPage() {
 
       {/* Beneficios — el descuento sigue visible aunque se cierre el popup */}
       <section className="mt-8" aria-labelledby="beneficios">
-        <h2 id="beneficios" className="mb-3 text-sm font-bold uppercase tracking-[.14em] text-faint">
+        <h2 id="beneficios" className="mb-3 text-sm font-bold uppercase tracking-[.14em] text-muted">
           Beneficios
         </h2>
 
@@ -96,7 +96,7 @@ export default async function AccountPage() {
       {/* Ultimas experiencias */}
       <section className="mt-10" aria-labelledby="recientes">
         <div className="mb-4 flex items-end justify-between gap-4">
-          <h2 id="recientes" className="text-sm font-bold uppercase tracking-[.14em] text-faint">
+          <h2 id="recientes" className="text-sm font-bold uppercase tracking-[.14em] text-muted">
             Tus experiencias recientes
           </h2>
           {totalBookings > 0 && (

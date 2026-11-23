@@ -109,7 +109,7 @@ export default async function ReservaDetallePage({ params }: Params) {
 
       {/* Pagos ---------------------------------------------------- */}
       <section aria-labelledby="pagos" className="mt-8">
-        <h2 id="pagos" className="mb-3 text-sm font-bold uppercase tracking-[.12em] text-faint">
+        <h2 id="pagos" className="mb-3 text-sm font-bold uppercase tracking-[.12em] text-muted">
           Intentos de pago ({pagos.length})
         </h2>
 
@@ -121,7 +121,7 @@ export default async function ReservaDetallePage({ params }: Params) {
           <div className="overflow-x-auto rounded-2xl border border-[#e3e3de] bg-white">
             <table className="w-full min-w-[46rem] text-left text-sm">
               <thead>
-                <tr className="border-b border-line-soft text-xs uppercase tracking-[.1em] text-faint">
+                <tr className="border-b border-line-soft text-xs uppercase tracking-[.1em] text-muted">
                   <th scope="col" className="px-4 py-3 font-bold">Método</th>
                   <th scope="col" className="px-4 py-3 font-bold">Entorno</th>
                   <th scope="col" className="px-4 py-3 font-bold">Estado</th>
@@ -175,7 +175,7 @@ function Bloque({
 }) {
   return (
     <section className="rounded-2xl border border-[#e3e3de] bg-white p-5">
-      <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-[.12em] text-faint">
+      <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-[.12em] text-muted">
         <Icon size={15} /> {titulo}
       </h2>
       <dl className="mt-4 grid gap-3">{children}</dl>
@@ -204,7 +204,7 @@ function Campo({
           destacado ? 'text-lg font-semibold text-brand' : 'text-sm font-medium text-brand'
         }`}
       >
-        {value ?? <span className="text-faint">{nota ?? '—'}</span>}
+        {value ?? <span className="text-muted">{nota ?? '—'}</span>}
       </dd>
     </div>
   )
