@@ -6,6 +6,7 @@ import { LanguageProvider } from '@/components/i18n/language-provider'
 import { SessionBoundary } from '@/components/auth/session-boundary'
 import { WhatsAppProvider } from '@/components/whatsapp/whatsapp-provider'
 import { WhatsAppWidget } from '@/components/whatsapp/whatsapp-widget'
+import { MobileNav } from '@/components/site/mobile-nav'
 import { getSiteUrl } from '@/lib/site'
 import './globals.css'
 
@@ -108,6 +109,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <LanguageProvider>
             <WhatsAppProvider>
               {children}
+              <MobileNav />
               <WhatsAppWidget />
             </WhatsAppProvider>
           </LanguageProvider>

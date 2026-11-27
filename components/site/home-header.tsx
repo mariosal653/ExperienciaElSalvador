@@ -21,12 +21,13 @@ const SECTIONS: Section[] = [
   { id: 'servicios', label: { ES: 'Personal Driver', EN: 'Personal Driver' } },
   { id: 'experiencias', label: { ES: 'Explorar', EN: 'Explore' } },
   { id: 'destinos', label: { ES: 'Destinos', EN: 'Destinations' } },
+  { id: 'ideas', label: { ES: 'Ideas de viaje', EN: 'Trip ideas' } },
   { id: 'opiniones', label: { ES: 'Opiniones', EN: 'Reviews' } },
   { id: 'como-funciona', label: { ES: 'Cómo funciona', EN: 'How it works' } },
 ]
 
 /** Las mismas secciones, en el orden en que aparecen al bajar la página. */
-const DOCUMENT_ORDER = ['destinos', 'servicios', 'experiencias', 'opiniones', 'como-funciona']
+const DOCUMENT_ORDER = ['destinos', 'servicios', 'experiencias', 'ideas', 'opiniones', 'como-funciona']
 
 /**
  * Cabecera de la portada. Una sola barra, dos estados.
@@ -155,7 +156,7 @@ export function HomeHeader() {
         }`}
       >
         <a href="#inicio" className="flex shrink-0 items-center gap-2 sm:gap-2.5" aria-label={`Experiences in El Salvador · ${es ? 'Inicio' : 'Home'}`}>
-          <LogoMark className="h-9 w-9 shrink-0 rounded-[28%] ring-1 ring-white/30" />
+          <LogoMark tone="onDark" className="h-8 w-auto shrink-0" />
           <span className="whitespace-nowrap text-base font-bold sm:text-lg tracking-tight">Experiences in <span className="text-gold">El Salvador</span></span>
         </a>
 
@@ -175,7 +176,8 @@ export function HomeHeader() {
               // sitio al idioma, la cuenta y el botón de buscar. Con la
               // cápsula de cristal (que lleva su propio margen interior),
               // dejar «Opiniones» desbordaba la barra 56 px a 1024.
-              className={`${linkClass(section.id)} ${section.id === 'como-funciona' || section.id === 'opiniones' ? 'hidden 2xl:inline-block' : ''}`}
+              // «Ideas de viaje» entra desde xl: a 1024 px no cabe junto a la cuenta.
+              className={`${linkClass(section.id)} ${section.id === 'como-funciona' || section.id === 'opiniones' ? 'hidden 2xl:inline-block' : section.id === 'ideas' ? 'hidden xl:inline-block' : ''}`}
             >
               {section.label[lang]}
             </a>
