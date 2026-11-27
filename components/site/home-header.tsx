@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ArrowUp, Menu, Search, X } from 'lucide-react'
+import { Menu, Search, X } from 'lucide-react'
 import { useLanguage } from '@/components/i18n/language-provider'
 import { LanguageSwitch } from '@/components/i18n/language-switch'
 import { SessionNav } from '@/components/auth/session-nav'
@@ -184,21 +184,10 @@ export function HomeHeader() {
 
         <div className="hidden shrink-0 items-center gap-3 lg:flex">
           {/*
-            El botón solo existe con la barra sólida: sobre el héroe el
-            buscador está ahí mismo, a un palmo. Hasta xl va sin texto —con
-            texto, el idioma y la cuenta se salían a 1024 px.
+            Sin botón de búsqueda en escritorio: competía en terracota con
+            «Reservar». El buscador está arriba y el logo lleva al inicio.
+            En móvil queda un icono discreto para volver al buscador.
           */}
-          {scrolled && (
-            <a
-              href="#inicio"
-              aria-label={es ? 'Volver al buscador' : 'Back to search'}
-              className="flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-2 text-sm font-bold text-white transition hover:bg-accent-dark xl:px-4"
-            >
-              <Search size={15} aria-hidden="true" />
-              <span className="hidden xl:inline">{es ? 'Buscar' : 'Search'}</span>
-              <ArrowUp size={14} aria-hidden="true" />
-            </a>
-          )}
           <LanguageSwitch lang={lang} onChange={setLang} />
           <SessionNav />
         </div>
@@ -208,11 +197,9 @@ export function HomeHeader() {
             <a
               href="#inicio"
               aria-label={es ? 'Volver al buscador' : 'Back to search'}
-              className="flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-2 text-xs font-bold text-white transition hover:bg-accent-dark"
+              className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-white/15"
             >
-              <Search size={14} aria-hidden="true" />
-              {/* En teléfonos la flecha no cabe junto al logo. */}
-              <ArrowUp size={13} aria-hidden="true" className="hidden sm:block" />
+              <Search size={17} aria-hidden="true" />
             </a>
           )}
           <button

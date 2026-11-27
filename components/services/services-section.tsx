@@ -36,13 +36,13 @@ export function ServicesSection() {
   ]
 
   return (
-    <section id="servicios" aria-labelledby="servicios-title" className="bg-surface-mint py-16 lg:py-20">
+    <section id="servicios" aria-labelledby="servicios-title" className="section-y bg-sand">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="on-dark overflow-hidden rounded-[2rem] bg-brand text-white shadow-card">
+        <div className="on-dark overflow-hidden rounded-[2rem] bg-brand text-white">
           <div className="grid lg:grid-cols-[1.05fr_.95fr]">
             {/* Texto, precio y cotización --------------------------------- */}
             <div className="p-7 md:p-10 lg:p-12">
-              <p className="text-sm font-bold uppercase tracking-[.18em] text-gold-soft">
+              <p className="eyebrow">
                 {es ? 'Transporte privado con conductor' : 'Private transport with a driver'}
               </p>
               <h2 id="servicios-title" className="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">
