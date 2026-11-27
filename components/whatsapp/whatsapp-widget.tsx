@@ -98,9 +98,9 @@ export function WhatsAppWidget() {
   // Capa 50 — ver la escala en app/globals.css.
   // --sticky-offset lo fija la barra de reserva del detalle para no taparla.
   // Donde hay barra inferior en el celular, WhatsApp va dentro de ella y
-  // este botón se esconde hasta lg (ver components/site/mobile-nav.tsx).
+  // este botón se esconde hasta md (ver components/site/mobile-nav.tsx).
   return (
-    <div className={`${hasMobileNav(pathname) ? 'max-lg:hidden ' : ''}fixed right-6 z-50 flex flex-col items-end gap-3 bottom-[calc(1.5rem+var(--sticky-offset,0px)+env(safe-area-inset-bottom,0px))] transition-[bottom] duration-300 md:right-8 md:bottom-[calc(2rem+var(--sticky-offset,0px)+env(safe-area-inset-bottom,0px))]`}>
+    <div className={`${hasMobileNav(pathname) ? 'max-md:hidden ' : ''}fixed right-6 z-50 flex flex-col items-end gap-3 bottom-[calc(1.5rem+var(--sticky-offset,0px)+env(safe-area-inset-bottom,0px))] transition-[bottom] duration-300 md:right-8 md:bottom-[calc(2rem+var(--sticky-offset,0px)+env(safe-area-inset-bottom,0px))]`}>
       {showBubble && (
         <div
           role="status"

@@ -23,12 +23,10 @@ const SECTIONS: Section[] = [
   { id: 'experiencias', label: { ES: 'Explorar', EN: 'Explore' } },
   { id: 'destinos', label: { ES: 'Destinos', EN: 'Destinations' } },
   { id: 'ideas', label: { ES: 'Ideas de viaje', EN: 'Trip ideas' } },
-  { id: 'opiniones', label: { ES: 'Opiniones', EN: 'Reviews' } },
-  { id: 'como-funciona', label: { ES: 'Cómo funciona', EN: 'How it works' } },
 ]
 
 /** Las mismas secciones, en el orden en que aparecen al bajar la página. */
-const DOCUMENT_ORDER = ['destinos', 'servicios', 'experiencias', 'ideas', 'opiniones', 'como-funciona']
+const DOCUMENT_ORDER = ['destinos', 'servicios', 'experiencias', 'ideas']
 
 /**
  * Cabecera de la portada. Una sola barra, dos estados.
@@ -150,9 +148,12 @@ export function HomeHeader() {
       >
         <a href="#inicio" className="flex shrink-0 items-center gap-2 sm:gap-2.5" aria-label={`Experiences in El Salvador · ${es ? 'Inicio' : 'Home'}`}>
           <LogoMark tone="onDark" className="h-8 w-auto shrink-0" />
-          {/* En el celular el nombre va en dos líneas para que quepan el idioma y la cuenta. */}
-          <span className="text-sm font-bold leading-tight tracking-tight sm:whitespace-nowrap sm:text-lg">
-            <span className="block sm:inline">Experiences in</span> <span className="block text-gold sm:inline">El Salvador</span>
+          {/* Hasta lg el nombre va en dos líneas: en el celular para que
+              quepan el idioma y la cuenta, y en tablet para que quepan
+              además los tres enlaces (en una línea, a 768 px la cápsula
+              se desbordaba 34 px en inglés). */}
+          <span className="text-sm font-bold leading-tight tracking-tight md:text-base lg:whitespace-nowrap lg:text-lg">
+            <span className="block lg:inline">Experiences in</span> <span className="block text-gold lg:inline">El Salvador</span>
           </span>
         </a>
 
@@ -161,19 +162,17 @@ export function HomeHeader() {
           tableta de 768 px la fila se salía de la pantalla y aparecía scroll
           horizontal. Hasta lg manda el botón de menú, que lleva lo mismo.
         */}
-        <nav className="hidden items-center gap-1 whitespace-nowrap text-sm font-medium lg:flex" aria-label={es ? 'Navegación principal' : 'Main navigation'}>
+        <nav className="hidden items-center gap-1 whitespace-nowrap text-sm font-medium md:flex" aria-label={es ? 'Navegación principal' : 'Main navigation'}>
           {SECTIONS.map((section) => (
             <a
               key={section.id}
               href={`#${section.id}`}
               aria-current={scrolled && active === section.id ? 'true' : undefined}
-              // «Cómo funciona» y «Opiniones» son los menos buscados y se
-              // alcanzan bajando: de 1024 a 1536 px ceden su
-              // sitio al idioma, la cuenta y el botón de buscar. Con la
-              // cápsula de cristal (que lleva su propio margen interior),
-              // dejar «Opiniones» desbordaba la barra 56 px a 1024.
+              // Solo cuatro enlaces. «Opiniones» y «Cómo funciona» salieron
+              // del menú: se alcanzan bajando, y con ellos más el botón de
+              // buscar la cápsula se desbordaba en español a 1 920 px.
               // «Ideas de viaje» entra desde xl: a 1024 px no cabe junto a la cuenta.
-              className={`${linkClass(section.id)} ${section.id === 'como-funciona' || section.id === 'opiniones' ? 'hidden 2xl:inline-block' : section.id === 'ideas' ? 'hidden xl:inline-block' : ''}`}
+              className={`${linkClass(section.id)} ${section.id === 'ideas' ? 'hidden xl:inline-block' : ''}`}
             >
               {section.label[lang]}
             </a>
@@ -190,10 +189,13 @@ export function HomeHeader() {
             <a
               href="#inicio"
               aria-label={es ? 'Volver al buscador' : 'Back to search'}
-              className="flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-2 text-sm font-bold text-white transition hover:bg-accent-dark xl:px-4"
+              // Solo desde xl: de 1024 a 1279 px, en español, el idioma y la
+              // cuenta ya llenan la cápsula y este botón la desbordaba 16 px.
+              // Ahí el logo hace el mismo trabajo: vuelve al buscador.
+              className="hidden items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-bold text-white transition hover:bg-accent-dark xl:flex"
             >
               <Search size={15} aria-hidden="true" />
-              <span className="hidden xl:inline">{es ? 'Buscar' : 'Search'}</span>
+              {es ? 'Buscar' : 'Search'}
               <ArrowUp size={14} aria-hidden="true" />
             </a>
           )}
@@ -202,9 +204,10 @@ export function HomeHeader() {
         </div>
 
         {/*
-          Celular: idioma y cuenta, sin botón de menú. Los enlaces viven en
-          la barra flotante de abajo (components/site/mobile-nav.tsx) y esta
-          cabecera se esconde al bajar: nunca hay dos menús a la vez.
+          Hasta lg: idioma y cuenta en versión compacta, sin botón de menú.
+          En el celular los enlaces viven en la barra flotante de abajo
+          (components/site/mobile-nav.tsx) y esta cabecera se esconde al
+          bajar; desde md (tablet) los enlaces vuelven aquí arriba.
         */}
         <div className="flex shrink-0 items-center gap-2 lg:hidden">
           <LanguageSwitch lang={lang} onChange={setLang} />

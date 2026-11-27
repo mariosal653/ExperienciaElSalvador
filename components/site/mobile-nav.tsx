@@ -12,7 +12,9 @@ import { hasMobileNav } from '@/lib/mobile-nav'
 type Item = 'experiencias' | 'destinos' | 'driver'
 
 /**
- * Barra de navegación flotante, abajo y al centro, SOLO EN EL CELULAR.
+ * Barra de navegación flotante, abajo y al centro, SOLO EN EL CELULAR
+ * (menos de 768 px). En tablet y en ventanas angostas los enlaces están
+ * arriba, en la cabecera.
  *
  * Abajo porque ahí llega el pulgar; arriba, el menú obligaba a estirar la
  * mano o a abrir el botón de tres rayas. En escritorio no existe: nadie
@@ -74,12 +76,12 @@ export function MobileNav() {
   return (
     <>
       {/* Hueco al final de la página para que la barra no tape el pie. */}
-      <div aria-hidden="true" className="h-[calc(5.5rem+env(safe-area-inset-bottom,0px))] bg-cream lg:hidden" />
+      <div aria-hidden="true" className="h-[calc(5.5rem+env(safe-area-inset-bottom,0px))] bg-cream md:hidden" />
 
       {/* Capa 50, como el widget de WhatsApp: ver la escala en app/globals.css. */}
       <nav
         aria-label={es ? 'Navegación' : 'Navigation'}
-        className="no-print liquid-glass-tinted fixed inset-x-0 bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] z-50 mx-auto flex w-fit items-center gap-0.5 rounded-full p-1.5 text-white lg:hidden"
+        className="no-print liquid-glass-tinted fixed inset-x-0 bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] z-50 mx-auto flex w-fit items-center gap-0.5 rounded-full p-1.5 text-white md:hidden"
       >
         {items.map(({ id, href, label, icon: Icon }) => {
           const current = active === id
