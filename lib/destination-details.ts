@@ -61,6 +61,14 @@ const INTRO: Record<string, Text> = {
     ES: 'Volcán del oriente del país, en La Unión, que se asoma al Golfo de Fonseca y a sus islas, con Honduras y Nicaragua al otro lado del agua.',
     EN: 'A volcano in the east of the country, in La Unión, overlooking the Gulf of Fonseca and its islands, with Honduras and Nicaragua across the water.',
   },
+  'joya-de-ceren': {
+    ES: 'Aldea maya sepultada por la ceniza de un volcán hacia el año 600, en el valle de Zapotitán. Patrimonio de la Humanidad desde 1993, a menos de una hora de San Salvador.',
+    EN: 'A Maya village buried by volcanic ash around the year 600, in the Zapotitán valley. A World Heritage Site since 1993, less than an hour from San Salvador.',
+  },
+  'el-imposible': {
+    ES: 'Parque nacional en las montañas de Ahuachapán, al occidente del país: uno de los bosques más extensos que quedan en El Salvador, con cañones, miradores y ríos.',
+    EN: 'A national park in the mountains of Ahuachapán, in the west of the country: one of the largest forests left in El Salvador, with canyons, viewpoints and rivers.',
+  },
 }
 
 export type DestinationPage = {

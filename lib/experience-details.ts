@@ -776,6 +776,73 @@ export const experienceDetails: Record<string, ExperienceDetails> = {
     minAge: 6,
     languages: ['ES', 'EN'],
   },
+
+  'joya-de-ceren-san-andres': {
+    gallery: [],
+    itinerary: [
+      { time: '8:30', text: { ES: 'Salida desde San Salvador', EN: 'Departure from San Salvador' } },
+      { time: '9:30', text: { ES: 'Museo y recorrido por la aldea de Joya de Cerén', EN: 'Museum and walk through the village of Joya de Cerén' } },
+      { time: '11:15', text: { ES: 'Sitio arqueológico San Andrés: acrópolis y museo', EN: 'San Andrés archaeological site: acropolis and museum' } },
+      { time: '13:30', text: { ES: 'Regreso a San Salvador', EN: 'Return to San Salvador' } },
+    ],
+    includes: {
+      ES: ['Transporte desde San Salvador', 'Guía local', 'Agua'],
+      EN: ['Transport from San Salvador', 'Local guide', 'Water'],
+    },
+    excludes: {
+      ES: ['Entradas a los parques arqueológicos', 'Comida', 'Propinas'],
+      EN: ['Archaeological park entry fees', 'Food', 'Tips'],
+    },
+    bring: {
+      ES: ['Gorra y protector solar: buena parte del recorrido es al aire libre', 'Zapatos cómodos', ...ID_DOC.ES],
+      EN: ['A cap and sunscreen: much of the visit is outdoors', 'Comfortable shoes', ...ID_DOC.EN],
+    },
+    notes: {
+      ES: ['Los parques arqueológicos cierran los lunes.', 'Fecha, hora de salida y precio final se confirman por WhatsApp o correo.'],
+      EN: ['The archaeological parks are closed on Mondays.', 'Date, departure time and final price are confirmed by WhatsApp or email.'],
+    },
+    meetingPoint: {
+      name: { ES: 'Tu hotel o un punto acordado en San Salvador', EN: 'Your hotel or an agreed point in San Salvador' },
+      mapQuery: 'Parque Arqueológico Joya de Cerén, San Juan Opico, El Salvador',
+    },
+    difficulty: 'easy',
+    minAge: 0,
+    languages: ['ES', 'EN'],
+  },
+
+  'el-imposible-senderos': {
+    gallery: [],
+    itinerary: [
+      { time: '5:30', text: { ES: 'Salida desde San Salvador hacia Ahuachapán', EN: 'Departure from San Salvador to Ahuachapán' } },
+      { time: '8:30', text: { ES: 'Registro en la entrada del parque', EN: 'Check-in at the park entrance' } },
+      { time: '9:00', text: { ES: 'Sendero por el bosque y miradores sobre los cañones', EN: 'Forest trail and viewpoints over the canyons' } },
+      { time: '11:30', text: { ES: 'Pozas de río para descansar y refrescarse', EN: 'River pools to rest and cool off' } },
+      { time: '13:00', text: { ES: 'Almuerzo y regreso a San Salvador', EN: 'Lunch and return to San Salvador' } },
+    ],
+    includes: {
+      ES: ['Transporte desde San Salvador', 'Guía local del parque', 'Agua'],
+      EN: ['Transport from San Salvador', 'Local park guide', 'Water'],
+    },
+    excludes: {
+      ES: ['Entrada al parque', 'Comida', 'Propinas'],
+      EN: ['Park entry fee', 'Food', 'Tips'],
+    },
+    bring: {
+      ES: ['Zapatos de montaña', 'Traje de baño y toalla para las pozas', 'Repelente', ...ID_DOC.ES],
+      EN: ['Hiking boots', 'Swimsuit and towel for the pools', 'Insect repellent', ...ID_DOC.EN],
+    },
+    notes: {
+      ES: ['El acceso a los senderos depende de las disposiciones del parque y del clima. Si alguno está cerrado, te avisamos antes y proponemos otro.', 'Fecha y precio final se confirman por WhatsApp o correo.'],
+      EN: ['Trail access depends on park rules and the weather. If one is closed, we let you know in advance and suggest another.', 'Date and final price are confirmed by WhatsApp or email.'],
+    },
+    meetingPoint: {
+      name: { ES: 'Tu hotel o un punto acordado en San Salvador', EN: 'Your hotel or an agreed point in San Salvador' },
+      mapQuery: 'Parque Nacional El Imposible, Ahuachapán, El Salvador',
+    },
+    difficulty: 'moderate',
+    minAge: 10,
+    languages: ['ES', 'EN'],
+  },
 }
 
 export function getExperienceDetails(id: string): ExperienceDetails | null {

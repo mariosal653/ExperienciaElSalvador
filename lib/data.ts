@@ -121,6 +121,8 @@ export const destinations: Destination[] = [
   { id: 'tamanique', name: 'Tamanique', region: { ES: 'La Libertad', EN: 'La Libertad' } },
   { id: 'puerta-del-diablo', name: 'Puerta del Diablo', region: { ES: 'Panchimalco, San Salvador', EN: 'Panchimalco, San Salvador' } },
   { id: 'volcan-de-conchagua', name: 'Volcán de Conchagua', region: { ES: 'La Unión', EN: 'La Unión' } },
+  { id: 'joya-de-ceren', name: 'Joya de Cerén', region: { ES: 'San Juan Opico, La Libertad', EN: 'San Juan Opico, La Libertad' } },
+  { id: 'el-imposible', name: 'El Imposible', region: { ES: 'Ahuachapán', EN: 'Ahuachapán' } },
 ]
 
 /* ------------------------------------------------------------------ */
@@ -666,6 +668,59 @@ export const experiences: Experience[] = [
     highlights: {
       ES: ['Amanecer sobre el Golfo de Fonseca', 'Tres países a la vista', 'Subida en 4x4'],
       EN: ['Sunrise over the Gulf of Fonseca', 'Three countries in view', '4x4 ride to the top'],
+    },
+  },
+  {
+    id: 'joya-de-ceren-san-andres',
+    title: 'Joya de Cerén y San Andrés',
+    name: { ES: 'Joya de Cerén y San Andrés', EN: 'Joya de Cerén and San Andrés' },
+    destination: 'Joya de Cerén',
+    category: 'cultura',
+    booking: 'quote',
+    // Sin precio de referencia todavía: se muestra «Precio a consultar».
+    priceUsd: null,
+    durationHours: 5,
+    image: '/img/experiences/joya-de-ceren.jpg',
+    imageAlt: {
+      ES: 'Estructura de adobe de la aldea maya de Joya de Cerén',
+      EN: 'Adobe structure of the Maya village of Joya de Cerén',
+    },
+    tag: { ES: 'Patrimonio UNESCO', EN: 'UNESCO heritage' },
+    maxPeople: 7,
+    // El parque arqueológico cierra los lunes.
+    weekdays: [0, 2, 3, 4, 5, 6],
+    description: {
+      ES: 'Una aldea maya que la ceniza de un volcán cubrió hacia el año 600 y conservó casi intacta: casas, bodegas y un temazcal tal como los dejaron sus habitantes. Patrimonio de la Humanidad desde 1993. La visita sigue en San Andrés, el centro ceremonial del mismo valle.',
+      EN: 'A Maya village that volcanic ash buried around the year 600 and kept almost intact: houses, storerooms and a sweat bath just as their inhabitants left them. A World Heritage Site since 1993. The visit continues at San Andrés, the ceremonial center of the same valley.',
+    },
+    highlights: {
+      ES: ['Patrimonio de la Humanidad', 'Aldea maya bajo la ceniza', 'Centro ceremonial de San Andrés'],
+      EN: ['World Heritage Site', 'Maya village under the ash', 'San Andrés ceremonial center'],
+    },
+  },
+  {
+    id: 'el-imposible-senderos',
+    title: 'Parque Nacional El Imposible',
+    name: { ES: 'Parque Nacional El Imposible', EN: 'El Imposible National Park' },
+    destination: 'El Imposible',
+    category: 'aventura',
+    booking: 'quote',
+    priceUsd: null,
+    durationHours: 10,
+    image: '/img/experiences/el-imposible.jpg',
+    imageAlt: {
+      ES: 'Montañas cubiertas de bosque vistas desde un mirador de El Imposible',
+      EN: 'Forest-covered mountains seen from a viewpoint in El Imposible',
+    },
+    maxPeople: 7,
+    weekdays: [0, 6],
+    description: {
+      ES: 'Uno de los bosques más grandes que le quedan a El Salvador, en las montañas de Ahuachapán. Senderos entre árboles altos, miradores sobre los cañones y pozas de río para refrescarse. Su nombre viene de un paso de montaña que antes era casi imposible de cruzar.',
+      EN: 'One of the largest forests left in El Salvador, in the mountains of Ahuachapán. Trails among tall trees, viewpoints over the canyons and river pools to cool off. Its name comes from a mountain pass that was once almost impossible to cross.',
+    },
+    highlights: {
+      ES: ['Bosque protegido', 'Miradores sobre los cañones', 'Pozas de río'],
+      EN: ['Protected forest', 'Viewpoints over the canyons', 'River pools'],
     },
   },
 ]

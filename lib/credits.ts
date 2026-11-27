@@ -210,6 +210,22 @@ export const credits = {
     license: 'CC BY-SA 4.0',
     source: `${COMMONS}Volcan_Conchagua.jpg`,
   },
+  joyaDeCeren: {
+    file: '/img/experiences/joya-de-ceren.jpg',
+    title: 'Parque Arqueológico Joya de Cerén',
+    author: 'xiquinhosilva',
+    license: 'CC BY 4.0',
+    source: `${COMMONS}Parque_Arqueol%C3%B3gico_Joya_de_Cer%C3%A9n_-_55385239073.jpg`,
+  },
+  // Recortada por la derecha para dejar fuera a los visitantes de la
+  // baranda: CC BY-SA permite adaptar la obra citando al autor.
+  elImposible: {
+    file: '/img/experiences/el-imposible.jpg',
+    title: 'Mirador Reserva Natural El Imposible',
+    author: 'ElmerGuevara',
+    license: 'CC BY-SA 3.0',
+    source: `${COMMONS}Mirador_Reserva_Natural_El_Imposible.JPG`,
+  },
   // Vídeo del héroe. Pixabay no obliga a citar, pero se cita igual: desde
   // esta página se sabe de dónde sale cada archivo. Lo que se sirve es un
   // recorte de 11 s a 1080p del original de 4K (ver lib/hero-video.ts).
