@@ -32,14 +32,14 @@ export function KpiCard({
   }
 
   return (
-    <div className="rounded-2xl border border-[#e3e3de] bg-white p-4 sm:p-5">
+    <div className="min-w-0 rounded-2xl border border-[#e3e3de] bg-white p-3.5 sm:p-5">
       <div className="flex items-start justify-between gap-3">
-        <p className="text-sm text-[#17181a]/60">{label}</p>
-        <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg ${accents[accent]}`}>
+        <p className="min-w-0 text-xs text-[#17181a]/60 sm:text-sm">{label}</p>
+        <span className={`hidden h-8 w-8 shrink-0 sm:grid place-items-center rounded-lg ${accents[accent]}`}>
           <Icon size={16} aria-hidden="true" />
         </span>
       </div>
-      <p className="mt-3 text-3xl font-medium tracking-tight text-[#17181a] tabular-nums">{value}</p>
+      <p className="mt-2 break-words text-2xl font-medium tracking-tight text-[#17181a] tabular-nums sm:mt-3 sm:text-3xl">{value}</p>
       {hint && <p className="mt-1.5 text-xs leading-relaxed text-[#17181a]/50">{hint}</p>}
     </div>
   )

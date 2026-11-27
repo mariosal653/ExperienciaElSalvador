@@ -111,7 +111,7 @@ export function ReservasTable({
       ) : (
         <>
           {/* Fichas: móvil */}
-          <ul className="grid gap-3 lg:hidden">
+          <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:hidden">
             {rows.map((row) => (
               <li key={row.id} className="rounded-2xl border border-[#e3e3de] bg-white p-4">
                 <Link href={`/admin/reservas/${row.code}`} className="block">

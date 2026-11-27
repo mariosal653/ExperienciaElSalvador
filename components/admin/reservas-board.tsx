@@ -51,7 +51,7 @@ export function ReservasBoard({ rows, filters }: { rows: ReservaRow[]; filters: 
                   Sin reservas
                 </p>
               ) : (
-                <ul className="grid gap-3">
+                <ul className="grid grid-cols-1 gap-3">
                   {items.slice(0, POR_COLUMNA).map((row) => (
                     <li key={row.id}>
                       <BoardCard row={row} muted={estado === 'COMPLETED' || estado === 'CANCELLED'} />

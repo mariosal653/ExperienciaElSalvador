@@ -66,7 +66,7 @@ export function SalidasTable({
       ) : (
         <>
           {/* Fichas: móvil y tablet estrecha */}
-          <ul className="grid gap-3 md:hidden">
+          <ul className="grid grid-cols-1 gap-3 md:hidden">
             {rows.map((row) => (
               <li key={row.key} className="rounded-2xl border border-[#e3e3de] bg-white p-4">
                 <div className="flex items-start justify-between gap-3">

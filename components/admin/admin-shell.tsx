@@ -61,14 +61,14 @@ export function AdminShell({ admin, children }: { admin: AdminUser; children: Re
       {/* Barra lateral (escritorio) ------------------------------------ */}
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-[#e8e8e3] bg-white px-5 py-6 lg:flex">
         <Link href="/admin" className="flex items-center gap-2.5 px-3" aria-label="Panel de administración">
-          <LogoMark className="h-8 w-8 shrink-0 rounded-[28%] ring-1 ring-black/5" />
+          <LogoMark className="h-7 w-auto shrink-0" />
           <span className="leading-tight">
             <span className="block text-[15px] font-bold tracking-tight">Experiences in El Salvador</span>
             <span className="block text-[11px] text-[#17181a]/50">Administración</span>
           </span>
         </Link>
 
-        <nav aria-label="Secciones del panel" className="mt-8 grid gap-0.5">
+        <nav aria-label="Secciones del panel" className="mt-8 grid grid-cols-1 gap-0.5">
           {NAV.map(({ href, label, icon: Icon }) => (
             <Link key={href} href={href} className={navLink}>
               <Icon size={17} strokeWidth={1.8} aria-hidden="true" />
@@ -78,7 +78,7 @@ export function AdminShell({ admin, children }: { admin: AdminUser; children: Re
         </nav>
 
         <p className="mt-8 px-3 text-[11px] font-semibold uppercase tracking-[.12em] text-[#17181a]/40">Atajos</p>
-        <nav aria-label="Filtros rápidos" className="mt-2 grid gap-0.5">
+        <nav aria-label="Filtros rápidos" className="mt-2 grid grid-cols-1 gap-0.5">
           {shortcuts(hoySv()).map(({ href, label }) => (
             <Link key={href} href={href} className={navLink}>
               <CalendarDays size={17} strokeWidth={1.8} aria-hidden="true" />
@@ -93,7 +93,7 @@ export function AdminShell({ admin, children }: { admin: AdminUser; children: Re
         </Link>
 
         <div className="mt-auto flex items-center gap-3 border-t border-[#ececE7] px-1 pt-5">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#eeefe6] text-sm font-bold">
+          <span className="grid grid-cols-1 h-9 w-9 shrink-0 place-items-center rounded-full bg-[#eeefe6] text-sm font-bold">
             {inicial}
           </span>
           <span className="min-w-0 flex-1">
@@ -103,7 +103,7 @@ export function AdminShell({ admin, children }: { admin: AdminUser; children: Re
           <SignOutButton
             redirectTo="/admin/login"
             compact
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-[#17181a]/70 transition hover:bg-[#f2f2ee] hover:text-[#17181a] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#17181a]"
+            className="grid grid-cols-1 h-9 w-9 shrink-0 place-items-center rounded-full text-[#17181a]/70 transition hover:bg-[#f2f2ee] hover:text-[#17181a] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#17181a]"
           />
         </div>
       </aside>
@@ -112,13 +112,13 @@ export function AdminShell({ admin, children }: { admin: AdminUser; children: Re
       <header className="sticky top-0 z-20 border-b border-[#e8e8e3] bg-white lg:hidden">
         <div className="flex items-center justify-between gap-3 px-4 py-3">
           <Link href="/admin" className="flex items-center gap-2" aria-label="Panel de administración">
-            <LogoMark className="h-8 w-8 shrink-0 rounded-[28%] ring-1 ring-black/5" />
+            <LogoMark className="h-7 w-auto shrink-0" />
             <span className="text-[15px] font-bold tracking-tight">Experiences in El Salvador</span>
           </Link>
           <SignOutButton
             redirectTo="/admin/login"
             compact
-            className="grid h-9 w-9 place-items-center rounded-full border border-[#e8e8e3] text-[#17181a]/70"
+            className="grid grid-cols-1 h-9 w-9 place-items-center rounded-full border border-[#e8e8e3] text-[#17181a]/70"
           />
         </div>
         <nav aria-label="Secciones del panel" className="flex gap-1 overflow-x-auto px-3 pb-2.5 [scrollbar-width:none]">

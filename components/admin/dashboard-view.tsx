@@ -161,7 +161,7 @@ export function DashboardView({
           Reservas reales de la base de datos. Los ingresos cuentan solo las que tienen el cobro aprobado.
         </p>
 
-        <div className="mt-7 grid items-end gap-8 md:grid-cols-2 xl:grid-cols-[1.2fr_1fr_1.3fr]">
+        <div className="mt-7 grid grid-cols-1 items-end gap-8 md:grid-cols-2 xl:grid-cols-[1.2fr_1fr_1.3fr]">
           <ActivityChart days={actividad} title="Reservas nuevas" />
           <Gauge value={tasaCobro} label="Reservas cobradas" />
           <div className="grid grid-cols-2 gap-6 md:col-span-2 xl:col-span-1">
@@ -234,7 +234,7 @@ export function DashboardView({
         {/* Indicadores ------------------------------------------------- */}
         <section aria-labelledby="kpis" className="mt-6">
           <h2 id="kpis" className="sr-only">Indicadores</h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 2xl:grid-cols-6">
             <KpiCard
               label="Experiencias realizadas"
               value={String(kpis.salidasRealizadas)}
@@ -324,7 +324,7 @@ export function DashboardView({
           <h2 id="comparativa-title" className="mb-3 text-lg font-medium tracking-tight">
             Comparativa entre experiencias
           </h2>
-          <div className="grid gap-3 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
             <BarComparison title="Personas por experiencia" description="Viajeros con cobro aprobado." data={personas} />
             <BarComparison title="Ingresos por experiencia" description="Suma de las reservas cobradas." data={ingresos} />
             <BarComparison

@@ -40,7 +40,7 @@ export function AdminFilters({ filters, catalogo, destinos, hoy }: {
         <Filter size={15} /> Filtros
       </h2>
 
-      <form method="get" className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <form method="get" className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <label htmlFor="f-from" className={label}>Desde</label>
           <input id="f-from" type="date" name="from" defaultValue={filters.from ?? ''} className={field} />
@@ -116,7 +116,7 @@ export function AdminFilters({ filters, catalogo, destinos, hoy }: {
           {hasFilters(filters) && (
             <Link
               href="/admin"
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-[#dcdcd6] text-[#17181a]/60 transition hover:bg-[#f2f2ee]"
+              className="grid grid-cols-1 h-10 w-10 shrink-0 place-items-center rounded-xl border border-[#dcdcd6] text-[#17181a]/60 transition hover:bg-[#f2f2ee]"
               aria-label="Quitar todos los filtros"
               title="Quitar todos los filtros"
             >

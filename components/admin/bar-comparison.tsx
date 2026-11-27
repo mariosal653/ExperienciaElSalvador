@@ -60,7 +60,7 @@ export function BarComparison({
       {!hayDatos ? (
         <p className="mt-6 rounded-xl bg-surface-soft px-4 py-6 text-center text-sm text-muted">{emptyLabel}</p>
       ) : (
-        <ul className="mt-4 grid gap-3">
+        <ul className="mt-4 grid grid-cols-1 gap-3">
           {rows.map((row) => {
             // `max` es > 0 aquí, así que no hay división por cero. El 2 %
             // mínimo evita que un valor pequeño quede invisible.

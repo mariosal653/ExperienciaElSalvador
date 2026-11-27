@@ -60,7 +60,7 @@ export default async function ReservaDetallePage({ params }: Params) {
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+      <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
         {/* Experiencia -------------------------------------------- */}
         <Bloque titulo="Experiencia" icon={Receipt}>
           <Campo label="Experiencia" value={reserva.experienceTitle} />
@@ -178,7 +178,7 @@ function Bloque({
       <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-[.12em] text-muted">
         <Icon size={15} /> {titulo}
       </h2>
-      <dl className="mt-4 grid gap-3">{children}</dl>
+      <dl className="mt-4 grid grid-cols-1 gap-3">{children}</dl>
     </section>
   )
 }
@@ -200,7 +200,7 @@ function Campo({
     <div className="flex items-baseline justify-between gap-4 border-b border-surface-soft pb-2.5 last:border-0 last:pb-0">
       <dt className="shrink-0 text-xs text-muted">{label}</dt>
       <dd
-        className={`min-w-0 break-words text-right ${capitalize ? 'capitalize ' : ''}${
+        className={`min-w-0 break-all text-right ${capitalize ? 'capitalize ' : ''}${
           destacado ? 'text-lg font-semibold text-brand' : 'text-sm font-medium text-brand'
         }`}
       >
