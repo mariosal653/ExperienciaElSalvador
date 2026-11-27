@@ -21,6 +21,8 @@ import { WelcomeModal } from '@/components/benefits/welcome-modal'
 import { ReelsSection } from '@/components/reels/reels-section'
 import { ServicesSection } from '@/components/services/services-section'
 import { HeroVideo } from '@/components/home/hero-video'
+import { TrustStrip } from '@/components/home/trust-strip'
+import { GuidesSection } from '@/components/guides/guides-section'
 import { SiteFooter } from '@/components/site/site-footer'
 import { HomeHeader } from '@/components/site/home-header'
 import { DestinationName, DestinationPhoto } from '@/components/destination/destination-transition'
@@ -38,6 +40,7 @@ import {
 } from '@/lib/catalog-filters'
 import { destinationPages } from '@/lib/destination-details'
 import {
+  catalog,
   emptyCriteria,
   filterExperiences,
   hasActiveCriteria,
@@ -239,6 +242,9 @@ export function HomeView() {
         </div>
       </section>
 
+      {/* Garantías a la vista, pegadas al buscador: ver components/home/trust-strip.tsx. */}
+      <TrustStrip lang={language} maxPeople={Math.max(...catalog.map((item) => item.maxPeople))} />
+
       {/*
         Destinos, justo debajo del buscador: quien llega sin un plan claro
         empieza por el lugar, no por la experiencia.
@@ -433,6 +439,9 @@ export function HomeView() {
           </div>
         )}
       </section>
+
+      {/* Ideas de viaje: itinerarios que enlazan experiencias y el Personal Driver. */}
+      <GuidesSection lang={language} />
 
       <ReviewsSection />
 

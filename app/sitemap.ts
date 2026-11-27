@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { catalog as experiences } from '@/lib/data'
 import { destinationPages } from '@/lib/destination-details'
+import { guides } from '@/lib/guides'
 import { LEGAL_SLUGS } from '@/lib/legal'
 import { services } from '@/lib/services'
 import { getSiteUrl } from '@/lib/site'
@@ -29,6 +30,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${site}/experiences/${experience.id}`,
       changeFrequency: 'weekly' as const,
       priority: 0.9,
+    })),
+    ...guides.map((guide) => ({
+      url: `${site}/guias/${guide.slug}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
     })),
     ...LEGAL_SLUGS.map((slug) => ({ url: `${site}/legal/${slug}`, changeFrequency: 'yearly' as const, priority: 0.2 })),
   ]
