@@ -43,7 +43,7 @@ export function QuoteActions({
   const whatsappUrl = buildWhatsAppUrl({ lang, service, details, kind })
   const mailto = buildQuoteMailto({ lang, service, details, kind })
 
-  const base = `inline-flex items-center justify-center gap-2 rounded-control font-bold transition ${
+  const base = `inline-flex items-center justify-center gap-2 rounded-full font-bold transition ${
     size === 'lg' ? 'px-6 py-3.5 text-sm' : 'px-4 py-2.5 text-xs'
   }`
 

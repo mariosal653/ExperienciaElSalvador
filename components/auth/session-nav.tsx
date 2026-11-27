@@ -37,7 +37,7 @@ export function SessionNav() {
       </a>
       <a
         href="/register"
-        className="rounded-control border border-white/60 px-4 py-2 text-sm font-bold text-white transition hover:bg-white hover:text-brand"
+        className="rounded-full bg-accent px-4 py-2 text-sm font-bold text-white transition hover:bg-accent-dark"
       >
         {es ? 'Crear cuenta' : 'Sign up'}
       </a>

@@ -105,9 +105,9 @@ export function ReelsSection() {
   const activeReel = reels[current]
 
   return (
-    <section id="reels" aria-labelledby="reels-title" className="section-y overflow-hidden !pb-0">
+    <section id="reels" aria-labelledby="reels-title" className="overflow-hidden pt-14">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <p className="eyebrow">
+        <p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-accent">
           {es ? 'En imágenes' : 'In pictures'}
         </p>
         <h2 id="reels-title" className="text-3xl font-semibold tracking-tight md:text-4xl">

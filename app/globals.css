@@ -54,8 +54,7 @@
   --color-surface: #ffffff;
   --color-surface-soft: #f4f7f5; /* gris verdoso muy claro */
   --color-surface-mint: #eaf1ed; /* bandas de sección */
-  --color-cream: #faf7f2; /* fondo general cálido: el papel de la página */
-  --color-sand: #f4efe6; /* bandas de sección sobre la crema (muted 4.6:1, cumple AA) */
+  --color-cream: #fbfaf7; /* fondo general cálido */
   --color-line: #dce7e1; /* borde normal */
   --color-line-soft: #edf0ed; /* separadores dentro de una tarjeta */
 
@@ -64,12 +63,6 @@
   --shadow-card: 0 1px 2px rgb(23 63 69 / 0.04), 0 8px 24px rgb(23 63 69 / 0.07);
   --shadow-card-hover: 0 2px 4px rgb(23 63 69 / 0.06), 0 16px 40px rgb(23 63 69 / 0.13);
   --shadow-float: 0 8px 32px rgb(23 63 69 / 0.18);
-
-  /* Forma: dos radios con nombre. Las tarjetas y fotos llevan el grande;
-     los botones de acción, el de control. La píldora completa queda para
-     lo que se activa y desactiva (filtros, idioma). */
-  --radius-card: 1.25rem;
-  --radius-control: 0.75rem;
 }
 
 :root {
@@ -134,41 +127,6 @@
   /* Los titulares grandes se leen mejor con el interletraje algo cerrado;
      el texto corrido no. */
   h1, h2, h3 { letter-spacing: -0.02em; }
-}
-
-/* ---------------------------------------------------------------------
-   RITMO EDITORIAL
-   Una sola etiqueta de sección y un solo espaciado vertical para toda la
-   portada: el aire entre bloques es lo que hace que la página se sienta
-   cuidada. La etiqueta es dorada siempre: tinta dorada sobre claro y
-   dorado suave sobre oscuro (.on-dark).
-   --------------------------------------------------------------------- */
-@utility eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.875rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  color: var(--color-gold-ink);
-  &::before { content: ''; height: 1px; width: 2rem; background: currentColor; opacity: 0.6; }
-}
-.on-dark .eyebrow, .eyebrow.on-dark { color: var(--color-gold-soft); }
-
-@utility section-y {
-  padding-block: 5rem;
-  @media (width >= 48rem) { padding-block: 7rem; }
-  @media (width >= 64rem) { padding-block: 8rem; }
-}
-
-/* Aparición al hacer scroll (components/ui/reveal.tsx). El estado oculto
-   solo existe con JavaScript y sin «reducir movimiento»: sin JS, o con la
-   preferencia activada, todo se ve desde el principio. */
-@media (prefers-reduced-motion: no-preference) {
-  [data-reveal] { transition: opacity 700ms var(--ease-apple, ease-out), transform 700ms var(--ease-apple, ease-out); }
-  [data-reveal='pending'] { opacity: 0; transform: translateY(20px); }
 }
 
 /* ---------------------------------------------------------------------

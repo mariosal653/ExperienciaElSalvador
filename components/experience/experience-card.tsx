@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, CalendarCheck, Heart, ShieldCheck } from 'lucide-react'
+import { CalendarCheck, Clock, Heart, MapPin, MessageCircle, ShieldCheck } from 'lucide-react'
 import { Picture } from '@/components/ui/picture'
 import { SharedName, SharedPhoto } from '@/components/ui/shared-transition'
 import { RatingBadge } from '@/components/reviews/rating-badge'
@@ -16,15 +16,10 @@ import type { ReviewStats } from '@/lib/reviews/types'
  * Tarjeta de experiencia del catálogo. La usan el inicio y las páginas de
  * destino, para que las dos muestren exactamente lo mismo.
  *
- * Cuatro cosas y nada más: foto → lugar y duración → nombre → precio.
- * Sin caja ni sombra: la foto es la tarjeta y el texto va debajo, como en
- * una revista. Cada dato extra (transporte, cancelación, «nueva») le
- * quitaba peso al nombre; ese detalle vive en la ficha.
- *
- * `variant="feature"` es la versión grande de los tours que se reservan
- * en línea («Imperdibles» del inicio): foto amplia, cancelación gratis y
- * próxima salida a la vista, y el botón de reservar como única acción
- * fuerte.
+ * Orden de lectura, de más a menos peso: foto → nombre → precio. Todo lo
+ * demás (ubicación, duración, cancelación, salida) es apoyo y va en gris:
+ * si un dato de apoyo pesa más que el nombre, la cuadrícula se vuelve
+ * ilegible de un vistazo.
  */
 export function ExperienceCard({
   item,
@@ -34,7 +29,6 @@ export function ExperienceCard({
   saved,
   onToggleSave,
   bookQuery,
-  variant = 'grid',
 }: {
   item: Experience
   lang: Locale
@@ -46,7 +40,6 @@ export function ExperienceCard({
   onToggleSave: (id: string) => void
   /** Fecha y viajeros ya buscados, para llegar al checkout con ellos. */
   bookQuery?: string
-  variant?: 'grid' | 'feature'
 }) {
   const es = lang === 'ES'
   const name = experienceName(item, lang)
@@ -64,99 +57,112 @@ export function ExperienceCard({
   const [leaving, setLeaving] = useState(false)
   const leave = () => setLeaving(true)
 
-  const feature = variant === 'feature'
-  const rating = stats?.[item.id]
-  const hasRating = rating !== undefined && rating.count > 0
-  const hours = `${item.durationHours} h`
-
   return (
-    <article className="group flex flex-col">
+    <article className="group flex flex-col overflow-hidden rounded-2xl bg-surface shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-card-hover">
       {/*
         Proporción fija para todas las tarjetas: las fotos del catálogo van
         de 4:3 a 2:3 y, con una altura suelta, la cuadrícula se descuadraba
         al cambiar de filtro.
       */}
-      <div className={`relative overflow-hidden rounded-card bg-sand ${feature ? 'aspect-[16/10]' : 'aspect-[4/3]'}`}>
+      <div className="relative aspect-[16/10] overflow-hidden bg-surface-mint">
         <Link href={detailHref} onClick={leave} tabIndex={-1} aria-hidden="true" className="block h-full">
-          <SharedPhoto name={`experiencia-foto-${item.id}`} enabled={leaving} className="h-full overflow-hidden rounded-card">
+          <SharedPhoto name={`experiencia-foto-${item.id}`} enabled={leaving} className="h-full overflow-hidden rounded-t-2xl">
             <Picture
               src={item.image}
-              sizes={feature ? '(min-width: 1024px) 50vw, 100vw' : '(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw'}
+              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
               alt={item.imageAlt[lang]}
               loading="lazy"
               decoding="async"
-              width={feature ? 1280 : 640}
-              height={feature ? 800 : 480}
-              className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.04]"
+              width={640}
+              height={400}
+              className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
             />
           </SharedPhoto>
         </Link>
-        {/* Degradado superior: sin él, las fotos claras dejan la etiqueta y el corazón sin contraste. */}
-        <span aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgb(14_48_53/0.32)_0%,transparent_36%)]" />
+        {/* Degradado inferior: sin él, las fotos claras dejan la etiqueta y el corazón sin contraste. */}
+        <span aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgb(14_48_53/0.28)_0%,transparent_38%)]" />
         {item.tag && (
-          <span className="absolute left-3 top-3 rounded-full bg-brand/75 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[.14em] text-white backdrop-blur-sm">
+          <span className="absolute left-3 top-3 rounded-full bg-gold-soft px-2.5 py-1 text-[11px] font-bold text-brand shadow-sm">
             {item.tag[lang]}
           </span>
         )}
         <button
           onClick={() => onToggleSave(item.id)}
           aria-pressed={saved}
-          className="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-full bg-surface/90 text-brand backdrop-blur-sm transition hover:bg-surface"
+          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-surface/90 text-brand shadow-sm backdrop-blur-sm transition hover:scale-110 hover:bg-surface"
           aria-label={`${es ? 'Guardar' : 'Save'} ${name}`}
         >
           <Heart size={17} fill={saved ? 'var(--color-accent)' : 'none'} className={saved ? 'text-accent' : ''} />
         </button>
       </div>
 
-      <div className={`flex flex-1 flex-col ${feature ? 'pt-5' : 'pt-4'}`}>
-        <div className="flex items-center justify-between gap-2 text-xs text-muted">
-          <span className="truncate">
-            {item.destination} <span aria-hidden="true">·</span> {hours}
+      <div className="flex flex-1 flex-col p-4">
+        <div className="mb-1.5 flex items-center justify-between gap-2 text-xs text-muted">
+          <span className="flex min-w-0 items-center gap-1">
+            <MapPin size={13} className="shrink-0 text-faint" aria-hidden="true" />
+            <span className="truncate">{item.destination}</span>
           </span>
-          {/* Sin opiniones no se dice nada: «Nueva» en todas las tarjetas no informaba. */}
-          {hasRating && <RatingBadge rating={rating} loading={false} lang={lang} />}
+          <RatingBadge rating={stats?.[item.id]} loading={stats === undefined} lang={lang} />
         </div>
 
         <SharedName name={`experiencia-nombre-${item.id}`} enabled={leaving}>
-          <h3 className={`mt-1.5 font-semibold leading-snug text-brand ${feature ? 'text-2xl tracking-tight md:text-3xl' : 'text-lg'}`}>
-            <Link href={detailHref} onClick={leave} className="transition hover:text-accent-deep">{name}</Link>
+          <h3 className="text-lg font-bold leading-snug text-brand">
+            <Link href={detailHref} onClick={leave} className="transition hover:text-accent">{name}</Link>
           </h3>
         </SharedName>
 
-        {/*
-          Solo la versión grande lleva datos de apoyo: son los tours que se
-          reservan aquí, y cancelación y próxima salida son lo que más
-          empuja a reservar. `mb-auto` absorbe el hueco sobrante para que el
-          pie quede apoyado en el fondo y los precios de una fila se alineen.
-        */}
-        {feature && online ? (
-          <ul className="mb-auto mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-muted">
-            <li className="flex items-center gap-1.5">
-              <ShieldCheck size={15} className="text-success" aria-hidden="true" />
-              {es ? `Cancelación gratis hasta ${FREE_CANCELLATION_HOURS} h antes` : `Free cancellation up to ${FREE_CANCELLATION_HOURS} h before`}
+        {/* Apoyo: dos datos en una sola línea de chips, no cuatro renglones. */}
+        <ul className="mt-2.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px]">
+          <li className="flex items-center gap-1 rounded-full bg-surface-soft px-2 py-1 text-muted">
+            <Clock size={12} aria-hidden="true" />
+            {item.durationHours} {es ? 'horas' : 'hours'}
+          </li>
+          <li className="flex items-center gap-1 rounded-full bg-surface-soft px-2 py-1 text-muted">
+            {item.transportIncluded ? (es ? 'Transporte incluido' : 'Transport included') : es ? 'Guía local' : 'Local guide'}
+          </li>
+          {online ? (
+            <li className="flex items-center gap-1 rounded-full bg-success-soft px-2 py-1 text-success">
+              <ShieldCheck size={12} aria-hidden="true" />
+              {es ? `Cancela gratis ${FREE_CANCELLATION_HOURS} h antes` : `Free cancellation ${FREE_CANCELLATION_HOURS} h before`}
             </li>
-            <li className="flex min-h-5 items-center gap-1.5">
-              <CalendarCheck size={15} className="text-faint" aria-hidden="true" />
-              {next ? (
-                <span>{es ? 'Próxima salida: ' : 'Next departure: '}<strong className="font-semibold text-brand">{departureLabel(next, lang, now ?? undefined)}</strong></span>
-              ) : (
-                <span className="h-3 w-24 animate-pulse rounded-full bg-sand" aria-hidden="true" />
-              )}
+          ) : (
+            <li className="flex items-center gap-1 rounded-full bg-gold-pale px-2 py-1 font-semibold text-gold-ink">
+              <MessageCircle size={12} aria-hidden="true" />
+              {es ? 'Bajo cotización' : 'On request'}
             </li>
-          </ul>
-        ) : (
-          <span className="mb-auto" />
-        )}
+          )}
+        </ul>
 
-        {/* En la cuadrícula, precio y acción en dos renglones fijos: así no saltan de línea según lo largo del precio. */}
-        <div className={feature ? 'mt-5 flex flex-wrap items-center justify-between gap-3' : 'mt-2 flex flex-col items-start gap-1'}>
+        {/*
+          Lo que más mueve a reservar: cuándo sale la próxima. Va solo.
+
+          `mb-auto` es lo que alinea la cuadrícula. La tarjeta ya se estira a
+          la altura de su fila, pero el hueco sobrante se quedaba AQUÍ
+          repartido por los márgenes fijos y el pie flotaba a media altura:
+          en una misma fila, los precios y los botones bailaban hasta 32 px
+          según si el nombre ocupaba uno o dos renglones, o si la fila de
+          chips se partía en dos. Con el hueco absorbido en este punto, el
+          pie se apoya en el fondo con su ritmo intacto (mt-4 + pt-3).
+        */}
+        <p className="mb-auto mt-2.5 flex min-h-4 items-center gap-1.5 text-xs text-muted">
+          <CalendarCheck size={13} className="text-faint" aria-hidden="true" />
+          {!online ? (
+            <span>{es ? 'Fecha y precio se confirman por WhatsApp o correo' : 'Date and price confirmed by WhatsApp or email'}</span>
+          ) : next ? (
+            <span>{es ? 'Próxima salida: ' : 'Next departure: '}<strong className="font-semibold text-brand">{departureLabel(next, lang, now ?? undefined)}</strong></span>
+          ) : (
+            <span className="h-3 w-24 animate-pulse rounded-full bg-surface-mint" aria-hidden="true" />
+          )}
+        </p>
+
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-line-soft pt-3">
           {item.priceUsd === null ? (
-            <strong className="text-sm font-semibold text-brand">{es ? 'Precio a consultar' : 'Price on request'}</strong>
+            <strong className="text-sm font-bold text-brand">{es ? 'Precio a consultar' : 'Price on request'}</strong>
           ) : (
             <span className="flex items-baseline gap-1">
-              <span className="text-xs text-muted">{es ? 'Desde' : 'From'}</span>
-              <strong className={`font-semibold leading-none text-brand ${feature ? 'text-2xl' : 'text-lg'}`}>${item.priceUsd}</strong>
-              <span className="text-xs text-muted">
+              <span className="text-[11px] text-muted">{es ? 'Desde' : 'From'}</span>
+              <strong className="text-xl font-extrabold leading-none text-brand">${item.priceUsd}</strong>
+              <span className="text-[11px] text-muted">
                 {es ? '/ persona' : '/ person'}
                 {!online && (es ? ' · por confirmar' : ' · to be confirmed')}
               </span>
@@ -165,22 +171,19 @@ export function ExperienceCard({
           {online ? (
             <a
               href={bookHref}
-              className={`rounded-control bg-accent font-bold text-white transition hover:bg-accent-dark ${feature ? 'px-6 py-3 text-sm' : 'px-4 py-2.5 text-xs'}`}
+              className="rounded-full bg-accent px-3.5 py-1.5 text-xs font-bold text-white transition hover:bg-accent-dark"
             >
-              {es ? 'Reservar' : 'Book now'}
+              {es ? 'Reservar' : 'Book Now'}
             </a>
           ) : (
-            // Acción secundaria: texto con flecha. El terracota sólido queda
-            // para reservar, que es lo único que se cierra en la web.
             <a
               href={experienceQuoteWhatsApp(item, lang)}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={es ? `Cotizar ${name} por WhatsApp` : `Get a quote for ${name} on WhatsApp`}
-              className="group/quote inline-flex min-h-10 items-center gap-1 text-xs font-bold text-accent-deep"
+              className="inline-flex items-center gap-1.5 rounded-full border border-accent px-3.5 py-1.5 text-xs font-bold text-accent transition hover:bg-accent hover:text-white"
             >
+              <MessageCircle size={13} aria-hidden="true" />
               {es ? 'Cotizar' : 'Get a quote'}
-              <ArrowRight size={14} className="transition group-hover/quote:translate-x-0.5" aria-hidden="true" />
             </a>
           )}
         </div>
