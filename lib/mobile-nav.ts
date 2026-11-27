@@ -16,3 +16,12 @@ export function hasMobileNav(pathname: string | null | undefined): boolean {
   if (!pathname) return false
   return pathname === '/' || PREFIXES.some((prefix) => pathname.startsWith(prefix))
 }
+
+/**
+ * Clases de la cabecera cuando se baja por una página con barra inferior:
+ * en el celular sube y desaparece, y queda solo la barra de abajo. En
+ * escritorio (lg) no cambia nada. Vuelve al llegar arriba del todo, que es
+ * donde están el idioma y la cuenta.
+ */
+export const HEADER_HIDDEN_ON_MOBILE =
+  'max-lg:pointer-events-none max-lg:-translate-y-[calc(100%+1.5rem)] max-lg:opacity-0'

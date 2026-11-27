@@ -8,10 +8,32 @@ import { useLanguage } from '@/components/i18n/language-provider'
  * Bloque de sesion del header. Antes el boton "Iniciar sesion" no hacia
  * nada; ahora lleva al login o al perfil segun el estado real.
  */
-export function SessionNav() {
+export function SessionNav({ compact = false }: { compact?: boolean }) {
   const { data: session, status } = useSession()
   const { lang } = useLanguage()
   const es = lang === 'ES'
+
+  /**
+   * Versión de icono para la cabecera del celular, donde no caben los dos
+   * botones junto al idioma. Lleva a la cuenta o al acceso; desde el
+   * acceso se puede crear la cuenta.
+   */
+  if (compact) {
+    const signedIn = Boolean(session?.user)
+    const label = signedIn
+      ? session?.user?.name?.split(' ')[0] ?? (es ? 'Mi cuenta' : 'Account')
+      : es ? 'Iniciar sesión' : 'Sign in'
+    return (
+      <a
+        href={signedIn ? '/cuenta' : '/login'}
+        aria-label={label}
+        title={label}
+        className="grid h-9 w-9 place-items-center rounded-full border border-white/50 transition hover:bg-white hover:text-brand"
+      >
+        <User size={17} aria-hidden="true" />
+      </a>
+    )
+  }
 
   if (status === 'loading') {
     return <span className="h-9 w-24 animate-pulse rounded-full bg-white/20" aria-hidden="true" />

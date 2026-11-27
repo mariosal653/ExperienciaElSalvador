@@ -21,8 +21,9 @@ type Item = 'experiencias' | 'destinos' | 'driver'
  * - Cuatro destinos, con icono y texto: Explorar, Destinos, Driver y
  *   WhatsApp. WhatsApp va dentro de la barra, así que el botón flotante de
  *   WhatsApp se esconde en el celular en estas páginas (no se enciman).
- * - Se esconde al bajar y vuelve al subir, para no restar pantalla a las
- *   fotos mientras se lee.
+ * - Siempre visible. Es la cabecera la que se esconde en el celular al
+ *   bajar (ver headerHiddenClass en lib/mobile-nav.ts): así nunca hay dos
+ *   menús a la vez en pantalla.
  * - Respeta el margen seguro inferior (la barra de Safari en iPhone y la
  *   barra de gestos de Android).
  * - Solo en las páginas de descubrir: ver lib/mobile-nav.ts.
@@ -33,22 +34,6 @@ export function MobileNav() {
   const { lead } = useWhatsAppLead()
   const es = lang === 'ES'
   const home = pathname === '/'
-
-  // Visible al cargar; se oculta al bajar y reaparece al subir.
-  const [visible, setVisible] = useState(true)
-  useEffect(() => {
-    let last = window.scrollY
-    function onScroll() {
-      const y = window.scrollY
-      if (Math.abs(y - last) < 8) return
-      // Cerca del principio y del final siempre está visible.
-      const nearEnd = window.innerHeight + y >= document.documentElement.scrollHeight - 120
-      setVisible(y < last || y < 80 || nearEnd)
-      last = y
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
 
   // En el inicio se resalta la sección que se está leyendo.
   const [section, setSection] = useState<Item | null>(null)
@@ -94,9 +79,7 @@ export function MobileNav() {
       {/* Capa 50, como el widget de WhatsApp: ver la escala en app/globals.css. */}
       <nav
         aria-label={es ? 'Navegación' : 'Navigation'}
-        className={`no-print liquid-glass-tinted fixed inset-x-0 bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] z-50 mx-auto flex w-fit items-center gap-0.5 rounded-full p-1.5 text-white transition duration-300 lg:hidden ${
-          visible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-[calc(100%+1.5rem)] opacity-0'
-        }`}
+        className="no-print liquid-glass-tinted fixed inset-x-0 bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] z-50 mx-auto flex w-fit items-center gap-0.5 rounded-full p-1.5 text-white lg:hidden"
       >
         {items.map(({ id, href, label, icon: Icon }) => {
           const current = active === id

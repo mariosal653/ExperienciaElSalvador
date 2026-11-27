@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ArrowUp, Menu, Search, X } from 'lucide-react'
+import { ArrowUp, Search } from 'lucide-react'
 import { useLanguage } from '@/components/i18n/language-provider'
 import { LanguageSwitch } from '@/components/i18n/language-switch'
 import { SessionNav } from '@/components/auth/session-nav'
 import type { Locale } from '@/lib/data'
 import { LogoMark } from '@/components/brand/logo-mark'
+import { HEADER_HIDDEN_ON_MOBILE } from '@/lib/mobile-nav'
 
 type Section = { id: string; label: Record<Locale, string> }
 
@@ -51,20 +52,8 @@ const DOCUMENT_ORDER = ['destinos', 'servicios', 'experiencias', 'ideas', 'opini
 export function HomeHeader() {
   const { lang, setLang } = useLanguage()
   const es = lang === 'ES'
-  const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
-  // Escape cierra el menú móvil y devuelve el foco al botón que lo abrió.
-  useEffect(() => {
-    if (!menuOpen) return
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-      setMenuOpen(false)
-      document.getElementById('home-menu-button')?.focus()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [menuOpen])
   const [active, setActive] = useState<string | null>(null)
 
   /**
@@ -149,7 +138,11 @@ export function HomeHeader() {
   return (
     // Capa 40 — ver la escala documentada en app/globals.css
     // El margen superior respeta la muesca del iPhone (safe-area).
-    <header className="no-print fixed inset-x-0 top-0 z-40 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white sm:px-4">
+    <header
+      className={`no-print fixed inset-x-0 top-0 z-40 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white transition duration-300 sm:px-4 ${
+        scrolled ? HEADER_HIDDEN_ON_MOBILE : ''
+      }`}
+    >
       <div
         className={`mx-auto flex max-w-7xl items-center justify-between gap-2 rounded-full py-2.5 pl-2.5 pr-2.5 sm:gap-4 sm:pl-4 sm:pr-4 lg:pr-3 ${
           scrolled ? 'liquid-glass-tinted' : 'liquid-glass'
@@ -157,7 +150,10 @@ export function HomeHeader() {
       >
         <a href="#inicio" className="flex shrink-0 items-center gap-2 sm:gap-2.5" aria-label={`Experiences in El Salvador · ${es ? 'Inicio' : 'Home'}`}>
           <LogoMark tone="onDark" className="h-8 w-auto shrink-0" />
-          <span className="whitespace-nowrap text-base font-bold sm:text-lg tracking-tight">Experiences in <span className="text-gold">El Salvador</span></span>
+          {/* En el celular el nombre va en dos líneas para que quepan el idioma y la cuenta. */}
+          <span className="text-sm font-bold leading-tight tracking-tight sm:whitespace-nowrap sm:text-lg">
+            <span className="block sm:inline">Experiences in</span> <span className="block text-gold sm:inline">El Salvador</span>
+          </span>
         </a>
 
         {/*
@@ -205,52 +201,17 @@ export function HomeHeader() {
           <SessionNav />
         </div>
 
+        {/*
+          Celular: idioma y cuenta, sin botón de menú. Los enlaces viven en
+          la barra flotante de abajo (components/site/mobile-nav.tsx) y esta
+          cabecera se esconde al bajar: nunca hay dos menús a la vez.
+        */}
         <div className="flex shrink-0 items-center gap-2 lg:hidden">
-          {scrolled && (
-            <a
-              href="#inicio"
-              aria-label={es ? 'Volver al buscador' : 'Back to search'}
-              className="flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-2 text-xs font-bold text-white transition hover:bg-accent-dark"
-            >
-              <Search size={14} aria-hidden="true" />
-              {/* En teléfonos la flecha no cabe junto al logo. */}
-              <ArrowUp size={13} aria-hidden="true" className="hidden sm:block" />
-            </a>
-          )}
-          <button
-            id="home-menu-button"
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-white/15"
-            aria-expanded={menuOpen}
-            aria-controls="home-mobile-menu"
-            aria-label={menuOpen ? (es ? 'Cerrar menú' : 'Close menu') : (es ? 'Abrir menú' : 'Open menu')}
-          >
-            {menuOpen ? <X /> : <Menu />}
-          </button>
+          <LanguageSwitch lang={lang} onChange={setLang} />
+          <SessionNav compact />
         </div>
       </div>
 
-      {menuOpen && (
-        // Panel aparte bajo la píldora, siempre teñido: el menú se abre
-        // sobre cualquier sección y el texto blanco necesita fondo.
-        <div id="home-mobile-menu" className="liquid-glass-tinted mx-auto mt-2 max-h-[calc(100dvh-6rem)] max-w-7xl overflow-y-auto rounded-3xl px-5 pb-5 pt-4 lg:hidden">
-          <nav className="flex flex-col gap-4 text-sm" aria-label={es ? 'Navegación principal' : 'Main navigation'}>
-            {SECTIONS.map((section) => (
-              <a key={section.id} href={`#${section.id}`} onClick={() => setMenuOpen(false)}>
-                {section.label[lang]}
-              </a>
-            ))}
-          </nav>
-          {/*
-            Idioma y sesión también en móvil: antes el acceso a la cuenta
-            solo existía en escritorio.
-          */}
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-4 border-t border-white/20 pt-4">
-            <LanguageSwitch lang={lang} onChange={setLang} />
-            <SessionNav />
-          </div>
-        </div>
-      )}
     </header>
   )
 }
