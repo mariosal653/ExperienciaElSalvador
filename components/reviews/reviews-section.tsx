@@ -1,11 +1,21 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { ArrowRight, ChevronLeft, ChevronRight, Star } from 'lucide-react'
-import { ReviewCard } from './review-card'
+import { useEffect, useState } from 'react'
+import { ArrowRight, Star } from 'lucide-react'
 import { GoogleIcon, FacebookIcon, TikTokIcon } from './platform-icons'
 import { useLanguage } from '@/components/i18n/language-provider'
+import { experienceNameById } from '@/lib/data'
 import type { ReviewsPayload } from '@/lib/reviews/types'
+
+/**
+ * La nota media solo se enseña a partir de este número de opiniones. Con
+ * cuatro, «4.8» llama la atención sobre lo poco que hay; las citas, en
+ * cambio, convencen desde la primera.
+ */
+const MIN_REVIEWS_FOR_SCORE = 20
+
+/** Citas que se muestran: pocas y grandes, como en una revista. */
+const QUOTES = 3
 
 /**
  * Sección de opiniones de clientes.
@@ -20,7 +30,6 @@ export function ReviewsSection() {
 
   const [data, setData] = useState<ReviewsPayload | null>(null)
   const [loading, setLoading] = useState(true)
-  const trackRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let active = true
@@ -43,25 +52,23 @@ export function ReviewsSection() {
     }
   }, [lang])
 
-  function scrollBy(direction: 1 | -1) {
-    const track = trackRef.current
-    if (!track) return
-    track.scrollBy({ left: direction * (track.clientWidth * 0.8), behavior: 'smooth' })
-  }
-
   const reviews = data?.reviews ?? []
   const summary = data?.summary ?? null
   const hasReviews = reviews.length > 0
+  // Primero las que tienen texto más largo: dicen más que «¡Excelente!».
+  const quotes = [...reviews].filter((review) => review.text.trim().length > 0).sort((a, b) => b.text.length - a.text.length).slice(0, QUOTES)
+  const showScore =
+    summary !== null && summary.averageRating !== null && summary.totalCount !== null && summary.totalCount >= MIN_REVIEWS_FOR_SCORE
 
   return (
-    <section id="opiniones" className="bg-surface-mint py-20">
+    <section id="opiniones" className="section-y">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="mb-8 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+        <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
-            <p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-accent">
+            <p className="eyebrow">
               {es ? 'Lo que dicen' : 'What people say'}
             </p>
-            <h2 className="max-w-lg text-3xl font-semibold tracking-tight md:text-4xl">
+            <h2 className="max-w-2xl text-3xl font-semibold tracking-tight md:text-5xl">
               {es ? (
                 <>
                   Viajeros que ya lo <em className="font-serif font-normal">vivieron</em>
@@ -74,8 +81,8 @@ export function ReviewsSection() {
             </h2>
           </div>
 
-          {summary && summary.averageRating !== null && (
-            <div className="flex items-center gap-4 rounded-2xl bg-white px-5 py-4 shadow-card">
+          {showScore && summary && summary.averageRating !== null && (
+            <div className="flex items-center gap-4 rounded-card border border-line bg-white px-5 py-4">
               <div>
                 <p className="text-3xl font-semibold leading-none text-brand">
                   {summary.averageRating.toFixed(1)}
@@ -108,7 +115,7 @@ export function ReviewsSection() {
             {[0, 1, 2].map((index) => (
               <div
                 key={index}
-                className="h-52 min-w-[17rem] flex-1 animate-pulse rounded-2xl bg-white/70 sm:min-w-[19rem]"
+                className="h-52 min-w-[17rem] flex-1 animate-pulse rounded-card bg-sand sm:min-w-[19rem]"
               />
             ))}
           </div>
@@ -116,55 +123,51 @@ export function ReviewsSection() {
 
         {!loading && hasReviews && (
           <>
-            <div className="relative">
-              {/*
-                `relative` en el carrusel: los textos .sr-only de las tarjetas
-                son absolutos y, sin él, se posicionaban respecto al div
-                exterior, escapaban del recorte y daban a toda la página en
-                móvil ~1 100 px de scroll horizontal.
-              */}
-              <div
-                ref={trackRef}
-                className="relative flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-              >
-                {reviews.map((review) => (
-                  <ReviewCard key={`${review.source}-${review.id}`} review={review} lang={lang} />
-                ))}
-              </div>
-
-              {reviews.length > 2 && (
-                <div className="mt-4 hidden justify-end gap-2 md:flex">
-                  <button
-                    type="button"
-                    onClick={() => scrollBy(-1)}
-                    aria-label={es ? 'Opiniones anteriores' : 'Previous reviews'}
-                    className="grid h-10 w-10 place-items-center rounded-full border border-line bg-white text-brand transition hover:bg-surface-soft"
-                  >
-                    <ChevronLeft size={18} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => scrollBy(1)}
-                    aria-label={es ? 'Más opiniones' : 'More reviews'}
-                    className="grid h-10 w-10 place-items-center rounded-full border border-line bg-white text-brand transition hover:bg-surface-soft"
-                  >
-                    <ChevronRight size={18} />
-                  </button>
-                </div>
-              )}
-            </div>
+            {/* Tres citas grandes en serif, sin carrusel: se leen de un vistazo y no esconden nada detrás de flechas. */}
+            <ul className="grid gap-10 md:grid-cols-3 md:gap-8">
+              {quotes.map((review) => {
+                const experience = review.experienceTitle
+                  ? experienceNameById(review.experienceId, lang) ?? review.experienceTitle
+                  : null
+                return (
+                  <li key={`${review.source}-${review.id}`} className="flex flex-col border-t border-brand/20 pt-6">
+                    {review.rating !== null && (
+                      <p
+                        className="flex items-center gap-0.5"
+                        aria-label={`${review.rating} ${es ? 'de 5 estrellas' : 'out of 5 stars'}`}
+                      >
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            size={14}
+                            aria-hidden="true"
+                            className={star <= Math.round(review.rating ?? 0) ? 'text-gold' : 'text-line'}
+                            fill={star <= Math.round(review.rating ?? 0) ? '#f4b942' : 'none'}
+                          />
+                        ))}
+                      </p>
+                    )}
+                    <blockquote className="mt-4 flex-1 font-serif text-lg leading-relaxed text-brand md:text-xl">
+                      <p className="line-clamp-[8]">{es ? `«${review.text.trim()}»` : `“${review.text.trim()}”`}</p>
+                    </blockquote>
+                    <p className="mt-6 text-sm font-semibold text-brand">{review.authorName}</p>
+                    {experience && <p className="mt-0.5 text-xs text-muted">{experience}</p>}
+                  </li>
+                )
+              })}
+            </ul>
 
             {summary?.profileUrl && (
-              <div className="mt-8">
+              <div className="mt-12">
                 <a
                   href={summary.profileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-dark"
+                  className="inline-flex items-center gap-2 rounded-control border border-brand/30 px-5 py-3 text-sm font-bold text-brand transition hover:bg-brand hover:text-white"
                 >
                   <GoogleIcon className="h-4 w-4" />
                   {es ? 'Ver todas las opiniones en Google' : 'View all reviews on Google'}
-                  <ArrowRight size={16} />
+                  <ArrowRight size={16} aria-hidden="true" />
                 </a>
               </div>
             )}

@@ -5,7 +5,6 @@ import Link from 'next/link'
 import {
   ArrowRight,
   ArrowUpDown,
-  Check,
   ChevronDown,
   Heart,
   MapPin,
@@ -26,6 +25,7 @@ import { HomeHeader } from '@/components/site/home-header'
 import { DestinationName, DestinationPhoto } from '@/components/destination/destination-transition'
 import { useReviewStats } from '@/components/reviews/use-review-stats'
 import { ExperienceCard } from '@/components/experience/experience-card'
+import { Reveal } from '@/components/ui/reveal'
 import { useFavorites } from '@/components/favorites/use-favorites'
 import {
   applyRefinements,
@@ -41,13 +41,24 @@ import {
   emptyCriteria,
   filterExperiences,
   hasActiveCriteria,
+  isBookableOnline,
   parseLocalDate,
   type Locale,
   type SearchCriteria,
 } from '@/lib/data'
 
-/** Destinos con experiencias; cada uno tiene su página en /destinos/<id>. */
-const DESTINATION_TILES = destinationPages()
+/**
+ * Destinos con experiencias; cada uno tiene su página en /destinos/<id>.
+ * Los primeros de LEAD_ORDER abren la composición de la portada, en ese
+ * orden; el primero va en grande. El resto conserva el orden del catálogo.
+ */
+const LEAD_ORDER = ['volcan-de-santa-ana', 'lago-de-coatepeque', 'suchitoto', 'ruta-de-las-flores', 'el-tunco']
+const DESTINATION_TILES = destinationPages().sort((a, b) => {
+  const rank = (id: string) => (LEAD_ORDER.includes(id) ? LEAD_ORDER.indexOf(id) : LEAD_ORDER.length)
+  return rank(a.destination.id) - rank(b.destination.id)
+})
+/** Destinos visibles antes de pulsar «Ver todos»: uno grande y cuatro medianos. */
+const FEATURED_DESTINATIONS = 5
 
 const SORT_LABEL: Record<SortKey, Record<Locale, string>> = {
   recommended: { ES: 'Recomendadas', EN: 'Recommended' },
@@ -80,6 +91,8 @@ export function HomeView() {
   const [onlySaved, setOnlySaved] = useState(false)
   const [refine, setRefine] = useState<Refinements>(emptyRefinements)
   const [sort, setSort] = useState<SortKey>('recommended')
+  const [allDestinations, setAllDestinations] = useState(false)
+  const visibleTiles = allDestinations ? DESTINATION_TILES : DESTINATION_TILES.slice(0, FEATURED_DESTINATIONS)
   const stats = useReviewStats()
 
   /**
@@ -117,6 +130,9 @@ export function HomeView() {
       ),
     [criteria, refine, onlySaved, favorites, sort, stats],
   )
+
+  const bookable = results.filter(isBookableOnline)
+  const onRequest = results.filter((item) => !isBookableOnline(item))
 
   const isFiltered =
     (applied !== null && hasActiveCriteria(applied)) || onlySaved || hasRefinements(refine)
@@ -243,43 +259,67 @@ export function HomeView() {
         Destinos, justo debajo del buscador: quien llega sin un plan claro
         empieza por el lugar, no por la experiencia.
       */}
-      <section id="destinos" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-        <div className="on-dark rounded-[2rem] bg-brand p-7 text-white md:p-12">
-          <div>
-            <p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-gold-soft">{es ? 'Destinos' : 'Destinations'}</p>
-            <h2 className="max-w-xl text-3xl font-semibold tracking-tight md:text-5xl">
-              {es ? <>Elige a dónde <em className="font-serif font-normal text-gold-deep">ir primero.</em></> : <>Choose where to <em className="font-serif font-normal text-gold-deep">go first.</em></>}
-            </h2>
-            <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/75">
+      <section id="destinos" className="section-y mx-auto max-w-7xl px-5 lg:px-8">
+        <Reveal className="on-dark rounded-[2rem] bg-brand p-7 text-white md:p-12 lg:p-14">
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <div>
+              <p className="eyebrow">{es ? 'Destinos' : 'Destinations'}</p>
+              <h2 className="max-w-xl text-3xl font-semibold tracking-tight md:text-5xl">
+                {es ? <>Elige a dónde <em className="font-serif font-normal text-gold-deep">ir primero.</em></> : <>Choose where to <em className="font-serif font-normal text-gold-deep">go first.</em></>}
+              </h2>
+            </div>
+            <p className="max-w-sm text-sm leading-relaxed text-white/75">
               {es ? 'Cada destino tiene su página con todas sus experiencias.' : 'Each destination has its own page with all of its experiences.'}
             </p>
           </div>
-          <ul className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
-            {DESTINATION_TILES.map((tile) => (
-              <li key={tile.destination.id}>
-                <Link
-                  href={`/destinos/${tile.destination.id}`}
-                  className="group relative block h-40 w-full overflow-hidden rounded-2xl text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
-                >
-                  {/* Foto y nombre se transforman en el héroe de /destinos/[id]: ver DestinationPhoto. */}
-                  <DestinationPhoto id={tile.destination.id} className="absolute inset-0 overflow-hidden rounded-2xl">
-                    <Picture src={tile.image.src} sizes="(min-width: 1024px) 25vw, 50vw" alt={tile.image.alt[language]} loading="lazy" decoding="async" width={320} height={240} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-                    <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-                  </DestinationPhoto>
-                  <span className="absolute inset-x-3 bottom-3">
-                    <DestinationName id={tile.destination.id}>
-                      <span className="block font-semibold leading-tight">{tile.destination.name}</span>
-                    </DestinationName>
-                    <span className="mt-0.5 flex items-center gap-1 text-xs text-white/80">
-                      {tile.experiences.length} {es ? (tile.experiences.length === 1 ? 'experiencia' : 'experiencias') : tile.experiences.length === 1 ? 'experience' : 'experiences'}
-                      <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
+          {/*
+            Composición de revista: un destino protagonista y cuatro
+            secundarios. Los demás esperan detrás de «Ver todos»: trece
+            fotos iguales parecían un directorio, no una invitación.
+          */}
+          <ul id="destinos-lista" className="mt-10 grid auto-rows-[11rem] grid-cols-2 gap-3 md:auto-rows-[13rem] md:grid-cols-4 md:gap-4">
+            {visibleTiles.map((tile, index) => {
+              const lead = index === 0
+              return (
+                <li key={tile.destination.id} className={lead ? 'col-span-2 row-span-2' : ''}>
+                  <Link
+                    href={`/destinos/${tile.destination.id}`}
+                    className="group relative block h-full w-full overflow-hidden rounded-card text-left"
+                  >
+                    {/* Foto y nombre se transforman en el héroe de /destinos/[id]: ver DestinationPhoto. */}
+                    <DestinationPhoto id={tile.destination.id} className="absolute inset-0 overflow-hidden rounded-card">
+                      <Picture src={tile.image.src} sizes={lead ? '(min-width: 768px) 50vw, 100vw' : '(min-width: 768px) 25vw, 50vw'} alt={tile.image.alt[language]} loading="lazy" decoding="async" width={lead ? 960 : 480} height={lead ? 720 : 360} className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.04]" />
+                      <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                    </DestinationPhoto>
+                    <span className={`absolute inset-x-4 bottom-4 ${lead ? 'md:inset-x-6 md:bottom-6' : ''}`}>
+                      <span className="block text-[11px] font-semibold uppercase tracking-[.16em] text-white/75">{tile.destination.region[language]}</span>
+                      <DestinationName id={tile.destination.id}>
+                        <span className={`mt-0.5 flex items-center gap-1.5 font-semibold leading-tight ${lead ? 'text-2xl md:text-4xl' : 'text-base'}`}>
+                          {tile.destination.name}
+                          <ArrowRight size={lead ? 22 : 14} className="shrink-0 transition group-hover:translate-x-1" aria-hidden="true" />
+                        </span>
+                      </DestinationName>
                     </span>
-                  </span>
-                </Link>
-              </li>
-            ))}
+                  </Link>
+                </li>
+              )
+            })}
           </ul>
-        </div>
+          {DESTINATION_TILES.length > FEATURED_DESTINATIONS && (
+            <button
+              type="button"
+              onClick={() => setAllDestinations((value) => !value)}
+              aria-expanded={allDestinations}
+              aria-controls="destinos-lista"
+              className="mt-8 inline-flex items-center gap-2 rounded-control border border-white/40 px-5 py-3 text-sm font-bold text-white transition hover:border-white hover:bg-white/10"
+            >
+              {allDestinations
+                ? es ? 'Ver menos destinos' : 'Show fewer destinations'
+                : es ? `Ver los ${DESTINATION_TILES.length} destinos` : `See all ${DESTINATION_TILES.length} destinations`}
+              <ChevronDown size={16} className={`transition ${allDestinations ? 'rotate-180' : ''}`} aria-hidden="true" />
+            </button>
+          )}
+        </Reveal>
       </section>
 
       {/*
@@ -293,13 +333,16 @@ export function HomeView() {
       {/* Reels: debajo de los servicios principales, antes del catálogo. */}
       <ReelsSection />
 
-      <section id="experiencias" className="mx-auto max-w-7xl px-5 pb-20 pt-14 lg:px-8">
-        <div className="mb-8 flex items-end justify-between gap-4">
+      <section id="experiencias" className="section-y mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="mb-10 flex items-end justify-between gap-4">
           <div>
-            <p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-accent">{es ? 'Para empezar' : 'To get started'}</p>
-            <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
+            <p className="eyebrow">{es ? 'Imperdibles' : 'Must-dos'}</p>
+            <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
               {es ? <>Experiencias que <em className="font-serif font-normal">dejan huella</em></> : <>Experiences that <em className="font-serif font-normal">leave a mark</em></>}
             </h2>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted">
+              {es ? 'Reserva en línea con confirmación inmediata, o pídenos una a tu medida.' : 'Book online with instant confirmation, or ask us for one made to measure.'}
+            </p>
           </div>
           <div className="flex shrink-0 items-center gap-3">
             <p className="sr-only text-sm text-muted sm:not-sr-only" aria-live="polite">
@@ -319,7 +362,7 @@ export function HomeView() {
         </div>
 
         {/* Filtros finos y orden: en móvil se deslizan en horizontal. */}
-        <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="mb-10 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           {/* `relative`: sin él, el .sr-only de "Precio máximo" se posiciona respecto a <body>, escapa del recorte y ensancha toda la página en móvil. */}
           <div className="relative -mx-1 flex items-center gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]" role="group" aria-label={es ? 'Filtros' : 'Filters'}>
             <SlidersHorizontal size={16} className="shrink-0 text-muted" aria-hidden="true" />
@@ -400,23 +443,63 @@ export function HomeView() {
           </div>
         )}
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {results.map((item) => (
-            <ExperienceCard
-              key={item.id}
-              item={item}
-              lang={language}
-              stats={stats}
-              now={now}
-              saved={favorites.includes(item.id)}
-              onToggleSave={toggleFavorite}
-              bookQuery={bookQuery}
-            />
-          ))}
-        </div>
+        {/*
+          Dos grupos con dos pesos distintos. Arriba, grandes, los tours que
+          se reservan y pagan aquí: son lo que la web vende. Debajo, más
+          sobrios, los que se cotizan. Los filtros y el orden se aplican a
+          los dos por igual.
+        */}
+        {bookable.length > 0 && (
+          <div className="grid gap-x-8 gap-y-12 md:grid-cols-2">
+            {bookable.map((item) => (
+              <ExperienceCard
+                key={item.id}
+                item={item}
+                lang={language}
+                stats={stats}
+                now={now}
+                saved={favorites.includes(item.id)}
+                onToggleSave={toggleFavorite}
+                bookQuery={bookQuery}
+                variant="feature"
+              />
+            ))}
+          </div>
+        )}
+
+        {onRequest.length > 0 && (
+          <div className={bookable.length > 0 ? 'mt-20 border-t border-line pt-12' : ''}>
+            {bookable.length > 0 && (
+              <div className="mb-8 max-w-2xl">
+                <h3 className="text-2xl font-semibold tracking-tight">
+                  {es ? <>Experiencias <em className="font-serif font-normal">a medida</em></> : <>Tailor-made <em className="font-serif font-normal">experiences</em></>}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">
+                  {es
+                    ? 'Las organizamos para tu grupo. Te confirmamos fecha y precio final por WhatsApp o correo.'
+                    : 'We organize them for your group. We confirm the date and final price by WhatsApp or email.'}
+                </p>
+              </div>
+            )}
+            <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+              {onRequest.map((item) => (
+                <ExperienceCard
+                  key={item.id}
+                  item={item}
+                  lang={language}
+                  stats={stats}
+                  now={now}
+                  saved={favorites.includes(item.id)}
+                  onToggleSave={toggleFavorite}
+                  bookQuery={bookQuery}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {results.length === 0 && (
-          <div className="rounded-2xl bg-white p-10 text-center shadow-card">
+          <div className="rounded-card border border-line bg-white p-10 text-center">
             <p className="text-lg font-semibold text-brand">
               {es ? 'No encontramos experiencias con estos criterios.' : 'No experiences match these filters.'}
             </p>
@@ -425,7 +508,7 @@ export function HomeView() {
             </p>
             <button
               onClick={resetAll}
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-bold text-white transition hover:bg-accent-dark"
+              className="mt-6 inline-flex items-center gap-2 rounded-control bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-dark"
             >
               <RotateCcw size={16} />
               {es ? 'Limpiar filtros' : 'Clear filters'}
@@ -436,7 +519,39 @@ export function HomeView() {
 
       <ReviewsSection />
 
-      <section id="como-funciona" className="bg-surface-mint py-20"><div className="mx-auto max-w-7xl px-5 lg:px-8"><div className="grid items-center gap-12 lg:grid-cols-[.9fr_1.1fr]"><div><p className="mb-2 text-sm font-bold uppercase tracking-[.18em] text-accent">{es ? 'Viajar es fácil' : 'Travel made easy'}</p><h2 className="max-w-md text-3xl font-semibold tracking-tight md:text-4xl">{es ? <>Lo local se vive <em className="font-serif font-normal">mejor.</em></> : <>Local is simply <em className="font-serif font-normal">better.</em></>}</h2><p className="mt-5 max-w-md leading-relaxed text-muted">{es ? 'Conectamos tus ganas de explorar con quienes conocen cada rincón de El Salvador. Tú eliges el plan, nosotros cuidamos los detalles.' : 'We connect your urge to explore with the people who know every corner of El Salvador. You pick the plan, we handle the details.'}</p><a href="#experiencias" className="mt-7 inline-flex items-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">{es ? 'Elegir mi experiencia' : 'Choose my experience'} <ArrowRight size={17} /></a></div><div className="grid gap-4 sm:grid-cols-3">{(es ? [['01','Elige','Encuentra el destino o experiencia que te mueve.'],['02','Reserva','Confirma en pocos pasos y recibe todo al instante.'],['03','Disfruta','Vive el momento con anfitriones locales.']] : [['01','Choose','Find the destination or experience that moves you.'],['02','Book','Confirm in a few steps and get everything instantly.'],['03','Enjoy','Live the moment with local hosts.']]).map(([number, title, description]) => <div key={number} className="rounded-2xl bg-white p-5"><span className="text-4xl font-light text-gold-ink">{number}</span><h3 className="mt-8 font-semibold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-muted">{description}</p><Check className="mt-5 text-accent" size={19} /></div>)}</div></div></div></section>
+      <section id="como-funciona" className="section-y bg-sand">
+        <Reveal className="mx-auto max-w-7xl px-5 lg:px-8">
+          <div className="grid items-end gap-12 lg:grid-cols-[.9fr_1.1fr]">
+            <div>
+              <p className="eyebrow">{es ? 'Viajar es fácil' : 'Travel made easy'}</p>
+              <h2 className="max-w-md text-3xl font-semibold tracking-tight md:text-5xl">
+                {es ? <>Lo local se vive <em className="font-serif font-normal">mejor.</em></> : <>Local is simply <em className="font-serif font-normal">better.</em></>}
+              </h2>
+              <p className="mt-5 max-w-md leading-relaxed text-muted">
+                {es
+                  ? 'Conectamos tus ganas de explorar con quienes conocen cada rincón de El Salvador. Tú eliges el plan, nosotros cuidamos los detalles.'
+                  : 'We connect your urge to explore with the people who know every corner of El Salvador. You pick the plan, we handle the details.'}
+              </p>
+              <a href="#experiencias" className="mt-8 inline-flex items-center gap-2 rounded-control bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">
+                {es ? 'Elegir mi experiencia' : 'Choose my experience'} <ArrowRight size={17} aria-hidden="true" />
+              </a>
+            </div>
+            {/* Pasos sin caja: una línea arriba y el número en serif bastan para ordenarlos. */}
+            <ol className="grid gap-8 sm:grid-cols-3 sm:gap-6">
+              {(es
+                ? [['01', 'Elige', 'Encuentra el destino o experiencia que te mueve.'], ['02', 'Reserva', 'Confirma en pocos pasos y recibe todo al instante.'], ['03', 'Disfruta', 'Vive el momento con anfitriones locales.']]
+                : [['01', 'Choose', 'Find the destination or experience that moves you.'], ['02', 'Book', 'Confirm in a few steps and get everything instantly.'], ['03', 'Enjoy', 'Live the moment with local hosts.']]
+              ).map(([number, title, description]) => (
+                <li key={number} className="border-t border-brand/20 pt-5">
+                  <span className="font-serif text-4xl text-gold-ink" aria-hidden="true">{number}</span>
+                  <h3 className="mt-4 font-semibold">{title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">{description}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </Reveal>
+      </section>
 
       <SiteFooter />
     </main>
