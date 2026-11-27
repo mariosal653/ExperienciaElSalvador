@@ -75,7 +75,7 @@ export function AdminLoginForm() {
   return (
     <div className="w-full max-w-md rounded-2xl bg-white p-7 shadow-float md:p-9">
       <div className="mb-7 flex items-center gap-2.5">
-        <LogoMark className="h-9 w-9 shrink-0 rounded-[28%] ring-1 ring-black/5" />
+        <LogoMark className="h-8 w-auto shrink-0" />
         <span className="text-lg font-bold tracking-tight text-brand">
           Experiences in <span className="text-accent">El Salvador</span>
         </span>
@@ -84,7 +84,7 @@ export function AdminLoginForm() {
       <h1 className="text-2xl font-semibold tracking-tight text-brand">Panel de administración</h1>
       <p className="mt-1.5 text-sm text-muted">Acceso restringido al equipo.</p>
 
-      <form onSubmit={onSubmit} className="mt-7 grid gap-4" noValidate>
+      <form onSubmit={onSubmit} className="mt-7 grid grid-cols-1 gap-4" noValidate>
         <div>
           <label htmlFor="admin-email" className="text-sm font-semibold text-brand">
             Correo
@@ -118,7 +118,7 @@ export function AdminLoginForm() {
               type="button"
               onClick={() => setVisible((value) => !value)}
               aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-              className="absolute right-3 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-lg text-muted transition hover:bg-surface-soft"
+              className="absolute right-3 top-1/2 grid grid-cols-1 h-8 w-8 -translate-y-1/2 place-items-center rounded-lg text-muted transition hover:bg-surface-soft"
             >
               {visible ? <EyeOff size={17} /> : <Eye size={17} />}
             </button>

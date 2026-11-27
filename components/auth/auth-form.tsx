@@ -217,7 +217,7 @@ export function AuthForm({ mode, socialProviders }: { mode: Mode; socialProvider
   return (
     <div className="w-full max-w-md rounded-2xl bg-white p-7 shadow-float md:p-9">
       <div className="mb-7 flex items-center gap-2.5">
-        <LogoMark className="h-9 w-9 shrink-0 rounded-[28%] ring-1 ring-black/5" />
+        <LogoMark className="h-8 w-auto shrink-0" />
         <span className="text-lg font-bold tracking-tight text-brand">
           Experiences in <span className="text-accent">El Salvador</span>
         </span>

@@ -114,7 +114,7 @@ export function TicketValidation({
       <div className="mx-auto max-w-md">
         <div className="mb-5 flex items-center justify-between gap-3">
           <span className="flex items-center gap-2 font-bold">
-            <LogoMark className="h-8 w-8 shrink-0 rounded-[28%] ring-1 ring-black/5" />
+            <LogoMark className="h-7 w-auto shrink-0" />
             Experiences in <span className="text-accent">El Salvador</span>
           </span>
           <div className="rounded-full bg-brand p-0.5">

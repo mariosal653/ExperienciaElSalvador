@@ -25,7 +25,7 @@ export function SiteHeader({ compact = false }: { compact?: boolean }) {
     <header className="no-print sticky top-0 z-40 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white sm:px-4">
       <div className="liquid-glass-tinted mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-full py-2 pl-2.5 pr-2.5 sm:pl-3 sm:pr-3">
         <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label={es ? 'Experiences in El Salvador · Inicio' : 'Experiences in El Salvador · Home'}>
-          <LogoMark className="h-8 w-8 shrink-0 rounded-[28%] ring-1 ring-white/30" />
+          <LogoMark tone="onDark" className="h-7 w-auto shrink-0" />
           <span className="truncate text-base font-bold tracking-tight">
             Experiences in <span className="text-gold">El Salvador</span>
           </span>
